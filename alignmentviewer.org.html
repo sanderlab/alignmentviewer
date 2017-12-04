@@ -736,8 +736,8 @@
 		<span class='title tc1'>alignment</span><span class='title tc2'>viewer</span><span class='title tc3'>.org</span><br>
 		<span style='line-height:96%'>
 		<span class='title title2 tc1'>protein multiple sequence alignment visualization & analysis</span><br>
-		<span class='title title2 tc2'>in-browser computationally intensive tool, Chrome/Firefox browser required</span><br>
-		<span class='tiny tc3'>release 0.8 beta</span><br></span><br>
+		<span class='title title2 tc2'>in-browser computationally intensive tool, Firefox or Chrome browsers prefered</span><br>
+		<span class='tiny tc3'>release 1.0</span><br></span><br>
 
 		<a class='button btnPressed' id='btn1'>about</a>
 		<span id='buttons' style='display:none;'>
@@ -745,7 +745,7 @@
 			<a class='button btnReleased' id='btn2'>msa view</a> <span class='tc2'>|</span>
 			<a class='button btnReleased' id='btn4'>image view</a> <span class='tc2'>|</span>
 			<a class='button btnReleased' id='btn3'>stats view</a> <span class='tc2'>|</span>
-			<a class='button btnReleased' id='btn6'>species</a> <span class='tc2'>|</span>
+			<!-- <a class='button btnReleased' id='btn6'>species</a> <span class='tc2'>|</span> -->
 			<a class='button btnReleased' id='btn5'>custom data </a>
 		</span><br><span style='font-size:3px;'><br></span>
 
@@ -756,10 +756,13 @@
 		Drag and drop to this page or load below multiple sequence<br>
 		alignment file in plain text, STOCKHOLM or FASTA format.<br>
 		Or use example alignment:
-			<a onclick="PullMsaExample(1)">1bkr:A</a>,
+			<a href='http://awabi.cbio.mskcc.org/alignmentviewer/1bkr_A.1-108.msa.txt'>1bkr:A</a>
+			<a href='http://awabi.cbio.mskcc.org/alignmentviewer/MYG_PHYMC.1-154.msa.txt'>MYG</a>
+			<a href='http://awabi.cbio.mskcc.org/alignmentviewer/BLAT_ECOLX.1-286.msa.txt'>BLAT</a>
+<!--			<a onclick="PullMsaExample(1)">1bkr:A</a>,
 			<a onclick="PullMsaExample(2)">MYG</a>,
-<!--			<a onclick="PullMsaExample(3)">EGFR</a>, -->
-			<a onclick="PullMsaExample(4)">BLAT</a><br>
+			<a onclick="PullMsaExample(3)">EGFR</a>, 
+			<a onclick="PullMsaExample(4)">BLAT</a><br>-->
 		<span style='font-size:5px;'><br></span></span>
 		<input type="file" class='filectrl' id="files" size='40'><br>
 	</td></tr>
@@ -997,30 +1000,37 @@
 
 <table border='0' cellpadding='1' cellspacing='1' style='display:block;' id="ABTview">
 <tr><td class='text'>
-<br>Protein multilple sequence alignment viewer provides simple analysis plots and pairwise identity visualization.<br><br>
+<br>Protein multiple sequence alignment viewer provides simple analysis plots and pairwise identity visualization. <br>
+This tool is entirely client based (runs inside your browser, Firefox or Chrome browsers prefered), there is no communication<br>
+with the server (except when pulling example alignments), so you can save local copy of this page and use it while offline.<br><br>
 
-This tool is entirely client based (runs inside your browser, Chrome/Firefox browser required), there is no communication<br>
-with the server (except when pulling example alignments), so you can save local copy of this page and use it while offline.<br>
 
-<h4><b>Privacy Policy</b></h4>
-This website makes use of google analytics to measure website visits and traffic patterns through the use of browser cookies. There is no advertising on this site. For a full description, see <a href='http://www.google.com/policies/privacy/partners/'>www.google.com/policies/privacy/partners/</a>.
-&nbsp;<br>
-Visitors who disable cookies on their browser or use private/incognito browsing should still be able to access the full functionality of this website.<br><br>
+If you have any questions or requests please don't hesitate to contact me: Roc Reguant (roc@hms.harvard.edu) <br>
+The source code for this tool is at: <a href='https://github.com/dfci/alignmentviewer'>https://github.com/dfci/alignmentviewer</a>.
 
-If you have any questions or requests please don't hesitate to contact me: Yevgeniy Antipin
 <!--
 <img style='vertical-align:text-bottom;' src='yamail.png'>
 -->
 
 <br><br><hr height=2 width='300' color='#d0d0d0' align='left'><br><br>
 
+<b>Nov.29th&nbsp;&nbsp;2017</b> /// Released version 1.0<br><br>
+<b>Jul.5th&nbsp;&nbsp;2017</b> /// Mutation comparison added.<br><br>
 <b>May.20th&nbsp;&nbsp;2017</b> /// Weight comparison functions added.<br><br>
 <b>Mar.17th&nbsp;&nbsp;2014</b> /// Sequence logo display added.<br><br>
 <b>Jan.2nd&nbsp;&nbsp;2013</b> /// Filtering and export supported.<br><br>
 <b>Dec.24th 2012</b> /// Custom sequence annotation as sortable msa column supported now, see "Custom Data" tab.<br><br>
 <b>Dec.13th 2012</b> /// Added MSA image rendering with mview or hydrophobicity coloring.<br><br>
 <b>Nov.11th 2012</b> /// Release 0.5 is out, changes: sorting by identity, conservation coloring control, Pfam links, drag and drop your alignment file anywhere on the page to load!
-<br><br><br>
+
+
+
+<br><br><br><hr height=2 width='300' color='#d0d0d0' align='left'><br>
+
+<h4><b>Privacy Policy</b></h4>
+This website makes use of google analytics to measure website visits and traffic patterns through the use of browser cookies. There is no advertising on this site. For a full description, see <a href='http://www.google.com/policies/privacy/partners/'>www.google.com/policies/privacy/partners/</a>.
+&nbsp;<br>
+Visitors who disable cookies on their browser or use private/incognito browsing should still be able to access the full functionality of this website.<br><br>
 
 </td></tr>
 </table>
