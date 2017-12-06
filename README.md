@@ -15,6 +15,5 @@ You can see how it works by using an example situated in the examples folder.
 
 # Run with Docker
 ```
-docker build -t cannin/alignmentviewer .
 docker rm -f alignmentviewer; docker run --name alignmentviewer -p 8080:8080 -w /src -t cannin/alignmentviewer
 ```
