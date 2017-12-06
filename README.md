@@ -6,7 +6,7 @@ Protein multiple sequence alignment visualization & analysis
 
 AlignmentViewer runs completely locally. There is no installation beyond downloading the files and using a compatible browser.
 
-Clone directory locally and open "alignmentviewer.org.html"
+Clone directory locally and open "index.html"
 
 You can also use it without cloning the repository by accessing http://alignmentviewer.org
 
