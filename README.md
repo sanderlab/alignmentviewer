@@ -17,3 +17,13 @@ You can see how it works by using an example situated in the examples folder.
 ```
 docker rm -f alignmentviewer; docker run --name alignmentviewer -p 8080:8080 -w /src -t cannin/alignmentviewer
 ```
+
+# Contributors
+
+EVcouplings is developed in the lab of [Chris Sander](http://sanderlab.org/) at Harvard Medical School and Dana-Farber Cancer Institute.
+
+* [Roc Reguant](mailto:roc@hms.harvard.edu) (development lead)
+* Jenya Antipin
+* Rob Sheridan
+* Augustin Luna
+* Chris Sander
