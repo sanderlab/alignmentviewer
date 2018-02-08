@@ -153,7 +153,7 @@
 
 	// _________________________________________________________________________________________________________________________________
 
-	var btn2view = { 'btn1':'#ABTview', 'btn2':'#MSAview', 'btn3':'#STAview', 'btn4':'#IMGview', 'btn5':'#DATview', 'btn6':'#SPEview' };
+	var btn2view = { 'btn1':'#ABTview', 'btn2':'#MSAview', 'btn3':'#STAview', 'btn4':'#IMGview', 'btn5':'#DATview', 'btn6':'#SPEview', 'btn7':'#couplings'  };
 
 	$(document).ready(function() {
 		// some say this works for FF and Chrome only so we're providing FILE input control as well
@@ -162,6 +162,7 @@
 		document.documentElement.ondrop = handleFileSelect;
 		document.getElementById('files').addEventListener('change', handleFileSelect, false);
 		document.getElementById('customdata').addEventListener('change', handleCustomFileSelect, false);
+		document.getElementById('customdata2').addEventListener('change', handleCustomFileSelectCouplings, false);
 
 		// on-click computing pair-wise identity
 		$('#pairwise_start_btn').click(function(event) { msa.togglePairwiseIdentity(); });
@@ -444,6 +445,7 @@
 		$('#colorSlider').slider('option', 'value', colorSliderDflt);
 		$('#order').val('orderOrig');
 		$('#customdata').val('');								// clear path in custom data file control
+		$('#customdata2').val('');								// clear path in custom data file control
 		$('#order option[value="orderCustomAW"]').remove();		// remove sorting option from msa order dropdown
 		$('#order option[value="orderCustomBW"]').remove();		// remove sorting option from msa order dropdown
 		$("#MSAcustomAH").text('')
@@ -625,7 +627,7 @@
 		r.readAsText(f);
 		return false;
 	}
-	function handleCustomFileSelect2(evt) {
+	function handleCustomFileSelect(evt) {
 		evt.stopPropagation(); evt.preventDefault();
 		var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
 		if (!f) return;
@@ -648,20 +650,20 @@
 		r.readAsText(f);
 		return false;
 	}
-	function handleCustomFileSelect(evt) {
+	function handleCustomFileSelectCouplings(evt) {
 		evt.stopPropagation(); evt.preventDefault();
 		var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
 		if (!f) return;
 		var r = new FileReader();
 		r.onload = function(e) {
-			msa.loadCustomMsaDataFile(e.target.result, function() {
-				$('#cdatStatus2').html('mapped ' + msa.customweightsN );
+			msa.loadCouplingsDataFile(e.target.result, function() {
+				$('#cdatStatus2').html('mapped ' + msa.couplingsN );
 				console.log('>>> got the couplings');
 				var aux = {};
-				aux.A = new Array(1);
-			    aux.B = new Array(1);
-			    aux.A[0] = 2;
-			    aux.B[0] = 6;
+				aux.A = msa.A;
+			    aux.B = msa.B;
+			    console.log(msa.A);
+			    console.log(aux.B);
 			    var len = msa.getNormalizedColumnProportions().length;
 				var couplingsLogoDiagram = new CouplingsLogoDiagramD3({elementId: "couplingslogo", elementWidth: msaTextblockWidth, elementHeight: 48}, aux, len);
 				couplingsLogoDiagram.initDiagram();
@@ -767,8 +769,9 @@
 			<a class='button btnReleased' id='btn2'>msa view</a> <span class='tc2'>|</span>
 			<a class='button btnReleased' id='btn4'>image view</a> <span class='tc2'>|</span>
 			<a class='button btnReleased' id='btn3'>stats view</a> <span class='tc2'>|</span>
+			<a class='button btnReleased' id='btn5'>custom weights </a><span class='tc2'>|</span>
 			<!-- <a class='button btnReleased' id='btn6'>species</a> <span class='tc2'>|</span> -->
-			<a class='button btnReleased' id='btn5'>custom data </a>
+			<a class='button btnReleased' id='btn7'>Load couplings </a>
 		</span><br><span style='font-size:3px;'><br></span>
 
 	</td><td align='right' valign='bottom' width='99%' nowrap>

@@ -680,16 +680,15 @@
 			if (!this.h) return;
 			var t = text.split(/[\r\n]/g);
 			if (!t.length) return;
-			this.couplings.A = new Array(this.h);
-			this.couplings.B = new Array(this.h);
-			var i = 0;
+			this.A = new Array(t);
+			this.B = new Array(t);
 			for(var row in t) {
 				var w = t[row].split("\t");
+				console.log(w);
 				if (w.length < 2 || w.length > 3) continue;
-				if (!this.seqname2idx.hasOwnProperty(w[0])) continue;
-				this.couplings.A[i] = w[1];
-				this.couplings.B[i] = w[2];
-				i = i + 1;
+				this.A[this.couplingsN] = w[0];
+				this.B[this.couplingsN] = w[1];
+				this.couplingsN = this.couplingsN + 1;
 			}
 
 
