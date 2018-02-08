@@ -55,12 +55,11 @@ CouplingsLogoDiagramD3.prototype.drawDiagram = function(svg, bounds, options, de
 
 // addcolumnToPlot()
 // given a plot group (g) element, add a column to it
-CouplingsLogoDiagramD3.prototype.addColumnToPlot = function(plotGroup, options, columnIndexA, columnIndexB) {
+CouplingsLogoDiagramD3.prototype.addColumnToPlot = function(plotGroup, options, columnIndexA, columnIndexB, symbolCode) {
         var self = this;
         nextcolA = plotGroup.append("g").attr("transform","translate(" + (100 * columnIndexA) + ",0)");
         nextcolB = plotGroup.append("g").attr("transform","translate(" + (100 * columnIndexB) + ",0)");
         var columnFloorLevel = 100;
-        var symbolCode = "A";
         var symbolProportion = 1;
         columnFloorLevel -= symbolProportion * 100;
         nextcolA.append("g").attr("transform","matrix(1,0,0," + symbolProportion + ",0," + columnFloorLevel + ")").append("use").attr("xlink:href","#" + symbolCode);
@@ -75,7 +74,10 @@ CouplingsLogoDiagramD3.prototype.drawPlot = function(svg, options, bounds, xScal
         var columnCount = self.seqLen;
         if (columnCount == 0) {return;}
         plotGroup = svg.append("g").attr("transform","matrix(" + (this.options.elementWidth / columnCount / 100) + ",0,0," + (this.options.elementHeight / 100) + ",0,0)");
-        for (var col = 0; col < this.rawData.A.length; col++) {
-                this.addColumnToPlot(plotGroup, options, this.rawData.A[col], this.rawData.B[col]);
+        var symbolCodes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']; //['+','*','#', '@', '$', "&", "?", '%'];
+        for (var col = 0; col < this.rawData.A.length && col < symbolCodes.length; col++) {
+                this.addColumnToPlot(plotGroup, options, this.rawData.A[col], this.rawData.B[col], symbolCodes[col]);
         }
 }
+
+
