@@ -126,6 +126,7 @@
 <link type="text/css" href="seqlib.css" rel="stylesheet" />
 <script type="text/javascript" src="seqlib.js"></script>
 <script type="text/javascript" src="SequenceLogoDiagramD3.js"></script>
+<script type="text/javascript" src="CouplingsLogoDiagramD3.js"></script>
 
 <script type="text/javascript">
 
@@ -624,7 +625,7 @@
 		r.readAsText(f);
 		return false;
 	}
-	function handleCustomFileSelect(evt) {
+	function handleCustomFileSelect2(evt) {
 		evt.stopPropagation(); evt.preventDefault();
 		var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
 		if (!f) return;
@@ -643,6 +644,27 @@
 				$("#MSAcustomBH").text('custom data B')
 				console.log($("#MSAcustomAH").text)
 				console.log('>>> got some sorted custom weights....');
+			}); }
+		r.readAsText(f);
+		return false;
+	}
+	function handleCustomFileSelect(evt) {
+		evt.stopPropagation(); evt.preventDefault();
+		var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
+		if (!f) return;
+		var r = new FileReader();
+		r.onload = function(e) {
+			msa.loadCustomMsaDataFile(e.target.result, function() {
+				$('#cdatStatus2').html('mapped ' + msa.customweightsN );
+				console.log('>>> got the couplings');
+				var aux = {};
+				aux.A = new Array(1);
+			    aux.B = new Array(1);
+			    aux.A[0] = 2;
+			    aux.B[0] = 6;
+			    var len = msa.getNormalizedColumnProportions().length;
+				var couplingsLogoDiagram = new CouplingsLogoDiagramD3({elementId: "couplingslogo", elementWidth: msaTextblockWidth, elementHeight: 48}, aux, len);
+				couplingsLogoDiagram.initDiagram();
 			}); }
 		r.readAsText(f);
 		return false;
@@ -852,6 +874,20 @@
 
 <!-- ______________________________________________________ MSA custom data view ___________________________________________ -->
 
+<table id="couplings" border='0' cellpadding='1' cellspacing='1' style='display:none;'>
+<tr><td class='text'>
+
+	Load the couplings already sorted by strength. The residues start from the position 0.<br>
+	File format is tab-separated text file with two columns:
+	the position numbers of the coupled residues (position A contacts position B)<br>
+	Not all positions have to be present and only few will be displayed.<br><br>
+	<input type="file" class='filectrl' id="customdata2" size='40'><br>
+	<br><div id='cdatStatus2'></div>
+
+</td></tr></table>
+
+<!-- ______________________________________________________ MSA custom couplings view ___________________________________________ -->
+
 <table id="DATview" border='0' cellpadding='1' cellspacing='1' style='display:none;'>
 <tr><td class='text'>
 
@@ -945,6 +981,8 @@
 	</td>
 </tr><tr>														<!-- ___ MSA logo  __________ -->
 	<td colspan='12'></td><td align='left' nowrap><div id="seqlogo"> </div> </td>
+</tr><tr>														<!-- ___ MSA logo  __________ -->
+	<td colspan='12'></td><td align='left' nowrap><div id="couplingslogo"> </div> </td>
 </tr><tr>
 	<td align='right' nowrap>									<!-- ___ MSA header/plots ___ -->
 	</td><td align='right' nowrap>
@@ -1006,7 +1044,7 @@ This tool is entirely client based (runs inside your browser, Firefox or Chrome 
 with the server (except when pulling example alignments), so you can save local copy of this page and use it while offline.<br><br>
 
 
-If you have any questions or requests please don't hesitate to contact me: Roc Reguant (roc@hms.harvard.edu) <br>
+If you have any questions or requests please don't hesitate to contact us at alignmentviewer@gmail.com<br>
 The source code for this tool is at: <a href='https://github.com/dfci/alignmentviewer'>https://github.com/dfci/alignmentviewer</a>.
 
 <!--

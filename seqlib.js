@@ -643,6 +643,8 @@
 				this.customweightsB[i] = w[2];
 			}
 
+
+
 			var n_customweightsB = 0; // I have not decided a function for non 100% matching sequences between A and B
 			for(var k=0; k<this.h; k++) {
 				if (!isset(this.customweightsA[k])) this.customweightsA[k] = {i:k, v:''};
@@ -666,6 +668,30 @@
 			this.hcustomwB = '';
 			for(var i=this.page.from; i<this.page.to; i++)		// this.orderby.length
 				this.hcustomwB += this.customweightsB[this.orderby[i]].v + '<br>';
+
+			UIcallback();
+		},
+		// --- Load couplings for the alignment -------------------------------
+		//
+		// It loads the couplings sorted by importance to the user
+		//
+		loadCouplingsDataFile : function(text, UIcallback) {
+			this.couplingsN = 0;	// how many mapped
+			if (!this.h) return;
+			var t = text.split(/[\r\n]/g);
+			if (!t.length) return;
+			this.couplings.A = new Array(this.h);
+			this.couplings.B = new Array(this.h);
+			var i = 0;
+			for(var row in t) {
+				var w = t[row].split("\t");
+				if (w.length < 2 || w.length > 3) continue;
+				if (!this.seqname2idx.hasOwnProperty(w[0])) continue;
+				this.couplings.A[i] = w[1];
+				this.couplings.B[i] = w[2];
+				i = i + 1;
+			}
+
 
 			UIcallback();
 		},
