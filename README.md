@@ -22,7 +22,7 @@ docker rm -f alignmentviewer; docker run --name alignmentviewer -p 8080:8080 -w 
 
 EVcouplings is developed in the lab of [Chris Sander](http://sanderlab.org/) at Harvard Medical School and Dana-Farber Cancer Institute.
 
-* [Roc Reguant](mailto:roc@hms.harvard.edu) (development lead)
+* [Roc Reguant](mailto:alignmentviewer@gmail.com) (development lead)
 * Jenya Antipin
 * Rob Sheridan
 * Augustin Luna
