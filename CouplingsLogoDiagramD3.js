@@ -59,11 +59,24 @@ CouplingsLogoDiagramD3.prototype.addColumnToPlot = function(plotGroup, options, 
         var self = this;
         nextcolA = plotGroup.append("g").attr("transform","translate(" + (100 * columnIndexA) + ",0)");
         nextcolB = plotGroup.append("g").attr("transform","translate(" + (100 * columnIndexB) + ",0)");
+
+        nextcolC = plotGroup.append("g").attr("transform","translate(" + (100 * columnIndexB) + ",0)");
+
         var columnFloorLevel = 100;
         var symbolProportion = 1;
         columnFloorLevel -= symbolProportion * 100;
         nextcolA.append("g").attr("transform","matrix(1,0,0," + symbolProportion + ",0," + columnFloorLevel + ")").append("use").attr("xlink:href","#" + symbolCode);
         nextcolB.append("g").attr("transform","matrix(1,0,0," + symbolProportion + ",0," + columnFloorLevel + ")").append("use").attr("xlink:href","#" + symbolCode);
+
+
+        circleData = [  { "cx": 20, "cy": 20, "radius": 30, "color" : "green" },  { "cx": 70, "cy": 70, "radius": 20, "color" : "purple" }];
+        nextcolC.append("g").attr("transform","matrix(1,0,0," + symbolProportion + ",0," + columnFloorLevel + ")").selectAll("circle").data(circleData).enter().append("circle");
+
+        circleAttributes = nextcolC
+                        .attr("cx", function (d) { return d.cx; })
+                        .attr("cy", function (d) { return d.cy; })
+                        .attr("r", function (d) { return d.radius; })
+                        .style("fill", function (d) { return d.color; });
 }
 
 // drawPlot()
@@ -73,10 +86,24 @@ CouplingsLogoDiagramD3.prototype.drawPlot = function(svg, options, bounds, xScal
         if (this.rawData == null) {return;}
         var columnCount = self.seqLen;
         if (columnCount == 0) {return;}
-        plotGroup = svg.append("g").attr("transform","matrix(" + (this.options.elementWidth / columnCount / 100) + ",0,0," + (this.options.elementHeight / 100) + ",0,0)");
-        var symbolCodes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']; //['+','*','#', '@', '$', "&", "?", '%'];
-        for (var col = 0; col < this.rawData.A.length && col < symbolCodes.length; col++) {
-                this.addColumnToPlot(plotGroup, options, this.rawData.A[col], this.rawData.B[col], symbolCodes[col]);
+        plotGroup = svg.append("g").attr("transform","matrix(" + ((this.options.elementWidth) / columnCount / 100) + ",0,0," + (this.options.elementHeight / 100) + ",0,0)");
+        var colors = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"]; // http://bl.ocks.org/aaizemberg/78bd3dade9593896a59d
+        for (var col = 0; col < this.rawData.A.length && col < colors.length; col++) {
+//                this.addColumnToPlot(plotGroup, options, this.rawData.A[col], this.rawData.B[col], symbolCodes[col]);
+
+            var circleDataA = [ { "cx": -60, "cy": 50, "radius": 40, "color" : colors[col] } ];
+            var circleDataB = [ { "cx": -55, "cy": 50, "radius": 40, "color" : colors[col] } ];
+
+            //translate
+            var trans1A = plotGroup.append("g").attr("transform","translate(" + (100 * this.rawData.A[col]) + ",0)");
+            var trans1B = plotGroup.append("g").attr("transform","translate(" + (100 * this.rawData.B[col]) + ",0)");
+
+            var circlesA = trans1A.selectAll("circle").data(circleDataA).enter().append("circle");
+            var circlesB = trans1B.selectAll("circle").data(circleDataB).enter().append("circle");
+
+            var circleAttributesA = circlesA.attr("cx", function (d) { return d.cx; }).attr("cy", function (d) { return d.cy; }).attr("r", function (d) { return d.radius; }).style("fill", function (d) { return d.color; });
+            var circleAttributesB = circlesB.attr("cx", function (d) { return d.cx; }).attr("cy", function (d) { return d.cy; }).attr("r", function (d) { return d.radius; }).style("fill", function (d) { return d.color; });
+            
         }
 }
 
