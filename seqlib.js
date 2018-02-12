@@ -614,12 +614,14 @@
 				var Q5 = !Q && i%5==0;
 				s += Q ? '|' : (Q5 ? ':' : '.');
 				if (!Q) continue;
-				var sn = ''+i;
+				var sn = i-10;
+				var sn = ''+sn;
 				var np = s.length-sn.length-1;		// where num starts
 				if (np<0) continue;
 				s = s.substr(0,np) + sn + '|';
 			}
-			this.hruler = s; // this.hruler = s.replace(/ /g, '.');
+			this.hruler = '.'+s;
+			this.hruler = this.hruler.slice(0, -1); // this.hruler = s.replace(/ /g, '.');
 		},
 		// --- custom weights for sequences to allow custom sorting/annotations -------------------------------
 		//
