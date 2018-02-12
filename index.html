@@ -126,6 +126,7 @@
 <link type="text/css" href="seqlib.css" rel="stylesheet" />
 <script type="text/javascript" src="seqlib.js"></script>
 <script type="text/javascript" src="SequenceLogoDiagramD3.js"></script>
+<script type="text/javascript" src="CouplingsLogoDiagramD3.js"></script>
 
 <script type="text/javascript">
 
@@ -152,7 +153,7 @@
 
 	// _________________________________________________________________________________________________________________________________
 
-	var btn2view = { 'btn1':'#ABTview', 'btn2':'#MSAview', 'btn3':'#STAview', 'btn4':'#IMGview', 'btn5':'#DATview', 'btn6':'#SPEview' };
+	var btn2view = { 'btn1':'#ABTview', 'btn2':'#MSAview', 'btn3':'#STAview', 'btn4':'#IMGview', 'btn5':'#DATview', 'btn6':'#SPEview', 'btn7':'#couplings'  };
 
 	$(document).ready(function() {
 		// some say this works for FF and Chrome only so we're providing FILE input control as well
@@ -161,6 +162,7 @@
 		document.documentElement.ondrop = handleFileSelect;
 		document.getElementById('files').addEventListener('change', handleFileSelect, false);
 		document.getElementById('customdata').addEventListener('change', handleCustomFileSelect, false);
+		document.getElementById('customdata2').addEventListener('change', handleCustomFileSelectCouplings, false);
 
 		// on-click computing pair-wise identity
 		$('#pairwise_start_btn').click(function(event) { msa.togglePairwiseIdentity(); });
@@ -314,6 +316,7 @@
 		$('#IMGview').hide();
 		$('#ABTview').hide();
 		$('#DATview').hide();
+		$('#couplings').hide();
 		$('#SPEview').hide();
 		$('#MSAview').show();
 		// TODO: doable with one wildcard selector
@@ -323,6 +326,7 @@
 		$('#btn4').removeClass('btnPressed').addClass('btnReleased');
 		$('#btn5').removeClass('btnPressed').addClass('btnReleased');
 		$('#btn6').removeClass('btnPressed').addClass('btnReleased');
+		$('#btn7').removeClass('btnPressed').addClass('btnReleased');
 	}
 
 	// -------------------------------------------------------------------------- msa callbacks -------------
@@ -443,6 +447,7 @@
 		$('#colorSlider').slider('option', 'value', colorSliderDflt);
 		$('#order').val('orderOrig');
 		$('#customdata').val('');								// clear path in custom data file control
+		$('#customdata2').val('');								// clear path in custom data file control
 		$('#order option[value="orderCustomAW"]').remove();		// remove sorting option from msa order dropdown
 		$('#order option[value="orderCustomBW"]').remove();		// remove sorting option from msa order dropdown
 		$("#MSAcustomAH").text('')
@@ -647,6 +652,27 @@
 		r.readAsText(f);
 		return false;
 	}
+	function handleCustomFileSelectCouplings(evt) {
+		evt.stopPropagation(); evt.preventDefault();
+		var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
+		if (!f) return;
+		var r = new FileReader();
+		r.onload = function(e) {
+			msa.loadCouplingsDataFile(e.target.result, function() {
+				$('#cdatStatus2').html('mapped ' + msa.couplingsN );
+				console.log('>>> got the couplings');
+				var aux = {};
+				aux.A = msa.A;
+			    aux.B = msa.B;
+			    console.log(msa.A);
+			    console.log(aux.B);
+			    var len = msa.getNormalizedColumnProportions().length;
+				var couplingsLogoDiagram = new CouplingsLogoDiagramD3({elementId: "couplingslogo", elementWidth: msaTextblockWidth, elementHeight: 30}, aux, len);
+				couplingsLogoDiagram.initDiagram();
+			}); }
+		r.readAsText(f);
+		return false;
+	}
 	function UpdateSpeciesDiagram() {
 
 		var width = 700,
@@ -745,8 +771,9 @@
 			<a class='button btnReleased' id='btn2'>msa view</a> <span class='tc2'>|</span>
 			<a class='button btnReleased' id='btn4'>image view</a> <span class='tc2'>|</span>
 			<a class='button btnReleased' id='btn3'>stats view</a> <span class='tc2'>|</span>
-			<!-- <a class='button btnReleased' id='btn6'>species</a> <span class='tc2'>|</span> -->
-			<a class='button btnReleased' id='btn5'>custom data </a>
+			<a class='button btnReleased' id='btn5'>custom weights</a> <span class='tc2'>|</span>
+			<a class='button btnReleased' id='btn6'>load couplings</a> <span class='tc2'> <!--|</span>-->
+			<!--<a class='button btnReleased' id='btn7'> Load couplings </a>-->
 		</span><br><span style='font-size:3px;'><br></span>
 
 	</td><td align='right' valign='bottom' width='99%' nowrap>
@@ -846,7 +873,29 @@
 <table id="SPEview" border='0' cellpadding='1' cellspacing='1' style='display:none;'>
 <tr><td class='text'>
 
-	<svg class='plot_border' id='specburst'></svg>
+	<!-- <svg class='plot_border' id='specburst'></svg> -->
+
+
+	Load the couplings already sorted by importance.<br>
+	File format is tab-separated text file with two columns: residue A contacts residue B<br>
+	Each row in the input file is represented by a color with a maximum of 20 contacts.<br>
+	Not all positions have to be present but do not use the same position more than once.<br><br>
+	<input type="file" class='filectrl' id="customdata2" size='40'><br>
+	<br><div id='cdatStatus2'></div>
+
+</td></tr></table>
+
+<!-- ______________________________________________________ MSA custom couplings view ___________________________________________ -->
+
+<table id="couplings" border='0' cellpadding='1' cellspacing='1' style='display:none;'>
+<tr><td class='text'>
+
+	Load the couplings already sorted by strength. The residues start from the position zero.<br>
+	File format is tab-separated text file with two columns:
+	the position numbers of the coupled residues (position A contacts position B)<br>
+	Not all positions have to be present and only few will be displayed.<br><br>
+	<input type="file" class='filectrl' id="customdata2" size='40'><br>
+	<br><div id='cdatStatus2'></div>
 
 </td></tr></table>
 
@@ -945,6 +994,8 @@
 	</td>
 </tr><tr>														<!-- ___ MSA logo  __________ -->
 	<td colspan='12'></td><td align='left' nowrap><div id="seqlogo"> </div> </td>
+</tr><tr>														<!-- ___ MSA logo  __________ -->
+	<td colspan='12'></td><td align='left' nowrap><div id="couplingslogo"> </div> </td>
 </tr><tr>
 	<td align='right' nowrap>									<!-- ___ MSA header/plots ___ -->
 	</td><td align='right' nowrap>

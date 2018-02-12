@@ -614,12 +614,14 @@
 				var Q5 = !Q && i%5==0;
 				s += Q ? '|' : (Q5 ? ':' : '.');
 				if (!Q) continue;
-				var sn = ''+i;
+				var sn = i-10;
+				var sn = ''+sn;
 				var np = s.length-sn.length-1;		// where num starts
 				if (np<0) continue;
 				s = s.substr(0,np) + sn + '|';
 			}
-			this.hruler = s; // this.hruler = s.replace(/ /g, '.');
+			this.hruler = '.'+s;
+			this.hruler = this.hruler.slice(0, -1); // this.hruler = s.replace(/ /g, '.');
 		},
 		// --- custom weights for sequences to allow custom sorting/annotations -------------------------------
 		//
@@ -642,6 +644,8 @@
 				this.customweightsA[i] = w[1];
 				this.customweightsB[i] = w[2];
 			}
+
+
 
 			var n_customweightsB = 0; // I have not decided a function for non 100% matching sequences between A and B
 			for(var k=0; k<this.h; k++) {
@@ -666,6 +670,29 @@
 			this.hcustomwB = '';
 			for(var i=this.page.from; i<this.page.to; i++)		// this.orderby.length
 				this.hcustomwB += this.customweightsB[this.orderby[i]].v + '<br>';
+
+			UIcallback();
+		},
+		// --- Load couplings for the alignment -------------------------------
+		//
+		// It loads the couplings sorted by importance to the user
+		//
+		loadCouplingsDataFile : function(text, UIcallback) {
+			this.couplingsN = 0;	// how many mapped
+			if (!this.h) return;
+			var t = text.split(/[\r\n]/g);
+			if (!t.length) return;
+			this.A = new Array(t);
+			this.B = new Array(t);
+			for(var row in t) {
+				var w = t[row].split("\t");
+				console.log(w);
+				if (w.length < 2 || w.length > 3) continue;
+				this.A[this.couplingsN] = w[0];
+				this.B[this.couplingsN] = w[1];
+				this.couplingsN = this.couplingsN + 1;
+			}
+
 
 			UIcallback();
 		},
