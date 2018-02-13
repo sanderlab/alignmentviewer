@@ -119,6 +119,17 @@
 	.c7 {stroke: none; fill: #0099ff;}
 	.c8 {stroke: none; fill: #666666;}
 	.c9 {stroke: none; fill: #999999;}
+
+
+	.links line {
+	  stroke: #999;
+	  stroke-opacity: 0.6;
+	}
+
+	.nodes circle {
+	  stroke: #fff;
+	  stroke-width: 1.5px;
+	}
 </style>
 <link type="text/css" href="jquery-ui-1.8.21.custom.css" rel="stylesheet" />
 <script type="text/javascript" src="jquery-1.7.2.min.js"></script>
@@ -187,6 +198,11 @@
 
 		$('#graphApply').button()
 			.click(function() { if (d3fg) d3fg.clear(); initForceGraph(); })
+			.prop("disabled", false)
+			.button('refresh');
+
+		$('#graphApply2').button()
+			.click(function() { if (d3fg) d3fg.clear(); initGraph(msa); })
 			.prop("disabled", false)
 			.button('refresh');
 
@@ -613,6 +629,8 @@
 		if (!msa.pwdoneQ) return;	// compute pairwise identity first
 		var val = $('#graphSlider').slider('option', 'value');
 		pwGraph = msa.buildPairwiseIdentityGraph(val);
+		console.log(msa.pwhash);
+		console.log(msa.h);
 		if (typeof d3fg === 'undefined') d3fg = createForceGraph();
 		d3fg.init('#MSApairwiseGraph', 700, 700, pwGraph);
 	}
@@ -857,12 +875,13 @@
 	</ul></td>
 </tr><tr><td class='text'>
 	<div class='textB' style='margin-top:6px;'>Pairwise identity force-directed graph</div>
-	<div class='plot_border' id='MSApairwiseGraph' style='width:700p; height:700;'></div>
+	<!--<svg width="700" height="700"></svg>-->
+	<canvas class='plot_border' id='MSApairwiseGraph2' style='width:700p; height:700;'></canvas><br>
 	</td><td class='text' valign='top'>
 		<ul class='text'>
 		<li>lowest seq.identity to include in graph : <span id='graphSliderVal'></span></li>
 		<li><div id='graphSlider'></div></li>
-		<li><button id='graphApply'>rebuild graph</button>&nbsp;&nbsp;&nbsp;&nbsp;<button id='graphClear'>clear graph</button></li>
+		<li><button id='graphApply2'>rebuild graph</button>&nbsp;&nbsp;&nbsp;&nbsp;<button id='graphClear'>clear graph</button></li>
 		</ul>
 	</td>
 </tr><tr><td class='text'>
