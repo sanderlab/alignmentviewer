@@ -1,5 +1,6 @@
 FROM cannin/nodejs-http-server
 
-COPY * /alignmentviewer
+RUN mkdir /alignmentviewer
+COPY * /alignmentviewer/
 
 CMD http-server .
