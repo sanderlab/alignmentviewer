@@ -273,7 +273,10 @@
             console.log(originURL);
 
             if(originURL !== undefined){
-                $.get(originURL, function(data) { loadNewMSA(data); });
+                $('#progress').show().html('Fetching file...');
+                $.get(originURL, function(data) {
+                    loadNewMSA(data);
+                });
             }
         });
 
