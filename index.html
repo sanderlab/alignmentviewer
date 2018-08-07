@@ -1,759 +1,787 @@
 <html><head>
-<meta charset="utf-8">
-<meta http-equiv="Access-Control-Allow-Origin" content="*">
-<meta name="description" content="AlignmentViewer is multiple sequence alignment viewer for protein families with flexible  visualization, analysis tools and links to protein family databases. It is directly accessible in web browsers without the need for software installation, as it is implemented in JavaScript, and does not require an internet connection to function.  It can handle protein families with tens of thousand of sequences and is particularly suitable for evolutionary coupling analysis, preparing the computation of protein 3D structures and detection of functionally constrained interactions.">
-<meta name="keywords" content="alignment viewer, proteins, MSA, multiple sequence alignment, sanderlab, evolutionary couplings, families, analysis">
-<title>alignmentviewer.org</title>
-<style type="text/css">
-	html {
-		font-family: sans-serif;
-		margin: 1% 1% 1% 1%;
-		background: #fff;
-		background: #fff -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #e0e0e0), color-stop(100%, #e0e0e0)) fixed;
-		background: #fff -o-linear-gradient(#fff, #e0e0e0) fixed;
-		background: #fff -ms-linear-gradient(#fff, #e0e0e0) fixed;
-		background: #fff linear-gradient(#fff, #e0e0e0) fixed;
-		background: #fff -webkit-linear-gradient(#fff, #e0e0e0) fixed;
-		background: #fff -moz-linear-gradient(#fff, #e0e0e0) fixed;
-	}
-	a { color: #3e3f61;
-		cursor: pointer;
-		text-decoration: none;
-		border-bottom:1px dotted;
-	}
-	#progress {
-		display:none;
-		position:fixed;
-		left:44%; top:44%;
-		margin-left: auto;
-		margin-right: auto;
-		padding: 3% 3% 3% 3%;
-		background: #a1b4cc;
-		border-style: dotted;
-		border-width: 1px;
-		border-color: #585989
-		color: #585989;
-		font-family: Trebuchet MS, Verdana;
-		font-size: 18px;
-		-moz-box-shadow: 0 0 30px 5px #999;
-		-webkit-box-shadow: 0 0 30px 5px #999;
-	}
-	.dim { color: #a1b4cc }
-	.filectrl {
-		background-color: #fff;
-		width: 150px;
-	}
-	.tblhead { background: grey; }
-	.button {
-		font-family: Trebuchet MS, Verdana;
-		font-size: 16px;
-		font-weight: bold;
-		padding: 2px;
-		padding-left:10px;
-		padding-right:10px;
-		text-decoration: none;
-		border: 1px solid #a1b4cc;
-	}
-	.button2 {
-		height:24px;
-		font-size:10px;
-		vertical-align:text-top;
-	}
-	.btnPressed {
-		color: #3e3f61;
-		background: none;
-		border: 1px dotted #3e3f61;
-	}
-	.btnReleased {
-		color: white;
-		background: #a1b4cc;
-		border: 1px solid #a1b4cc;
-	}
-	.plot_border {
-		border: 1px dotted #7792ba;
-	}
-	.hpadding { padding-left:10px; }
-	.title {
-		font-family:Trebuchet MS, Verdana;
-		letter-spacing: -0.08em;
-		font-size:36px;
-		font-weight:bold;
-	}
-	.ctrlval { color:navy; font-weight:bold; }
-	.dense { line-height: 80% }
-	.lt { color:grey; }
-	.bgl { background-color:#aaa; }
-	.tiny {
-		font-family:Trebuchet MS, Verdana;
-		font-size:12px;
-	}
-	.text {
-		font-family:Trebuchet MS, Verdana;
-		font-size:14px;
-		font-weight:normal;
-	}
-	.textB {
-		font-family:Trebuchet MS, Verdana;
-		font-size:14px;
-		font-weight:bold;
-	}
-	.title2 {
-		font-size: 14px;
-		letter-spacing: 0em;
-	}
-	.enter { width: 8em; }
-	li { margin: 0.5em 0; }
-	button { color: #555; }
-	ul {
-		list-style-type: none;
-		padding: 2em;
-		margin: 1em;
-	}
-	.bar { fill: steelblue; }
-	.c1 {stroke: none; fill: #33cc00;}
-	.c2 {stroke: none; fill: #009900;}
-	.c3 {stroke: none; fill: yellow;}
-	.c4 {stroke: none; fill: #cc0000;}
-	.c5 {stroke: none; fill: #0033ff;}
-	.c6 {stroke: none; fill: #6600cc;}
-	.c7 {stroke: none; fill: #0099ff;}
-	.c8 {stroke: none; fill: #666666;}
-	.c9 {stroke: none; fill: #999999;}
-</style>
-<link type="text/css" href="jquery-ui-1.8.21.custom.css" rel="stylesheet" />
-<script type="text/javascript" src="jquery-1.7.2.min.js"></script>
-<script type="text/javascript" src="jquery-ui-1.8.21.custom.min.js"></script>
-<script type="text/javascript" src="d3.v2.min.js"></script>
-<script type="text/javascript" src="speclist.2012_09.js"></script>	<!-- before seqlib.js -->
-<link type="text/css" href="seqlib.css" rel="stylesheet" />
-<script type="text/javascript" src="seqlib.js"></script>
-<script type="text/javascript" src="SequenceLogoDiagramD3.js"></script>
-<script type="text/javascript" src="CouplingsLogoDiagramD3.js"></script>
-
-<script type="text/javascript">
-
-	var msa;					// msa obj created by seqlib.js
-	var msaTextblockWidth;
-	var d3StatsPlots;
-	var d3PairwiseIdentityPlot;
-	var d3fg;					// d3 force-directed graph
-	var pwGraph;				// pairwise identity graph object
-	var pwMap;					// pairwise map plot object
-	var pwMapNSeq;
-	var msaImage;
-	var msaImgColorType = 1;	// 1:mview, 2:hydrophobicity, 3:mutations
-	var drawImageNSeq;
-	var asyncTimeout = 2;		// ms
-	var msaImageTimeout = 1;	//original at 10
-	var colorSliderDflt = 0;
-	var imageSliderDflt = { w:4, h:4 };
-	var filterGaps = 100;		// default filtering values (=no filtering)
-	var filterIdent = 0;
-	var filterRSgaps = false;
-	var msaPage = 0;
-	var firstSequence =''
-
-	// _________________________________________________________________________________________________________________________________
-
-	var btn2view = { 'btn1':'#ABTview', 'btn2':'#MSAview', 'btn3':'#STAview', 'btn4':'#IMGview', 'btn5':'#DATview', 'btn6':'#SPEview', 'btn7':'#couplings'  };
-
-	$(document).ready(function() {
-		// some say this works for FF and Chrome only so we're providing FILE input control as well
-		document.documentElement.ondragover = function () { return false; };
-		document.documentElement.ondragend = function () { return false; };
-		document.documentElement.ondrop = handleFileSelect;
-		document.getElementById('files').addEventListener('change', handleFileSelect, false);
-		document.getElementById('customdata').addEventListener('change', handleCustomFileSelect, false);
-		document.getElementById('customdata2').addEventListener('change', handleCustomFileSelectCouplings, false);
-
-		// on-click computing pair-wise identity
-		$('#pairwise_start_btn').click(function(event) { msa.togglePairwiseIdentity(); });
-
-		var grapthSliderDflt = 0.7;
-		$('#graphSlider').slider({ max: 1, min: 0, step:0.01, value:grapthSliderDflt, slide: function(event, ui) { $('#graphSliderVal').html(ui.value); } });
-		$('#graphSliderVal').html(grapthSliderDflt);
-
-		// --- jQuery is awesome -------------
-		$('[id^=btn]').click(function(event) {
-			var view = btn2view[event.target.id];	// button id --> view id
-			if ($(view).is(":visible")) return;		// already active, do nothing
-			$('[id$=view]').not(view).hide();		// select all views except current, hide
-			$(view).show();							// show current
-			$(event.target).removeClass('btnReleased').addClass('btnPressed');
-			$('[id^=btn]').not(event.target).removeClass('btnPressed').addClass('btnReleased');
-		});
-
-		$('#order').change(reloadMSA);
-
-		$('#graphApply').button()
-			.click(function() { if (d3fg) d3fg.clear(); initForceGraph(); })
-			.prop("disabled", false)
-			.button('refresh');
-
-		$('#graphClear').button()
-			.click(function() { if (d3fg) d3fg.clear(); })
-			.prop("disabled", false)
-			.button('refresh');
-
-		$('#colorSlider').slider({ max: 1, min: 0, step:0.01, value:colorSliderDflt,
-			slide: function(event, ui) { $('#colorSliderVal').html(ui.value); msa.setColorThresh(ui.value); } });
-		$('#colorSliderVal').html(colorSliderDflt);
-		$('#colorApply').button().click(reloadMSA);
-
-		// --- filtering --------------------------
-
-		$('#sliderFilterIdent').slider({ max: 100, min: 0, step:1, value:filterIdent,
-			slide: function(event, ui) { $('#sliderFilterIdentVal').html(ui.value+'%'); } });
-		$('#sliderFilterIdentVal').html(filterIdent+'%');
-
-		$('#sliderFilterGaps').slider({ max: 100, min: 0, step:1, value:filterGaps,
-			slide: function(event, ui) { $('#sliderFilterGapsVal').html(ui.value+'%'); } });
-		$('#sliderFilterGapsVal').html(filterGaps+'%');
-
-		$('#CHKrfgaps').attr('checked', false);
-
-		$('#filterStatus').html('');
-		$('#filterApply').button().click(function(){
-			filterGaps = $('#sliderFilterGaps').slider("option", "value");
-			filterIdent = $('#sliderFilterIdent').slider("option", "value");
-			filterRSgaps = $('#CHKrfgaps').is(':checked');
-			var orderby = $('#order').val();
-			msa.reRender(msaPage, orderby, filterGaps, filterIdent, filterRSgaps);
-		});
-		$('#filterExport').button().click(function(){
-			var valGaps = $('#sliderFilterGaps').slider("option", "value");
-			var valIdent = $('#sliderFilterIdent').slider("option", "value");
-			var varRSgaps = $('#CHKrfgaps').is(':checked');
-			msa.applyExport(valGaps, valIdent, false);
-		});
-
-		// image view controls -----------------------
-		$('#imageApply').button().click(drawMsaImage);
-		$('#imageResidWSlider').slider({ max: 10, min: 1, step:1, value:imageSliderDflt.w,
-			slide: function(event, ui) { $('#imageResidW').html(ui.value); } });
-		$('#imageResidW').html(imageSliderDflt.w);
-		$('#imageResidHSlider').slider({ max: 10, min: 1, step:1, value:imageSliderDflt.h,
-			slide: function(event, ui) { $('#imageResidH').html(ui.value); } });
-		$('#imageResidH').html(imageSliderDflt.h);
-
-		// checkboxes to control annotation columns
-		$('#CHKspecies').attr('checked', true);
-		$('#CHKinfo').attr('checked', true);
-		$('#CHKcustom').attr('checked', true);
-		$('#CHKpfam').attr('checked', true);
-		$('#CHKconservation').attr('checked', true);
-		$('#CHKseqlogo').attr('checked', true);
-		$('#CHKspecies').change(function(){ $('[id^=MSAspecies]').toggle(); });
-		$('#CHKinfo').change(function(){ $('[id^=MSAinfo]').toggle(); });
-		$('#CHKpfam').change(function(){ $('[id^=MSApfam]').toggle(); });
-		$('#CHKcustom').change(function(){ $('#MSAcustomA').toggle(); $('#MSAcustomAH').toggle(); });
-		$('#CHKcustom').change(function(){ $('#MSAcustomB').toggle(); $('#MSAcustomBH').toggle(); });
-		$('#CHKconservation').change(function(){ $('#labeled_plot_canvas').toggle(); });
-		$('#CHKseqlogo').change(function(){ $('#seqlogo').toggle(); });
-	});
-
-	// causes re-rendering of conservation_plot/ruler/msa sequence table
-	function forceMsaRerender() {
-		// some web comments report that children must be rerendered explicitly rather than relying on cascade
-		var plot_canvas = document.getElementById('plot_canvas');
-		var seqlogo = document.getElementById('seqlogo');
-		var ruler = document.getElementById('MSAruler');
-		var seqs = document.getElementById('MSAseqs');
-		var msatable = document.getElementById('MSAview');
-		plot_canvas.style.display='none';
-		seqlogo.style.display='none';
-		ruler.style.display='none';
-		seqs.style.display='none';
-		plot_canvas.offsetWidth;
-		seqlogo.offsetWidth;
-		ruler.offsetWidth;
-		seqs.offsetWidth;
-		plot_canvas.style.display='block';
-		seqlogo.style.display='block';
-		ruler.style.display='block';
-		seqs.style.display='block';
-		msatable.style.display='none';
-		msatable.offsetWidth;
-		msatable.style.display='block';
-	}
-
-	// causes re-rendering of conservation plot and sequence logo if zoom causes change in MSA text width
-	function zoomEventWatchdog() {
-		if (!$('#MSAview').is(":visible")) {return;}
-		if (msaTextblockWidth == null) {return;}
-		if (msaTextblockWidth == 0) {return;}
-		if (Math.abs($('#MSAseqs').width() - msaTextblockWidth) > 5) {
-		//	console.log('logo width reset:' + msaTextblockWidth + ' ' + $('#MSAseqs').width() + ' mismatch');
-			$('#seqlogo').html('');
-			$('#plot_canvas').html('');
-			forceMsaRerender();
-			msaTextblockWidth = $('#MSAseqs').width();
-			var alignmentData = msa.getNormalizedColumnProportions();
-			msa.redrawConservationPlot('#plot_canvas', msaTextblockWidth);
-			var logoDiagram = new SequenceLogoDiagramD3({elementId: "seqlogo", elementWidth: msaTextblockWidth, elementHeight: 48}, alignmentData);
-			logoDiagram.initDiagram();
-		};
-	}
-
-	// this gets called on msa reload only!
-	function switchToMsaView() {
-		// clear entire msa html (12 divs) before switching to MSA view to avoid big pause for large alignments while old msa redraws
-		$('#MSAnames').html('');
-		$('#MSAinfo').html('');
-		$('#MSAcustomA').html('');
-		$('#MSAcustomB').html('');
-		$('#MSAspecies').html('');
-		$('#MSApfam').html('');
-		$('#MSAident1').html('');
-		$('#MSAident2').html('');
-		$('#MSAgaps').html('');
-		$('#MSArows').html('');
-		$('#MSArows2').html('');
-		$('#plot_canvas').html('');
-		$('#seqlogo').html('');
-		$('#MSAruler').html('');
-		$('#MSAseqs').html('');
-		forceMsaRerender();
-		$('#STAview').hide();
-		$('#IMGview').hide();
-		$('#ABTview').hide();
-		$('#DATview').hide();
-		$('#couplings').hide();
-		$('#SPEview').hide();
-		$('#MSAview').show();
-		// TODO: doable with one wildcard selector
-		$('#btn1').removeClass('btnPressed').addClass('btnReleased');
-		$('#btn2').removeClass('btnReleased').addClass('btnPressed');
-		$('#btn3').removeClass('btnPressed').addClass('btnReleased');
-		$('#btn4').removeClass('btnPressed').addClass('btnReleased');
-		$('#btn5').removeClass('btnPressed').addClass('btnReleased');
-		$('#btn6').removeClass('btnPressed').addClass('btnReleased');
-		$('#btn7').removeClass('btnPressed').addClass('btnReleased');
-	}
-
-	// -------------------------------------------------------------------------- msa callbacks -------------
-
-	var msaCallback = {		// msa reading callbacks
-
-		progress : function(msg) { $('#progress').html(msg); },
-		fail : function(msg) { $('#progress').html(msg); },
-		doneReading : function(msg) {			// msa fully parsed
-			console.log('doneReading...');
-			$('#MSAnames').html(msa.hnames);
-			$('#MSAspecies').html(msa.hspecies);
-			$('#MSAinfo').html(msa.hinfo);
-			$('#MSAcustomA').html(msa.hcustomwA);
-			$('#MSAcustomB').html(msa.hcustomwB);
-			$('#MSApfam').html(msa.hpfam);
-			$('#MSAident1').html(msa.hident1);
-			$('#MSAident2').html(msa.hident2);
-			$('#MSAgaps').html(msa.hgaps);
-			$('#MSArows').html(msa.hrows);
-			$('#MSArows2').html(msa.hrows2);
-			$('#MSAseqs').html(msa.hseqs);
-			$('#MSAruler').html(msa.hruler);
-			$('#MSAview').show();
-			msaTextblockWidth = null; // turn off zoom change watchdog
-			if (msa.rerenderQ) {
-				/*
-				// TODO: hiding gapping columns not working, comment out for now
-				//
-				// in case if msa width changes need to get a chance for dom to update before getting msa div width
-				setTimeout(function() {
-					var w = $('#MSAseqs').width();		// need to redraw plot in case columns got filtered out
-					msa.redrawConservationPlot('#plot_canvas', w);
-				}, 100);
-				*/
-				$('#progress').hide(); return;
-			}
-		//	console.log('hnames=' + msa.hnames.length + ' hident=' + msa.hident1.length + ' hgaps=' + msa.hgaps.length +
-		//				'hrows=' + msa.hrows.length + ' hseqs=' + msa.hseqs.length + ' hruler=' + msa.hruler.length);
-			$('#progress').html('computing conservation...');
-			setTimeout("msa.asyncComputeConservation()", msa.asyncTimeout);
-			$('#buttons').show();
-		},
-		doneComputing : function(msg) {			// top charts computed -- gaps and identity
-			console.log('doneComputing .......');
-			forceMsaRerender();
-			msaTextblockWidth = $('#MSAseqs').width();
-			var alignmentData = msa.getNormalizedColumnProportions();
-			msa.redrawConservationPlot('#plot_canvas', msaTextblockWidth);
-			var logoDiagram = new SequenceLogoDiagramD3({elementId: "seqlogo", elementWidth: msaTextblockWidth, elementHeight: 48}, alignmentData);
-			logoDiagram.initDiagram();
-			setInterval(function(){zoomEventWatchdog()}, 1269);
-			UpdateStatsPlot();
-			UpdatePairwisePlot();				// this will clear pairwise plot on new msa loading
-			resetMsaImage();
-			UpdateSpeciesDiagram();
-			if (msa.page.validQ) {
-				$('#pagingCtrl').show();
-				var np = msa.page.pages;
-				var val = msa.page.getstr(msaPage) + ' out of ' + msa.h;
-				// paging slider ------------------------------
-				$('#sliderPage').slider({
-						min: 1, max: np, step:1, value: 1,
-						slide: function(event, ui) {
-								msaPage = ui.value - 1;
-								var val = msa.page.getstr(msaPage) + ' out of ' + msa.h;
-								$('#sliderPageVal').html(val);
-							},
-						stop: function(event, ui) { msaPage = ui.value-1; reloadMSA(); }
-				});
-				$('#sliderPageVal').html(val);
-				} else {
-				$('#pagingCtrl').hide();
-			}
-			$('#progress').hide();
+	<meta charset="utf-8">
+	<meta http-equiv="Access-Control-Allow-Origin" content="*">
+	<meta name="description" content="AlignmentViewer is multiple sequence alignment viewer for protein families with flexible  visualization, analysis tools and links to protein family databases. It is directly accessible in web browsers without the need for software installation, as it is implemented in JavaScript, and does not require an internet connection to function.  It can handle protein families with tens of thousand of sequences and is particularly suitable for evolutionary coupling analysis, preparing the computation of protein 3D structures and detection of functionally constrained interactions.">
+	<meta name="keywords" content="alignment viewer, proteins, MSA, multiple sequence alignment, sanderlab, evolutionary couplings, families, analysis">
+	<title>alignmentviewer.org</title>
+	<style type="text/css">
+		html {
+			font-family: sans-serif;
+			margin: 1% 1% 1% 1%;
+			background: #fff;
+			background: #fff -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #e0e0e0), color-stop(100%, #e0e0e0)) fixed;
+			background: #fff -o-linear-gradient(#fff, #e0e0e0) fixed;
+			background: #fff -ms-linear-gradient(#fff, #e0e0e0) fixed;
+			background: #fff linear-gradient(#fff, #e0e0e0) fixed;
+			background: #fff -webkit-linear-gradient(#fff, #e0e0e0) fixed;
+			background: #fff -moz-linear-gradient(#fff, #e0e0e0) fixed;
 		}
-	};
-
-	var msaPairwise = {							// pairwise identity computation callback
-		start : function() {
-			$('#pairwise_status').html('');
-			$('#pairwise_start_btn').html('cancel');
-			$('#pairwise_start_btn').click(function(event) { $.proxy(msa.togglePairwiseIdentity, msa); });
-		},
-		progress : function(msg) { $('#pairwise_status').html(msg); },
-		done : function(completeQ) {
-			if (completeQ) {
-				$('#pairwise_start_btn').html('');
-				var txt = "<b><span class='tc2'>max</span>/<span class='tc1'>average</span>/<span class='tc0'>min</span></b> (sorted by ranking)";
-				$('#pairwise_status').html(txt);
-				$('#MSApairwise').removeClass('plot_border');
-				UpdatePairwisePlot();
-			} else {
-				$('#pairwise_status').html(' (takes a while for large alignments)');
-				$('#pairwise_start_btn').html('calculate');
-				$('#pairwise_start_btn').click(function(event) { $.proxy(msa.togglePairwiseIdentity, msa); });
-			}
+		a { color: #3e3f61;
+			cursor: pointer;
+			text-decoration: none;
+			border-bottom:1px dotted;
 		}
-	};
-
-	// ---------------------------------------------------------- global UI functions ---------------------
-
-	function reloadMSA() {
-		$('#progress').show().html('updating html...');
-		var orderby = $('#order').val();
-		msa.reRender(msaPage, orderby, filterGaps, filterIdent, filterRSgaps);
-	}
-	function loadNewMSA(data) {
-		console.log('loadNewMSA');
-		$('#progress').show().html('updating html...');
-		switchToMsaView();
-		$('#pairwise_start_btn').html('calculate');
-		$('#pairwise_start_btn').click(function(event) { $.proxy(msa.togglePairwiseIdentity, msa); });
-		$('#pairwise_status').html(' (takes a while for large alignments)');
-		$('[id^=inp_]').val('');
-		$('#MSApairwise').addClass('plot_border');
-		$('#colorSliderVal').html(colorSliderDflt);
-		$('#colorSlider').slider('option', 'value', colorSliderDflt);
-		$('#order').val('orderOrig');
-		$('#customdata').val('');								// clear path in custom data file control
-		$('#customdata2').val('');								// clear path in custom data file control
-		$('#order option[value="orderCustomAW"]').remove();		// remove sorting option from msa order dropdown
-		$('#order option[value="orderCustomBW"]').remove();		// remove sorting option from msa order dropdown
-		$("#MSAcustomAH").text('')
-		$("#MSAcustomBH").text('')
-		var species = isset(speclist) ? speclist : false;
-		if (!msa) msa = createMSA(species);
-		msa.asyncRead(data, msaCallback, msaPairwise);
-	}
-
-	// --- pulling msa examples from the server --------------------------------------------------------------
-
-	var exmpUrl = "http://sanderlab.org/alignmentviewer";
-	function PullMsaExample(which) {
-		var url = exmpUrl;
-		switch (which) {
-		case 1: url += '/1bkr_A.1-108.msa.txt'; break;
-		case 2: url += '/MYG_PHYMC.1-154.msa.txt'; break;
-		case 3: url += '/EGFR_HUMAN.712-968.msa.txt'; break;
-		case 4: url += '/BLAT_ECOLX.1-286.msa.txt'; break;
-		default: return;
+		#progress {
+			display:none;
+			position:fixed;
+			left:44%; top:44%;
+			margin-left: auto;
+			margin-right: auto;
+			padding: 3% 3% 3% 3%;
+			background: #a1b4cc;
+			border-style: dotted;
+			border-width: 1px;
+			border-color: #585989
+			color: #585989;
+			font-family: Trebuchet MS, Verdana;
+			font-size: 18px;
+			-moz-box-shadow: 0 0 30px 5px #999;
+			-webkit-box-shadow: 0 0 30px 5px #999;
 		}
-		$.get(url, function(data) { loadNewMSA(data); });
-	}
-
-	// --- canvas --------------------------------------------------------------------------------------------
-
-	function drawMsaImage() {
-		$('#msaImage').html('');
-		var div = document.getElementById('msaImage');
-		var ca = div.getContext('2d');
-		msaImage = createMsaImageCanvas(div, ca);
-		var currentFilteredSequenceCount = msa.h;
-		var filteredSequenceOrder = msa.getCurrentFilteredSequenceOrder();
-		if (filteredSequenceOrder != null) {currentFilteredSequenceCount = filteredSequenceOrder.length;}
-		var rw = $('#imageResidW').text();
-		var rh = $('#imageResidH').text();
-		msaImgColorType = $('#msaImgClrSelect').val();
-		msaImage.init(rw, rh, msa.w, currentFilteredSequenceCount);
-		drawImageNSeq = 0;
-		console.log('init msa image...');
-		console.log(this.seqs);
-		setTimeout("asyncDrawMsaImage()", 0); //0<-msaImageTimeout
-	}
-	function asyncDrawMsaImage() {
-		var filteredSequenceOrder = msa.getCurrentFilteredSequenceOrder();
-		if (filteredSequenceOrder == null || filteredSequenceOrder.length == 0) {return;}
-		if (drawImageNSeq == filteredSequenceOrder.length) return;
-		for(var col=0; col<msa.w; col++) {
-			var sequenceIndex = filteredSequenceOrder[drawImageNSeq];
-			var aa = msa.seqs[sequenceIndex].charAt(col);
-			if (aa=='.' || aa=='-') continue;
-
-			if (msaImgColorType==1) {clr =getResidColor('mview', aa);}
-			else if (msaImgColorType==2) {clr = getResidHydroColor(aa);}
-			else if (msaImgColorType==3) {
-				
-				clr = getResidColor('mview', aa);
-				
-				if (msa.seqs[sequenceIndex].charAt(col) == msa.seqs[0].charAt(col)) { //Reducing opacity instead of preventing any disply
-
-					color = clr
-					percent = 0.9 //How much transparency 0-> full color; 1-> white
-
-					//Applying the transparency layer to the obtained color
-					var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
-   					clr = "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1)
-
-
-				} //clr = '#DCDCDC' //#D3D3D3 //For "greying" the non-mutated amino acids
-			}
-			else{
-
-				console.log('Invalid option, something went wrong');
-			}
-			msaImage.paintCell(col, drawImageNSeq, clr);
+		.dim { color: #a1b4cc }
+		.filectrl {
+			background-color: #fff;
+			width: 150px;
 		}
-		drawImageNSeq++;
-		setTimeout("asyncDrawMsaImage()", msaImageTimeout);
-	}
-	function resetMsaImage() {
-		if (!msaImage) return;
-		msaImage.init(1,1,100,100);
-	}
-
-	// ---- stats view plota ---------------------------------------------------------------------------------
-
-	function UpdateStatsPlot() {
-		var wi = 700, he = 300;
-		if (d3StatsPlots) {
-			d3StatsPlots.remove();
-		} else {
-			d3StatsPlots = d3.select("#MSAstats").append("svg")
-						.attr("width", wi)
-						.attr("height",he);
+		.tblhead { background: grey; }
+		.button {
+			font-family: Trebuchet MS, Verdana;
+			font-size: 16px;
+			font-weight: bold;
+			padding: 2px;
+			padding-left:10px;
+			padding-right:10px;
+			text-decoration: none;
+			border: 1px solid #a1b4cc;
 		}
-		var plot = createPlot();
-		// ref.seq not included
-		plot.drawGrid(d3StatsPlots, wi, he, getRange(1, msa.h-1, 10), getRange(0, 1, 10), "#9899c9");
-		plot.addCurve('#585989', 4, msa.identS1.slice(1));
-		plot.addCurve('#7879a9', 4, msa.gapsS.slice(1));
-		$('#inp_gaps').val(msa.gapsMax);
-		$('#inp_ident_min').val(msa.identR.min);
-		$('#inp_ident_max').val(msa.identR.max);
-	}
-
-	function clearPlots() {
-		if (d3PairwiseIdentityPlot) {
-			d3PairwiseIdentityPlot.remove();
+		.button2 {
+			height:24px;
+			font-size:10px;
+			vertical-align:text-top;
 		}
-		if (pwMap) pwMap.clear();
-		if (d3fg) d3fg.clear();
-	}
-	function UpdatePairwisePlot() {
-		if (!msa.pwseqminS.length) { clearPlots(); return; }
-		var wi = 700, he = 300;
-		if (d3PairwiseIdentityPlot) clearPlots();
-		if (d3PairwiseIdentityPlot) {
-			d3PairwiseIdentityPlot.remove();
-		} else {
-			d3PairwiseIdentityPlot = d3.select("#MSApairwise").append("svg")
-							.attr("width", wi)
-							.attr("height", he)
+		.btnPressed {
+			color: #3e3f61;
+			background: none;
+			border: 1px dotted #3e3f61;
 		}
-		var p = createPlot();
-		p.drawGrid(d3PairwiseIdentityPlot, wi, he, getRange(1, msa.h, 10), getRange(0, 1, 10), '#9899c9');
-		p.addCurve('#3e3f61', 4, msa.pwseqminS);
-		p.addCurve('#585989', 4, msa.pwseqavgS);
-		p.addCurve('#7792ba', 4, msa.pwseqmaxS);
-		$('#inp_pwmin_min').val(msa.pwminR.min); $('#inp_pwmin_max').val(msa.pwminR.max);
-		$('#inp_pwmax_min').val(msa.pwmaxR.min); $('#inp_pwmax_max').val(msa.pwmaxR.max);
-		$('#inp_pwavg_min').val(msa.pwavgR.min); $('#inp_pwavg_max').val(msa.pwavgR.max);
-		initPairwiseMap(wi);
-	}
-	function initPairwiseMap(w) {
-		if (!pwMap) {
-			var div = document.getElementById('MSApairwiseMap');
-			var ca = div.getContext('2d');
-			pwMap = createPairwiseMapCanvas(ca);
+		.btnReleased {
+			color: white;
+			background: #a1b4cc;
+			border: 1px solid #a1b4cc;
 		}
-		pwMap.initMap(w, msa.h);
-		pwMapNSeq = 0;
-		console.log('init pairwise map...');
-		setTimeout("asyncDrawPairwiseMap()", msa.asyncTimeout);
-	}
-	function asyncDrawPairwiseMap() {
-		if (pwMapNSeq==msa.h) return;		// pairwise identity completed
-		for(var j=0; j<msa.h; j++) {
-			if (pwMapNSeq==j) continue;
-			var i = msa.getPairIdentity(pwMapNSeq, j);
-			var c = Math.floor(255 * (1-i));
-			var q = c.toString(16);
-			var hex = (c<16?'0':'') + q;
-		//	var clr = '#' + (i<0.333 ? hex+'00ff' : (i<0.666 ? '00'+hex+'ff' : hex+hex+'ff'));
-			var clr = '#'+hex+hex+'ff';
-			pwMap.paintCell(pwMapNSeq, j, clr);
+		.plot_border {
+			border: 1px dotted #7792ba;
 		}
-		pwMapNSeq++;
-		setTimeout("asyncDrawPairwiseMap()", msa.asyncTimeout);
-	}
-	function initForceGraph() {
-		if (!msa.pwdoneQ) return;	// compute pairwise identity first
-		var val = $('#graphSlider').slider('option', 'value');
-		pwGraph = msa.buildPairwiseIdentityGraph(val);
-		if (typeof d3fg === 'undefined') d3fg = createForceGraph();
-		d3fg.init('#MSApairwiseGraph', 700, 700, pwGraph);
-	}
-	function handleDragOver(evt) {
-		evt.stopPropagation();
-		evt.preventDefault();
-		evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-	}
-	function handleFileSelect(evt) {
-	    evt.stopPropagation(); evt.preventDefault();
-	    var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
-		if (!f) return;
-		$('#progress').show().html('reading the file...');
-		var r = new FileReader();
-		r.onload = function(e) { loadNewMSA(e.target.result); }
-		r.readAsText(f);
-		return false;
-	}
-	function handleCustomFileSelect(evt) {
-		evt.stopPropagation(); evt.preventDefault();
-		var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
-		if (!f) return;
-		var r = new FileReader();
-		r.onload = function(e) {
-			msa.loadCustomMsaDataFile(e.target.result, function() {
-				if (!msa.seqorder.cweightsA.length) return;
-				$('#MSAcustomA').html(msa.hcustomwA);
-				$('#MSAcustomB').html(msa.hcustomwB);
-				$('#cdatStatus').html('mapped ' + msa.customweightsN + ' out of ' + msa.customweightsA.length + ' sequences');
-				$('#order option[value="orderCustomAW"]').remove();	 
-				$('#order option[value="orderCustomBW"]').remove();	
-				$("<option value='orderCustomAW'>custom order A</option>").appendTo("#order");
-				$("<option value='orderCustomBW'>custom order B</option>").appendTo("#order");
-				$("#MSAcustomAH").text('custom data A')
-				$("#MSAcustomBH").text('custom data B')
-				console.log($("#MSAcustomAH").text)
-				console.log('>>> got some sorted custom weights....');
-			}); }
-		r.readAsText(f);
-		return false;
-	}
-	function handleCustomFileSelectCouplings(evt) {
-		evt.stopPropagation(); evt.preventDefault();
-		var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
-		if (!f) return;
-		var r = new FileReader();
-		r.onload = function(e) {
-			msa.loadCouplingsDataFile(e.target.result, function() {
-				$('#cdatStatus2').html('mapped ' + msa.couplingsN );
-				console.log('>>> got the couplings');
-				var aux = {};
-				aux.A = msa.A;
-			    aux.B = msa.B;
-			    console.log(msa.A);
-			    console.log(aux.B);
-			    var len = msa.getNormalizedColumnProportions().length;
-				var couplingsLogoDiagram = new CouplingsLogoDiagramD3({elementId: "couplingslogo", elementWidth: msaTextblockWidth, elementHeight: 30}, aux, len);
-				couplingsLogoDiagram.initDiagram();
-			}); }
-		r.readAsText(f);
-		return false;
-	}
-	function UpdateSpeciesDiagram() {
-
-		var width = 700,
-			height = 600,
-			radius = Math.min(width, height) / 2 - 50,
-			color = d3.scale.category20();
-		//	color = {E:'#00e000', A:'#e00000', B:'#0000e0', V:'#228888'};
-
-		var svg = d3.select("#specburst")
-			.attr("width", width)
-			.attr("height", height)
-			.append("g")
-			.attr("transform", "translate(" + width / 2 + "," + height * .52 + ")");
-
-		var partition = d3.layout.partition()
-		    .sort(null)
-		    .size([2 * Math.PI, radius * radius])
-		    .value(function(d) { return 1; });
-
-		var arc = d3.svg.arc()
-		    .startAngle(function(d) { return d.x; })
-		    .endAngle(function(d) { return d.x + d.dx; })
-		    .innerRadius(function(d) { return Math.sqrt(d.y); })
-		    .outerRadius(function(d) { return Math.sqrt(d.y + d.dy); });
-
-		var testobj = { name:'flare', children: [
-				{ name:'sdsdfsdf', size:2, children:[ { name:'a', size:23 }, { name:'b', size:12 } ] },
-				{ name:'qweqwecv', size:3, children:[ { name:'c', size:35 }, { name:'d', size:53 }, { name:'e', size:2 } ] }
-		] };
-
-		var obj = { name:'species', children:[] };	// have to convert object (hash-table) to array
-		for(var e in msa.specdist.children) {
-			var o = msa.specdist.children[e];
-			var v = { name:o.name, size:o.size, children:[] };
-			for(var c in o.children) {
-				var o2 = o.children[c];
-				var v2 = { name:o2.name, size:o2.size };
-				v.children.push(v2);
-			}
-			obj.children.push(v);
+		.hpadding { padding-left:10px; }
+		.title {
+			font-family:Trebuchet MS, Verdana;
+			letter-spacing: -0.08em;
+			font-size:36px;
+			font-weight:bold;
 		}
-		var path = svg.datum(obj)
-			.selectAll("path")
-			.data(partition.nodes)
-			.enter().append("path")
-			.attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
-			.attr("d", arc)
-			.style("stroke", "#fff")
-			.style("fill", function(d) { return color((d.children ? d : d.parent).name); /*color.hasOwnProperty(d.name) ? color[d.name] : 'grey'; */ })
-			.style("fill-rule", "evenodd")
-			.each(stash);
-
-		path.data(partition.value(function(d) { return d.size; }).nodes)
-			.transition()
-			.duration(1500)
-			.attrTween("d", arcTween);
-
-		function stash(d) { d.x0 = d.x; d.dx0 = d.dx; }			// Stash the old values for transition
-		function arcTween(a) {									// Interpolate the arcs in data space
-			var i = d3.interpolate({x: a.x0, dx: a.dx0}, a);
-			return function(t) {
-				var b = i(t);
-				a.x0 = b.x;
-				a.dx0 = b.dx;
-				return arc(b);
-			};
+		.ctrlval { color:navy; font-weight:bold; }
+		.dense { line-height: 80% }
+		.lt { color:grey; }
+		.bgl { background-color:#aaa; }
+		.tiny {
+			font-family:Trebuchet MS, Verdana;
+			font-size:12px;
 		}
-		d3.select(self.frameElement).style("height", height + "px");
-	}
+		.text {
+			font-family:Trebuchet MS, Verdana;
+			font-size:14px;
+			font-weight:normal;
+		}
+		.textB {
+			font-family:Trebuchet MS, Verdana;
+			font-size:14px;
+			font-weight:bold;
+		}
+		.title2 {
+			font-size: 14px;
+			letter-spacing: 0em;
+		}
+		.enter { width: 8em; }
+		li { margin: 0.5em 0; }
+		button { color: #555; }
+		ul {
+			list-style-type: none;
+			padding: 2em;
+			margin: 1em;
+		}
+		.bar { fill: steelblue; }
+		.c1 {stroke: none; fill: #33cc00;}
+		.c2 {stroke: none; fill: #009900;}
+		.c3 {stroke: none; fill: yellow;}
+		.c4 {stroke: none; fill: #cc0000;}
+		.c5 {stroke: none; fill: #0033ff;}
+		.c6 {stroke: none; fill: #6600cc;}
+		.c7 {stroke: none; fill: #0099ff;}
+		.c8 {stroke: none; fill: #666666;}
+		.c9 {stroke: none; fill: #999999;}
+	</style>
+	<link type="text/css" href="jquery-ui-1.8.21.custom.css" rel="stylesheet" />
+	<script type="text/javascript" src="jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="jquery-ui-1.8.21.custom.min.js"></script>
+	<script type="text/javascript" src="d3.v2.min.js"></script>
+	<script type="text/javascript" src="speclist.2012_09.js"></script>	<!-- before seqlib.js -->
+	<link type="text/css" href="seqlib.css" rel="stylesheet" />
+	<script type="text/javascript" src="seqlib.js"></script>
+	<script type="text/javascript" src="SequenceLogoDiagramD3.js"></script>
+	<script type="text/javascript" src="CouplingsLogoDiagramD3.js"></script>
 
-</script>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-57486113-7', 'auto');
-  ga('send', 'pageview');
-</script>
+	<script type="text/javascript">
+
+        var msa;					// msa obj created by seqlib.js
+        var msaTextblockWidth;
+        var d3StatsPlots;
+        var d3PairwiseIdentityPlot;
+        var d3fg;					// d3 force-directed graph
+        var pwGraph;				// pairwise identity graph object
+        var pwMap;					// pairwise map plot object
+        var pwMapNSeq;
+        var msaImage;
+        var msaImgColorType = 1;	// 1:mview, 2:hydrophobicity, 3:mutations
+        var drawImageNSeq;
+        var asyncTimeout = 2;		// ms
+        var msaImageTimeout = 1;	//original at 10
+        var colorSliderDflt = 0;
+        var imageSliderDflt = { w:4, h:4 };
+        var filterGaps = 100;		// default filtering values (=no filtering)
+        var filterIdent = 0;
+        var filterRSgaps = false;
+        var msaPage = 0;
+        var firstSequence ='';
+
+        // Read URL query parameters
+        var getUrlParameter = function getUrlParameter(sParam) {
+            var sPageURL = window.location.search.substring(1),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                }
+            }
+        };
+
+        // _________________________________________________________________________________________________________________________________
+
+        var btn2view = { 'btn1':'#ABTview', 'btn2':'#MSAview', 'btn3':'#STAview', 'btn4':'#IMGview', 'btn5':'#DATview', 'btn6':'#SPEview', 'btn7':'#couplings'  };
+
+        $(document).ready(function() {
+            // some say this works for FF and Chrome only so we're providing FILE input control as well
+            document.documentElement.ondragover = function () { return false; };
+            document.documentElement.ondragend = function () { return false; };
+            document.documentElement.ondrop = handleFileSelect;
+            document.getElementById('files').addEventListener('change', handleFileSelect, false);
+            document.getElementById('customdata').addEventListener('change', handleCustomFileSelect, false);
+            document.getElementById('customdata2').addEventListener('change', handleCustomFileSelectCouplings, false);
+
+            // on-click computing pair-wise identity
+            $('#pairwise_start_btn').click(function(event) { msa.togglePairwiseIdentity(); });
+
+            var grapthSliderDflt = 0.7;
+            $('#graphSlider').slider({ max: 1, min: 0, step:0.01, value:grapthSliderDflt, slide: function(event, ui) { $('#graphSliderVal').html(ui.value); } });
+            $('#graphSliderVal').html(grapthSliderDflt);
+
+            // --- jQuery is awesome -------------
+            $('[id^=btn]').click(function(event) {
+                var view = btn2view[event.target.id];	// button id --> view id
+                if ($(view).is(":visible")) return;		// already active, do nothing
+                $('[id$=view]').not(view).hide();		// select all views except current, hide
+                $(view).show();							// show current
+                $(event.target).removeClass('btnReleased').addClass('btnPressed');
+                $('[id^=btn]').not(event.target).removeClass('btnPressed').addClass('btnReleased');
+            });
+
+            $('#order').change(reloadMSA);
+
+            $('#graphApply').button()
+                .click(function() { if (d3fg) d3fg.clear(); initForceGraph(); })
+                .prop("disabled", false)
+                .button('refresh');
+
+            $('#graphClear').button()
+                .click(function() { if (d3fg) d3fg.clear(); })
+                .prop("disabled", false)
+                .button('refresh');
+
+            $('#colorSlider').slider({ max: 1, min: 0, step:0.01, value:colorSliderDflt,
+                slide: function(event, ui) { $('#colorSliderVal').html(ui.value); msa.setColorThresh(ui.value); } });
+            $('#colorSliderVal').html(colorSliderDflt);
+            $('#colorApply').button().click(reloadMSA);
+
+            // --- filtering --------------------------
+
+            $('#sliderFilterIdent').slider({ max: 100, min: 0, step:1, value:filterIdent,
+                slide: function(event, ui) { $('#sliderFilterIdentVal').html(ui.value+'%'); } });
+            $('#sliderFilterIdentVal').html(filterIdent+'%');
+
+            $('#sliderFilterGaps').slider({ max: 100, min: 0, step:1, value:filterGaps,
+                slide: function(event, ui) { $('#sliderFilterGapsVal').html(ui.value+'%'); } });
+            $('#sliderFilterGapsVal').html(filterGaps+'%');
+
+            $('#CHKrfgaps').attr('checked', false);
+
+            $('#filterStatus').html('');
+            $('#filterApply').button().click(function(){
+                filterGaps = $('#sliderFilterGaps').slider("option", "value");
+                filterIdent = $('#sliderFilterIdent').slider("option", "value");
+                filterRSgaps = $('#CHKrfgaps').is(':checked');
+                var orderby = $('#order').val();
+                msa.reRender(msaPage, orderby, filterGaps, filterIdent, filterRSgaps);
+            });
+            $('#filterExport').button().click(function(){
+                var valGaps = $('#sliderFilterGaps').slider("option", "value");
+                var valIdent = $('#sliderFilterIdent').slider("option", "value");
+                var varRSgaps = $('#CHKrfgaps').is(':checked');
+                msa.applyExport(valGaps, valIdent, false);
+            });
+
+            // image view controls -----------------------
+            $('#imageApply').button().click(drawMsaImage);
+            $('#imageResidWSlider').slider({ max: 10, min: 1, step:1, value:imageSliderDflt.w,
+                slide: function(event, ui) { $('#imageResidW').html(ui.value); } });
+            $('#imageResidW').html(imageSliderDflt.w);
+            $('#imageResidHSlider').slider({ max: 10, min: 1, step:1, value:imageSliderDflt.h,
+                slide: function(event, ui) { $('#imageResidH').html(ui.value); } });
+            $('#imageResidH').html(imageSliderDflt.h);
+
+            // checkboxes to control annotation columns
+            $('#CHKspecies').attr('checked', true);
+            $('#CHKinfo').attr('checked', true);
+            $('#CHKcustom').attr('checked', true);
+            $('#CHKpfam').attr('checked', true);
+            $('#CHKconservation').attr('checked', true);
+            $('#CHKseqlogo').attr('checked', true);
+            $('#CHKspecies').change(function(){ $('[id^=MSAspecies]').toggle(); });
+            $('#CHKinfo').change(function(){ $('[id^=MSAinfo]').toggle(); });
+            $('#CHKpfam').change(function(){ $('[id^=MSApfam]').toggle(); });
+            $('#CHKcustom').change(function(){ $('#MSAcustomA').toggle(); $('#MSAcustomAH').toggle(); });
+            $('#CHKcustom').change(function(){ $('#MSAcustomB').toggle(); $('#MSAcustomBH').toggle(); });
+            $('#CHKconservation').change(function(){ $('#labeled_plot_canvas').toggle(); });
+            $('#CHKseqlogo').change(function(){ $('#seqlogo').toggle(); });
+
+
+            // Read MSA from URL
+            var originURL = getUrlParameter('url');
+
+            console.log(originURL);
+
+            if(originURL !== undefined){
+                $('#progress').show().html('Fetching file...');
+                $.get(originURL, function(data) {
+                    loadNewMSA(data);
+                });
+            }
+        });
+
+        // causes re-rendering of conservation_plot/ruler/msa sequence table
+        function forceMsaRerender() {
+            // some web comments report that children must be rerendered explicitly rather than relying on cascade
+            var plot_canvas = document.getElementById('plot_canvas');
+            var seqlogo = document.getElementById('seqlogo');
+            var ruler = document.getElementById('MSAruler');
+            var seqs = document.getElementById('MSAseqs');
+            var msatable = document.getElementById('MSAview');
+            plot_canvas.style.display='none';
+            seqlogo.style.display='none';
+            ruler.style.display='none';
+            seqs.style.display='none';
+            plot_canvas.offsetWidth;
+            seqlogo.offsetWidth;
+            ruler.offsetWidth;
+            seqs.offsetWidth;
+            plot_canvas.style.display='block';
+            seqlogo.style.display='block';
+            ruler.style.display='block';
+            seqs.style.display='block';
+            msatable.style.display='none';
+            msatable.offsetWidth;
+            msatable.style.display='block';
+        }
+
+        // causes re-rendering of conservation plot and sequence logo if zoom causes change in MSA text width
+        function zoomEventWatchdog() {
+            if (!$('#MSAview').is(":visible")) {return;}
+            if (msaTextblockWidth == null) {return;}
+            if (msaTextblockWidth == 0) {return;}
+            if (Math.abs($('#MSAseqs').width() - msaTextblockWidth) > 5) {
+                //	console.log('logo width reset:' + msaTextblockWidth + ' ' + $('#MSAseqs').width() + ' mismatch');
+                $('#seqlogo').html('');
+                $('#plot_canvas').html('');
+                forceMsaRerender();
+                msaTextblockWidth = $('#MSAseqs').width();
+                var alignmentData = msa.getNormalizedColumnProportions();
+                msa.redrawConservationPlot('#plot_canvas', msaTextblockWidth);
+                var logoDiagram = new SequenceLogoDiagramD3({elementId: "seqlogo", elementWidth: msaTextblockWidth, elementHeight: 48}, alignmentData);
+                logoDiagram.initDiagram();
+            };
+        }
+
+        // this gets called on msa reload only!
+        function switchToMsaView() {
+            // clear entire msa html (12 divs) before switching to MSA view to avoid big pause for large alignments while old msa redraws
+            $('#MSAnames').html('');
+            $('#MSAinfo').html('');
+            $('#MSAcustomA').html('');
+            $('#MSAcustomB').html('');
+            $('#MSAspecies').html('');
+            $('#MSApfam').html('');
+            $('#MSAident1').html('');
+            $('#MSAident2').html('');
+            $('#MSAgaps').html('');
+            $('#MSArows').html('');
+            $('#MSArows2').html('');
+            $('#plot_canvas').html('');
+            $('#seqlogo').html('');
+            $('#MSAruler').html('');
+            $('#MSAseqs').html('');
+            forceMsaRerender();
+            $('#STAview').hide();
+            $('#IMGview').hide();
+            $('#ABTview').hide();
+            $('#DATview').hide();
+            $('#couplings').hide();
+            $('#SPEview').hide();
+            $('#MSAview').show();
+            // TODO: doable with one wildcard selector
+            $('#btn1').removeClass('btnPressed').addClass('btnReleased');
+            $('#btn2').removeClass('btnReleased').addClass('btnPressed');
+            $('#btn3').removeClass('btnPressed').addClass('btnReleased');
+            $('#btn4').removeClass('btnPressed').addClass('btnReleased');
+            $('#btn5').removeClass('btnPressed').addClass('btnReleased');
+            $('#btn6').removeClass('btnPressed').addClass('btnReleased');
+            $('#btn7').removeClass('btnPressed').addClass('btnReleased');
+        }
+
+        // -------------------------------------------------------------------------- msa callbacks -------------
+
+        var msaCallback = {		// msa reading callbacks
+
+            progress : function(msg) { $('#progress').html(msg); },
+            fail : function(msg) { $('#progress').html(msg); },
+            doneReading : function(msg) {			// msa fully parsed
+                console.log('doneReading...');
+                $('#MSAnames').html(msa.hnames);
+                $('#MSAspecies').html(msa.hspecies);
+                $('#MSAinfo').html(msa.hinfo);
+                $('#MSAcustomA').html(msa.hcustomwA);
+                $('#MSAcustomB').html(msa.hcustomwB);
+                $('#MSApfam').html(msa.hpfam);
+                $('#MSAident1').html(msa.hident1);
+                $('#MSAident2').html(msa.hident2);
+                $('#MSAgaps').html(msa.hgaps);
+                $('#MSArows').html(msa.hrows);
+                $('#MSArows2').html(msa.hrows2);
+                $('#MSAseqs').html(msa.hseqs);
+                $('#MSAruler').html(msa.hruler);
+                $('#MSAview').show();
+                msaTextblockWidth = null; // turn off zoom change watchdog
+                if (msa.rerenderQ) {
+                    /*
+                    // TODO: hiding gapping columns not working, comment out for now
+                    //
+                    // in case if msa width changes need to get a chance for dom to update before getting msa div width
+                    setTimeout(function() {
+                        var w = $('#MSAseqs').width();		// need to redraw plot in case columns got filtered out
+                        msa.redrawConservationPlot('#plot_canvas', w);
+                    }, 100);
+                    */
+                    $('#progress').hide(); return;
+                }
+                //	console.log('hnames=' + msa.hnames.length + ' hident=' + msa.hident1.length + ' hgaps=' + msa.hgaps.length +
+                //				'hrows=' + msa.hrows.length + ' hseqs=' + msa.hseqs.length + ' hruler=' + msa.hruler.length);
+                $('#progress').html('computing conservation...');
+                setTimeout("msa.asyncComputeConservation()", msa.asyncTimeout);
+                $('#buttons').show();
+            },
+            doneComputing : function(msg) {			// top charts computed -- gaps and identity
+                console.log('doneComputing .......');
+                forceMsaRerender();
+                msaTextblockWidth = $('#MSAseqs').width();
+                var alignmentData = msa.getNormalizedColumnProportions();
+                msa.redrawConservationPlot('#plot_canvas', msaTextblockWidth);
+                var logoDiagram = new SequenceLogoDiagramD3({elementId: "seqlogo", elementWidth: msaTextblockWidth, elementHeight: 48}, alignmentData);
+                logoDiagram.initDiagram();
+                setInterval(function(){zoomEventWatchdog()}, 1269);
+                UpdateStatsPlot();
+                UpdatePairwisePlot();				// this will clear pairwise plot on new msa loading
+                resetMsaImage();
+                UpdateSpeciesDiagram();
+                if (msa.page.validQ) {
+                    $('#pagingCtrl').show();
+                    var np = msa.page.pages;
+                    var val = msa.page.getstr(msaPage) + ' out of ' + msa.h;
+                    // paging slider ------------------------------
+                    $('#sliderPage').slider({
+                        min: 1, max: np, step:1, value: 1,
+                        slide: function(event, ui) {
+                            msaPage = ui.value - 1;
+                            var val = msa.page.getstr(msaPage) + ' out of ' + msa.h;
+                            $('#sliderPageVal').html(val);
+                        },
+                        stop: function(event, ui) { msaPage = ui.value-1; reloadMSA(); }
+                    });
+                    $('#sliderPageVal').html(val);
+                } else {
+                    $('#pagingCtrl').hide();
+                }
+                $('#progress').hide();
+            }
+        };
+
+        var msaPairwise = {							// pairwise identity computation callback
+            start : function() {
+                $('#pairwise_status').html('');
+                $('#pairwise_start_btn').html('cancel');
+                $('#pairwise_start_btn').click(function(event) { $.proxy(msa.togglePairwiseIdentity, msa); });
+            },
+            progress : function(msg) { $('#pairwise_status').html(msg); },
+            done : function(completeQ) {
+                if (completeQ) {
+                    $('#pairwise_start_btn').html('');
+                    var txt = "<b><span class='tc2'>max</span>/<span class='tc1'>average</span>/<span class='tc0'>min</span></b> (sorted by ranking)";
+                    $('#pairwise_status').html(txt);
+                    $('#MSApairwise').removeClass('plot_border');
+                    UpdatePairwisePlot();
+                } else {
+                    $('#pairwise_status').html(' (takes a while for large alignments)');
+                    $('#pairwise_start_btn').html('calculate');
+                    $('#pairwise_start_btn').click(function(event) { $.proxy(msa.togglePairwiseIdentity, msa); });
+                }
+            }
+        };
+
+        // ---------------------------------------------------------- global UI functions ---------------------
+
+        function reloadMSA() {
+            $('#progress').show().html('updating html...');
+            var orderby = $('#order').val();
+            msa.reRender(msaPage, orderby, filterGaps, filterIdent, filterRSgaps);
+        }
+        function loadNewMSA(data) {
+            console.log('loadNewMSA');
+            $('#progress').show().html('updating html...');
+            switchToMsaView();
+            $('#pairwise_start_btn').html('calculate');
+            $('#pairwise_start_btn').click(function(event) { $.proxy(msa.togglePairwiseIdentity, msa); });
+            $('#pairwise_status').html(' (takes a while for large alignments)');
+            $('[id^=inp_]').val('');
+            $('#MSApairwise').addClass('plot_border');
+            $('#colorSliderVal').html(colorSliderDflt);
+            $('#colorSlider').slider('option', 'value', colorSliderDflt);
+            $('#order').val('orderOrig');
+            $('#customdata').val('');								// clear path in custom data file control
+            $('#customdata2').val('');								// clear path in custom data file control
+            $('#order option[value="orderCustomAW"]').remove();		// remove sorting option from msa order dropdown
+            $('#order option[value="orderCustomBW"]').remove();		// remove sorting option from msa order dropdown
+            $("#MSAcustomAH").text('')
+            $("#MSAcustomBH").text('')
+            var species = isset(speclist) ? speclist : false;
+            if (!msa) msa = createMSA(species);
+            msa.asyncRead(data, msaCallback, msaPairwise);
+        }
+
+        // --- pulling msa examples from the server --------------------------------------------------------------
+
+        var exmpUrl = "http://sanderlab.org/alignmentviewer";
+        function PullMsaExample(which) {
+            var url = exmpUrl;
+            switch (which) {
+                case 1: url += '/1bkr_A.1-108.msa.txt'; break;
+                case 2: url += '/MYG_PHYMC.1-154.msa.txt'; break;
+                case 3: url += '/EGFR_HUMAN.712-968.msa.txt'; break;
+                case 4: url += '/BLAT_ECOLX.1-286.msa.txt'; break;
+                default: return;
+            }
+            $.get(url, function(data) { loadNewMSA(data); });
+        }
+
+        // --- canvas --------------------------------------------------------------------------------------------
+
+        function drawMsaImage() {
+            $('#msaImage').html('');
+            var div = document.getElementById('msaImage');
+            var ca = div.getContext('2d');
+            msaImage = createMsaImageCanvas(div, ca);
+            var currentFilteredSequenceCount = msa.h;
+            var filteredSequenceOrder = msa.getCurrentFilteredSequenceOrder();
+            if (filteredSequenceOrder != null) {currentFilteredSequenceCount = filteredSequenceOrder.length;}
+            var rw = $('#imageResidW').text();
+            var rh = $('#imageResidH').text();
+            msaImgColorType = $('#msaImgClrSelect').val();
+            msaImage.init(rw, rh, msa.w, currentFilteredSequenceCount);
+            drawImageNSeq = 0;
+            console.log('init msa image...');
+            console.log(this.seqs);
+            setTimeout("asyncDrawMsaImage()", 0); //0<-msaImageTimeout
+        }
+        function asyncDrawMsaImage() {
+            var filteredSequenceOrder = msa.getCurrentFilteredSequenceOrder();
+            if (filteredSequenceOrder == null || filteredSequenceOrder.length == 0) {return;}
+            if (drawImageNSeq == filteredSequenceOrder.length) return;
+            for(var col=0; col<msa.w; col++) {
+                var sequenceIndex = filteredSequenceOrder[drawImageNSeq];
+                var aa = msa.seqs[sequenceIndex].charAt(col);
+                if (aa=='.' || aa=='-') continue;
+
+                if (msaImgColorType==1) {clr =getResidColor('mview', aa);}
+                else if (msaImgColorType==2) {clr = getResidHydroColor(aa);}
+                else if (msaImgColorType==3) {
+
+                    clr = getResidColor('mview', aa);
+
+                    if (msa.seqs[sequenceIndex].charAt(col) == msa.seqs[0].charAt(col)) { //Reducing opacity instead of preventing any disply
+
+                        color = clr
+                        percent = 0.9 //How much transparency 0-> full color; 1-> white
+
+                        //Applying the transparency layer to the obtained color
+                        var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+                        clr = "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1)
+
+
+                    } //clr = '#DCDCDC' //#D3D3D3 //For "greying" the non-mutated amino acids
+                }
+                else{
+
+                    console.log('Invalid option, something went wrong');
+                }
+                msaImage.paintCell(col, drawImageNSeq, clr);
+            }
+            drawImageNSeq++;
+            setTimeout("asyncDrawMsaImage()", msaImageTimeout);
+        }
+        function resetMsaImage() {
+            if (!msaImage) return;
+            msaImage.init(1,1,100,100);
+        }
+
+        // ---- stats view plota ---------------------------------------------------------------------------------
+
+        function UpdateStatsPlot() {
+            var wi = 700, he = 300;
+            if (d3StatsPlots) {
+                d3StatsPlots.remove();
+            } else {
+                d3StatsPlots = d3.select("#MSAstats").append("svg")
+                    .attr("width", wi)
+                    .attr("height",he);
+            }
+            var plot = createPlot();
+            // ref.seq not included
+            plot.drawGrid(d3StatsPlots, wi, he, getRange(1, msa.h-1, 10), getRange(0, 1, 10), "#9899c9");
+            plot.addCurve('#585989', 4, msa.identS1.slice(1));
+            plot.addCurve('#7879a9', 4, msa.gapsS.slice(1));
+            $('#inp_gaps').val(msa.gapsMax);
+            $('#inp_ident_min').val(msa.identR.min);
+            $('#inp_ident_max').val(msa.identR.max);
+        }
+
+        function clearPlots() {
+            if (d3PairwiseIdentityPlot) {
+                d3PairwiseIdentityPlot.remove();
+            }
+            if (pwMap) pwMap.clear();
+            if (d3fg) d3fg.clear();
+        }
+        function UpdatePairwisePlot() {
+            if (!msa.pwseqminS.length) { clearPlots(); return; }
+            var wi = 700, he = 300;
+            if (d3PairwiseIdentityPlot) clearPlots();
+            if (d3PairwiseIdentityPlot) {
+                d3PairwiseIdentityPlot.remove();
+            } else {
+                d3PairwiseIdentityPlot = d3.select("#MSApairwise").append("svg")
+                    .attr("width", wi)
+                    .attr("height", he)
+            }
+            var p = createPlot();
+            p.drawGrid(d3PairwiseIdentityPlot, wi, he, getRange(1, msa.h, 10), getRange(0, 1, 10), '#9899c9');
+            p.addCurve('#3e3f61', 4, msa.pwseqminS);
+            p.addCurve('#585989', 4, msa.pwseqavgS);
+            p.addCurve('#7792ba', 4, msa.pwseqmaxS);
+            $('#inp_pwmin_min').val(msa.pwminR.min); $('#inp_pwmin_max').val(msa.pwminR.max);
+            $('#inp_pwmax_min').val(msa.pwmaxR.min); $('#inp_pwmax_max').val(msa.pwmaxR.max);
+            $('#inp_pwavg_min').val(msa.pwavgR.min); $('#inp_pwavg_max').val(msa.pwavgR.max);
+            initPairwiseMap(wi);
+        }
+        function initPairwiseMap(w) {
+            if (!pwMap) {
+                var div = document.getElementById('MSApairwiseMap');
+                var ca = div.getContext('2d');
+                pwMap = createPairwiseMapCanvas(ca);
+            }
+            pwMap.initMap(w, msa.h);
+            pwMapNSeq = 0;
+            console.log('init pairwise map...');
+            setTimeout("asyncDrawPairwiseMap()", msa.asyncTimeout);
+        }
+        function asyncDrawPairwiseMap() {
+            if (pwMapNSeq==msa.h) return;		// pairwise identity completed
+            for(var j=0; j<msa.h; j++) {
+                if (pwMapNSeq==j) continue;
+                var i = msa.getPairIdentity(pwMapNSeq, j);
+                var c = Math.floor(255 * (1-i));
+                var q = c.toString(16);
+                var hex = (c<16?'0':'') + q;
+                //	var clr = '#' + (i<0.333 ? hex+'00ff' : (i<0.666 ? '00'+hex+'ff' : hex+hex+'ff'));
+                var clr = '#'+hex+hex+'ff';
+                pwMap.paintCell(pwMapNSeq, j, clr);
+            }
+            pwMapNSeq++;
+            setTimeout("asyncDrawPairwiseMap()", msa.asyncTimeout);
+        }
+        function initForceGraph() {
+            if (!msa.pwdoneQ) return;	// compute pairwise identity first
+            var val = $('#graphSlider').slider('option', 'value');
+            pwGraph = msa.buildPairwiseIdentityGraph(val);
+            if (typeof d3fg === 'undefined') d3fg = createForceGraph();
+            d3fg.init('#MSApairwiseGraph', 700, 700, pwGraph);
+        }
+        function handleDragOver(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+        }
+        function handleFileSelect(evt) {
+            evt.stopPropagation(); evt.preventDefault();
+            var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
+            if (!f) return;
+            $('#progress').show().html('reading the file...');
+            var r = new FileReader();
+            r.onload = function(e) { loadNewMSA(e.target.result); }
+            r.readAsText(f);
+            return false;
+        }
+        function handleCustomFileSelect(evt) {
+            evt.stopPropagation(); evt.preventDefault();
+            var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
+            if (!f) return;
+            var r = new FileReader();
+            r.onload = function(e) {
+                msa.loadCustomMsaDataFile(e.target.result, function() {
+                    if (!msa.seqorder.cweightsA.length) return;
+                    $('#MSAcustomA').html(msa.hcustomwA);
+                    $('#MSAcustomB').html(msa.hcustomwB);
+                    $('#cdatStatus').html('mapped ' + msa.customweightsN + ' out of ' + msa.customweightsA.length + ' sequences');
+                    $('#order option[value="orderCustomAW"]').remove();
+                    $('#order option[value="orderCustomBW"]').remove();
+                    $("<option value='orderCustomAW'>custom order A</option>").appendTo("#order");
+                    $("<option value='orderCustomBW'>custom order B</option>").appendTo("#order");
+                    $("#MSAcustomAH").text('custom data A')
+                    $("#MSAcustomBH").text('custom data B')
+                    console.log($("#MSAcustomAH").text)
+                    console.log('>>> got some sorted custom weights....');
+                }); }
+            r.readAsText(f);
+            return false;
+        }
+        function handleCustomFileSelectCouplings(evt) {
+            evt.stopPropagation(); evt.preventDefault();
+            var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
+            if (!f) return;
+            var r = new FileReader();
+            r.onload = function(e) {
+                msa.loadCouplingsDataFile(e.target.result, function() {
+                    $('#cdatStatus2').html('mapped ' + msa.couplingsN );
+                    console.log('>>> got the couplings');
+                    var aux = {};
+                    aux.A = msa.A;
+                    aux.B = msa.B;
+                    console.log(msa.A);
+                    console.log(aux.B);
+                    var len = msa.getNormalizedColumnProportions().length;
+                    var couplingsLogoDiagram = new CouplingsLogoDiagramD3({elementId: "couplingslogo", elementWidth: msaTextblockWidth, elementHeight: 30}, aux, len);
+                    couplingsLogoDiagram.initDiagram();
+                }); }
+            r.readAsText(f);
+            return false;
+        }
+        function UpdateSpeciesDiagram() {
+
+            var width = 700,
+                height = 600,
+                radius = Math.min(width, height) / 2 - 50,
+                color = d3.scale.category20();
+            //	color = {E:'#00e000', A:'#e00000', B:'#0000e0', V:'#228888'};
+
+            var svg = d3.select("#specburst")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height * .52 + ")");
+
+            var partition = d3.layout.partition()
+                .sort(null)
+                .size([2 * Math.PI, radius * radius])
+                .value(function(d) { return 1; });
+
+            var arc = d3.svg.arc()
+                .startAngle(function(d) { return d.x; })
+                .endAngle(function(d) { return d.x + d.dx; })
+                .innerRadius(function(d) { return Math.sqrt(d.y); })
+                .outerRadius(function(d) { return Math.sqrt(d.y + d.dy); });
+
+            var testobj = { name:'flare', children: [
+                    { name:'sdsdfsdf', size:2, children:[ { name:'a', size:23 }, { name:'b', size:12 } ] },
+                    { name:'qweqwecv', size:3, children:[ { name:'c', size:35 }, { name:'d', size:53 }, { name:'e', size:2 } ] }
+                ] };
+
+            var obj = { name:'species', children:[] };	// have to convert object (hash-table) to array
+            for(var e in msa.specdist.children) {
+                var o = msa.specdist.children[e];
+                var v = { name:o.name, size:o.size, children:[] };
+                for(var c in o.children) {
+                    var o2 = o.children[c];
+                    var v2 = { name:o2.name, size:o2.size };
+                    v.children.push(v2);
+                }
+                obj.children.push(v);
+            }
+            var path = svg.datum(obj)
+                .selectAll("path")
+                .data(partition.nodes)
+                .enter().append("path")
+                .attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
+                .attr("d", arc)
+                .style("stroke", "#fff")
+                .style("fill", function(d) { return color((d.children ? d : d.parent).name); /*color.hasOwnProperty(d.name) ? color[d.name] : 'grey'; */ })
+                .style("fill-rule", "evenodd")
+                .each(stash);
+
+            path.data(partition.value(function(d) { return d.size; }).nodes)
+                .transition()
+                .duration(1500)
+                .attrTween("d", arcTween);
+
+            function stash(d) { d.x0 = d.x; d.dx0 = d.dx; }			// Stash the old values for transition
+            function arcTween(a) {									// Interpolate the arcs in data space
+                var i = d3.interpolate({x: a.x0, dx: a.dx0}, a);
+                return function(t) {
+                    var b = i(t);
+                    a.x0 = b.x;
+                    a.dx0 = b.dx;
+                    return arc(b);
+                };
+            }
+            d3.select(self.frameElement).style("height", height + "px");
+        }
+
+	</script>
+	<script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-57486113-7', 'auto');
+        ga('send', 'pageview');
+	</script>
 </head>
 <body>
 
@@ -786,9 +814,9 @@
 		alignment file in plain text, STOCKHOLM or FASTA format.<br>
 		Or use example alignment:
 			<a onclick="PullMsaExample(1)">1bkr:A</a>,
-<!--			<a onclick="PullMsaExample(2)">MYG</a>,
-			<a onclick="PullMsaExample(3)">EGFR</a>, 
-			<a onclick="PullMsaExample(4)">BLAT</a><br>-->
+			<!--			<a onclick="PullMsaExample(2)">MYG</a>,
+                        <a onclick="PullMsaExample(3)">EGFR</a>,
+                        <a onclick="PullMsaExample(4)">BLAT</a><br>-->
 		<span style='font-size:5px;'><br></span></span>
 		<input type="file" class='filectrl' id="files" size='40'><br>
 	</td></tr>
@@ -799,197 +827,197 @@
 <!-- ______________________________________________________ image view ___________________________________________________ -->
 
 <table id="IMGview" border='0' cellpadding='1' cellspacing='1' style='display:none;'>
-<tr><td class='text'>
-<br>
-	<table class='text'>
-	<tr><td nowrap> Generate msa image using
-		<select id='msaImgClrSelect'>
-		<option value="1">mview</option>
-		<option value="2">hydrophobicity</option>
-		<option value="3">Mutations</option>
-		</select> coloring :
-	</td><td style='padding-left:50px;' nowrap> <button id='imageApply' style='height:24px; font-size:10px; vertical-align:text-top;'> apply </button>
-	</td></tr></table>
+	<tr><td class='text'>
+		<br>
+		<table class='text'>
+			<tr><td nowrap> Generate msa image using
+				<select id='msaImgClrSelect'>
+					<option value="1">mview</option>
+					<option value="2">hydrophobicity</option>
+					<option value="3">Mutations</option>
+				</select> coloring :
+			</td><td style='padding-left:50px;' nowrap> <button id='imageApply' style='height:24px; font-size:10px; vertical-align:text-top;'> apply </button>
+			</td></tr></table>
 
-	<table><tr><td class='text lt' align='right' nowrap>
-		residue width in pixels: <span id='imageResidW'></span> </td><td class='text' style='padding-left:15px;'><div id='imageResidWSlider' style='width: 200px; height:6px;'></div>
-	</td></tr><tr><td class='text lt' align='right' nowrap>
-		residue height in pixels: <span id='imageResidH'></span> </td><td class='text' style='padding-left:15px;'><div id='imageResidHSlider' style='width: 200px; height:6px;'></div>
-	</td></tr></table>
-	<br><br>
-	<canvas class='plot_border' id='msaImage' width='100' height='100' style='margin-top:6px;'></canvas>
+		<table><tr><td class='text lt' align='right' nowrap>
+			residue width in pixels: <span id='imageResidW'></span> </td><td class='text' style='padding-left:15px;'><div id='imageResidWSlider' style='width: 200px; height:6px;'></div>
+		</td></tr><tr><td class='text lt' align='right' nowrap>
+			residue height in pixels: <span id='imageResidH'></span> </td><td class='text' style='padding-left:15px;'><div id='imageResidHSlider' style='width: 200px; height:6px;'></div>
+		</td></tr></table>
+		<br><br>
+		<canvas class='plot_border' id='msaImage' width='100' height='100' style='margin-top:6px;'></canvas>
 
-	<br><br><br><br><br><br><br><br>
+		<br><br><br><br><br><br><br><br>
 
-</td></tr>
+	</td></tr>
 </table>
 
 <!-- ______________________________________________________ stats view ____________________________________________________ -->
 
 <table id="STAview" border='0' style='display:none;'>
-<tr><td valign='top'>
-	<span class='textB'>Sequence <span class='tc2'>gaps</span> &amp; <span class='tc1'>ref.seq identity</span></span><span class='text text2'> - amount of sequences with given fraction of gaps/identity (sorted by ranking)</span>
-	<div id='MSAstats'></div>
+	<tr><td valign='top'>
+		<span class='textB'>Sequence <span class='tc2'>gaps</span> &amp; <span class='tc1'>ref.seq identity</span></span><span class='text text2'> - amount of sequences with given fraction of gaps/identity (sorted by ranking)</span>
+		<div id='MSAstats'></div>
 	</td><td class='text' valign='top'></td>
-</tr><tr><td class='text'>
+	</tr><tr><td class='text'>
 	<span class='textB'>Pairwise identity</span>&nbsp;&nbsp;&nbsp;<a id='pairwise_start_btn'>calculate</a><span id='pairwise_status'> (takes a while for large alignments)</span>
 	<div class='plot_border tc3' id='MSApairwise' style='margin-top:6px; width:700px; height:300px;'></div>
-	</td><td class='text' valign='top'></td>
+</td><td class='text' valign='top'></td>
 </tr><tr><td class='text'>
 	<div class='textB' style='margin-top:6px;'>Pairwise identity 2D map</div>
 	<canvas class='plot_border' id='MSApairwiseMap' width="700" height="700" style='margin-top:6px;'></canvas><br>
-	</td><td class='text' valign='top'><ul class='text' style='line-height:90%'>
-		<li><span style='background-color:#ffffff'>&nbsp;&nbsp;&nbsp;</span> 0 </li>
-		<li><span style='background-color:#d8d8ff'>&nbsp;&nbsp;&nbsp;</span> 0.1 </li>
-		<li><span style='background-color:#ccccff'>&nbsp;&nbsp;&nbsp;</span> 0.2 </li>
-		<li><span style='background-color:#a8a8ff'>&nbsp;&nbsp;&nbsp;</span> 0.3 </li>
-		<li><span style='background-color:#9999ff'>&nbsp;&nbsp;&nbsp;</span> 0.4 </li>
-		<li><span style='background-color:#7878ff'>&nbsp;&nbsp;&nbsp;</span> 0.5 </li>
-		<li><span style='background-color:#6666ff'>&nbsp;&nbsp;&nbsp;</span> 0.6 </li>
-		<li><span style='background-color:#4848ff'>&nbsp;&nbsp;&nbsp;</span> 0.7 </li>
-		<li><span style='background-color:#3333ff'>&nbsp;&nbsp;&nbsp;</span> 0.8 </li>
-		<li><span style='background-color:#1919ff'>&nbsp;&nbsp;&nbsp;</span> 0.9 </li>
-		<li><span style='background-color:#0000ff'>&nbsp;&nbsp;&nbsp;</span> 1 </li>
-	</ul></td>
+</td><td class='text' valign='top'><ul class='text' style='line-height:90%'>
+	<li><span style='background-color:#ffffff'>&nbsp;&nbsp;&nbsp;</span> 0 </li>
+	<li><span style='background-color:#d8d8ff'>&nbsp;&nbsp;&nbsp;</span> 0.1 </li>
+	<li><span style='background-color:#ccccff'>&nbsp;&nbsp;&nbsp;</span> 0.2 </li>
+	<li><span style='background-color:#a8a8ff'>&nbsp;&nbsp;&nbsp;</span> 0.3 </li>
+	<li><span style='background-color:#9999ff'>&nbsp;&nbsp;&nbsp;</span> 0.4 </li>
+	<li><span style='background-color:#7878ff'>&nbsp;&nbsp;&nbsp;</span> 0.5 </li>
+	<li><span style='background-color:#6666ff'>&nbsp;&nbsp;&nbsp;</span> 0.6 </li>
+	<li><span style='background-color:#4848ff'>&nbsp;&nbsp;&nbsp;</span> 0.7 </li>
+	<li><span style='background-color:#3333ff'>&nbsp;&nbsp;&nbsp;</span> 0.8 </li>
+	<li><span style='background-color:#1919ff'>&nbsp;&nbsp;&nbsp;</span> 0.9 </li>
+	<li><span style='background-color:#0000ff'>&nbsp;&nbsp;&nbsp;</span> 1 </li>
+</ul></td>
 </tr><tr><td class='text'>
 	<div class='textB' style='margin-top:6px;'>Pairwise identity force-directed graph</div>
 	<div class='plot_border' id='MSApairwiseGraph' style='width:700p; height:700;'></div>
-	</td><td class='text' valign='top'>
-		<ul class='text'>
+</td><td class='text' valign='top'>
+	<ul class='text'>
 		<li>lowest seq.identity to include in graph : <span id='graphSliderVal'></span></li>
 		<li><div id='graphSlider'></div></li>
 		<li><button id='graphApply'>rebuild graph</button>&nbsp;&nbsp;&nbsp;&nbsp;<button id='graphClear'>clear graph</button></li>
-		</ul>
-	</td>
+	</ul>
+</td>
 </tr><tr><td class='text'>
-	</td><td class='text' valign='top'>
-	</td>
+</td><td class='text' valign='top'>
+</td>
 </tr></table>
 
 <!-- ______________________________________________________ MSA species view _______________________________________________ -->
 
 <table id="SPEview" border='0' cellpadding='1' cellspacing='1' style='display:none;'>
-<tr><td class='text'>
+	<tr><td class='text'>
 
-	<!-- <svg class='plot_border' id='specburst'></svg> -->
+		<!-- <svg class='plot_border' id='specburst'></svg> -->
 
 
-	Load the couplings already sorted by importance.<br>
-	File format is tab-separated text file with two columns: residue A contacts residue B<br>
-	Each row in the input file is represented by a color with a maximum of 20 contacts.<br>
-	Not all positions have to be present but do not use the same position more than once.<br><br>
-	<input type="file" class='filectrl' id="customdata2" size='40'><br>
-	<br><div id='cdatStatus2'></div>
+		Load the couplings already sorted by importance.<br>
+		File format is tab-separated text file with two columns: residue A contacts residue B<br>
+		Each row in the input file is represented by a color with a maximum of 20 contacts.<br>
+		Not all positions have to be present but do not use the same position more than once.<br><br>
+		<input type="file" class='filectrl' id="customdata2" size='40'><br>
+		<br><div id='cdatStatus2'></div>
 
-</td></tr></table>
+	</td></tr></table>
 
 <!-- ______________________________________________________ MSA custom couplings view ___________________________________________ -->
 
 <table id="couplings" border='0' cellpadding='1' cellspacing='1' style='display:none;'>
-<tr><td class='text'>
+	<tr><td class='text'>
 
-	Load the couplings already sorted by strength. The residues start from the position zero.<br>
-	File format is tab-separated text file with two columns:
-	the position numbers of the coupled residues (position A contacts position B)<br>
-	Not all positions have to be present and only few will be displayed.<br><br>
-	<input type="file" class='filectrl' id="customdata2" size='40'><br>
-	<br><div id='cdatStatus2'></div>
+		Load the couplings already sorted by strength. The residues start from the position zero.<br>
+		File format is tab-separated text file with two columns:
+		the position numbers of the coupled residues (position A contacts position B)<br>
+		Not all positions have to be present and only few will be displayed.<br><br>
+		<input type="file" class='filectrl' id="customdata2" size='40'><br>
+		<br><div id='cdatStatus2'></div>
 
-</td></tr></table>
+	</td></tr></table>
 
 <!-- ______________________________________________________ MSA custom data view ___________________________________________ -->
 
 <table id="DATview" border='0' cellpadding='1' cellspacing='1' style='display:none;'>
-<tr><td class='text'>
+	<tr><td class='text'>
 
-	Load custom sequence annotation to be shown along the alignment as sortable column.<br>
-	File format is tab-separated text file with two columns:
-	sequence name as in your multiple sequence alignment (MYG_HUMAN/1-154), annotation (numerical or text).<br>
-	Not all sequence names have to be present - can provide as few as one to move it up when sorted.<br>
-	Position of reference sequence is maintained in sorted msa.<br><br>
-	<input type="file" class='filectrl' id="customdata" size='40'><br>
-	<br><div id='cdatStatus'></div>
+		Load custom sequence annotation to be shown along the alignment as sortable column.<br>
+		File format is tab-separated text file with two columns:
+		sequence name as in your multiple sequence alignment (MYG_HUMAN/1-154), annotation (numerical or text).<br>
+		Not all sequence names have to be present - can provide as few as one to move it up when sorted.<br>
+		Position of reference sequence is maintained in sorted msa.<br><br>
+		<input type="file" class='filectrl' id="customdata" size='40'><br>
+		<br><div id='cdatStatus'></div>
 
-</td></tr></table>
+	</td></tr></table>
 
 <!-- ______________________________________________________ MSA view ______________________________________________________ -->
 
 <table id="MSAview" border='0' cellpadding='1' cellspacing='1' style='display:none;'>
-<tr><td></td>
-	<td class='text' colspan='11' nowrap>
+	<tr><td></td>
+		<td class='text' colspan='11' nowrap>
 
-		<table border='0' cellpadding='1' cellspacing='1'><tr><td class='text' nowrap>
+			<table border='0' cellpadding='1' cellspacing='1'><tr><td class='text' nowrap>
 
 			<span class='tc2'>
 				&nbsp;ident1% = fraction of reference sequence identical to second sequence (gaps not counted)<br>
 				&nbsp;ident2% = fraction of second sequence identical to reference sequence (gaps not counted)<br>
 			</span><span style='font-size:5px;'><br></span>
 
-			&nbsp;Sequence order: <select id='order'>
-			<option value="orderOrig">original</option>
-			<option value="orderIdent1">identity1</option>
-			<option value="orderIdent2">identity2</option>
+				&nbsp;Sequence order: <select id='order'>
+				<option value="orderOrig">original</option>
+				<option value="orderIdent1">identity1</option>
+				<option value="orderIdent2">identity2</option>
 			</select><br>
 
-			<span style='font-size:5px;'><br></span>
-			<input type="checkbox" id="CHKspecies"> show species <span class='lt'>(kingdom code: A-archaea B-bacteria E-eukaryota V-viruses, Uniprot IDs required)</span><br>
-			<input type="checkbox" id="CHKinfo"> show sequence annotation <span class='lt'>(any text after sequence name)</span><br>
-			<input type="checkbox" id="CHKpfam"> link to protein Pfam domain structure page<br>
-			<input type="checkbox" id="CHKcustom"> custom annotations <span class='lt'>(see tab <i>custom data</i>)</span><br>
-			<input type="checkbox" id="CHKconservation"> gap &amp; conservation bar chart<br>
-			<input type="checkbox" id="CHKseqlogo"> sequence logo<br>
-			<span style='font-size:5px'><br></span>
-			&nbsp;Color columns with conservation higher than: <span id='colorSliderVal'></span><br>
-			<table class='text'><tr><td nowrap><div id='colorSlider' style='width: 300px; height:6px;'></div></td>
-			<td>&nbsp;&nbsp;&nbsp;<button id='colorApply' style='height:24px; font-size:10px; vertical-align:text-top;'>apply</button></td>
-			</tr></table>
-			<span style="font-size:5px"><br></span>
-			<div id="pagingCtrl">
-			<span class="ctrlval">Currently showing sequences: <span id="sliderPageVal"></span></span><br>
-			<span style="font-size:5px"><br></span>
-			<div style="width: 300px; height:6px;" id="sliderPage" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a class="ui-slider-handle ui-state-default ui-corner-all ui-state-focus" href="#" style="left: 0%;"></a></div>
-			</div>
-
-		</td><td class='text hpadding' valign='top' nowrap>
-
-			<table class='text' border='0' cellspacing='1' cellpadding='10' width='340'>
-			<tr><td class='hpadding textB' bgcolor='#d0d0e0' style='color:white'> Filtering </td></tr>
-			<tr><td class='hpadding' nowrap bgcolor='#f0f0f0'>
+				<span style='font-size:5px;'><br></span>
+				<input type="checkbox" id="CHKspecies"> show species <span class='lt'>(kingdom code: A-archaea B-bacteria E-eukaryota V-viruses, Uniprot IDs required)</span><br>
+				<input type="checkbox" id="CHKinfo"> show sequence annotation <span class='lt'>(any text after sequence name)</span><br>
+				<input type="checkbox" id="CHKpfam"> link to protein Pfam domain structure page<br>
+				<input type="checkbox" id="CHKcustom"> custom annotations <span class='lt'>(see tab <i>custom data</i>)</span><br>
+				<input type="checkbox" id="CHKconservation"> gap &amp; conservation bar chart<br>
+				<input type="checkbox" id="CHKseqlogo"> sequence logo<br>
 				<span style='font-size:5px'><br></span>
+				&nbsp;Color columns with conservation higher than: <span id='colorSliderVal'></span><br>
+				<table class='text'><tr><td nowrap><div id='colorSlider' style='width: 300px; height:6px;'></div></td>
+					<td>&nbsp;&nbsp;&nbsp;<button id='colorApply' style='height:24px; font-size:10px; vertical-align:text-top;'>apply</button></td>
+				</tr></table>
+				<span style="font-size:5px"><br></span>
+				<div id="pagingCtrl">
+					<span class="ctrlval">Currently showing sequences: <span id="sliderPageVal"></span></span><br>
+					<span style="font-size:5px"><br></span>
+					<div style="width: 300px; height:6px;" id="sliderPage" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a class="ui-slider-handle ui-state-default ui-corner-all ui-state-focus" href="#" style="left: 0%;"></a></div>
+				</div>
 
-				Hide sequences with gaps higher than <span id='sliderFilterGapsVal'></span><br>
-				<span style='font-size:4px'><br></span>
-				<div id='sliderFilterGaps' style='width: 250px; height:6px;'></div>
-				<span style='font-size:10px'><br></span>
-				Hide sequences with identity1 lower than <span id='sliderFilterIdentVal'></span><br>
-				<span style='font-size:4px'><br></span>
-				<div id='sliderFilterIdent' style='width: 250px; height:6px;'></div><br>
+			</td><td class='text hpadding' valign='top' nowrap>
 
-				<!--
-				<input type="checkbox" id="CHKrfgaps">
-				Hide columns with gaps in reference sequence<br>
-				-->
+				<table class='text' border='0' cellspacing='1' cellpadding='10' width='340'>
+					<tr><td class='hpadding textB' bgcolor='#d0d0e0' style='color:white'> Filtering </td></tr>
+					<tr><td class='hpadding' nowrap bgcolor='#f0f0f0'>
+						<span style='font-size:5px'><br></span>
 
-			</td></tr><tr><td class='hpadding' align='middle' nowrap bgcolor='#f0f0f0'>
+						Hide sequences with gaps higher than <span id='sliderFilterGapsVal'></span><br>
+						<span style='font-size:4px'><br></span>
+						<div id='sliderFilterGaps' style='width: 250px; height:6px;'></div>
+						<span style='font-size:10px'><br></span>
+						Hide sequences with identity1 lower than <span id='sliderFilterIdentVal'></span><br>
+						<span style='font-size:4px'><br></span>
+						<div id='sliderFilterIdent' style='width: 250px; height:6px;'></div><br>
 
-				<span id='filterStatus'></span>
-				<span style='font-size:4px'><br></span>
-				<button id='filterExport' style='height:24px; font-size:10px; vertical-align:text-top;'>&nbsp;&nbsp;&nbsp;export&nbsp;&nbsp;&nbsp;</button>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<button id='filterApply' style='height:24px; font-size:10px; vertical-align:text-top;'>&nbsp;&nbsp;&nbsp;apply&nbsp;&nbsp;&nbsp;</button>
-			</td></tr>
-			</table>
+						<!--
+                        <input type="checkbox" id="CHKrfgaps">
+                        Hide columns with gaps in reference sequence<br>
+                        -->
 
-		</td></tr></table>
+					</td></tr><tr><td class='hpadding' align='middle' nowrap bgcolor='#f0f0f0'>
 
-	</td>
-</tr><tr>
+					<span id='filterStatus'></span>
+					<span style='font-size:4px'><br></span>
+					<button id='filterExport' style='height:24px; font-size:10px; vertical-align:text-top;'>&nbsp;&nbsp;&nbsp;export&nbsp;&nbsp;&nbsp;</button>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button id='filterApply' style='height:24px; font-size:10px; vertical-align:text-top;'>&nbsp;&nbsp;&nbsp;apply&nbsp;&nbsp;&nbsp;</button>
+				</td></tr>
+				</table>
+
+			</td></tr></table>
+
+		</td>
+	</tr><tr>
 	<td colspan='12'></td><td  align='left' nowrap>
-		<div id='labeled_plot_canvas'>
-			<span class='textB'><span class='tc3'>gaps</span>/<span class='tc1'>conservation</span></span>
-			<div id='plot_canvas' class=''></div>
-		</div>
-	</td>
+	<div id='labeled_plot_canvas'>
+		<span class='textB'><span class='tc3'>gaps</span>/<span class='tc1'>conservation</span></span>
+		<div id='plot_canvas' class=''></div>
+	</div>
+</td>
 </tr><tr>														<!-- ___ MSA logo  __________ -->
 	<td colspan='12'></td><td align='left' nowrap><div id="seqlogo"> </div> </td>
 </tr><tr>														<!-- ___ MSA logo  __________ -->
@@ -997,25 +1025,25 @@
 </tr><tr>
 	<td align='right' nowrap>									<!-- ___ MSA header/plots ___ -->
 	</td><td align='right' nowrap>
-	</td><td>
-	</td><td>
-	</td><td align='right' style='vertical-align:bottom;' nowrap>
-		<div class='tc2 tblheader' id='MSAcustomAH' > </div>
-	</td><td align='right' style='vertical-align:bottom;' nowrap>
-		<div class='tc2 tblheader' id='MSAcustomBH' > </div>
-	</td><td class='hpadding' style='vertical-align:bottom;'>
-		<div class='tc2 tblheader' id='MSAspeciesH'>species</div>
-	</td><td align='center' style='vertical-align:bottom;'>
-		<div class='tc2 tblheader' id='MSApfamH'>pfam</div>
-	</td><td align='right' style='vertical-align:bottom;' nowrap>
-		<div class='tc2 tblheader'>gaps%</div>
-	</td><td align='right' style='vertical-align:bottom;' nowrap>
-		<div class='tc2 tblheader'>ident1%</div>
-	</td><td align='right' style='vertical-align:bottom;' nowrap>
-		<div class='tc2 tblheader'>ident2%</div>
-	</td><td width='20px'>
-	</td><td align='left' nowrap><div id="MSAruler" class='ali tc2'> </div>
-	</td>
+</td><td>
+</td><td>
+</td><td align='right' style='vertical-align:bottom;' nowrap>
+	<div class='tc2 tblheader' id='MSAcustomAH' > </div>
+</td><td align='right' style='vertical-align:bottom;' nowrap>
+	<div class='tc2 tblheader' id='MSAcustomBH' > </div>
+</td><td class='hpadding' style='vertical-align:bottom;'>
+	<div class='tc2 tblheader' id='MSAspeciesH'>species</div>
+</td><td align='center' style='vertical-align:bottom;'>
+	<div class='tc2 tblheader' id='MSApfamH'>pfam</div>
+</td><td align='right' style='vertical-align:bottom;' nowrap>
+	<div class='tc2 tblheader'>gaps%</div>
+</td><td align='right' style='vertical-align:bottom;' nowrap>
+	<div class='tc2 tblheader'>ident1%</div>
+</td><td align='right' style='vertical-align:bottom;' nowrap>
+	<div class='tc2 tblheader'>ident2%</div>
+</td><td width='20px'>
+</td><td align='left' nowrap><div id="MSAruler" class='ali tc2'> </div>
+</td>
 </tr><tr>														<!-- ___ MSA body ___________ -->
 	<td align='right' nowrap>
 		<div class='ali dim' id="MSArows">  </div>
@@ -1049,40 +1077,40 @@
 <!-- ______________________________________________________ about view ____________________________________________ -->
 
 <table border='0' cellpadding='1' cellspacing='1' style='display:block;' id="ABTview">
-<tr><td class='text'>
-<br>Protein multiple sequence alignment viewer provides simple analysis plots and pairwise identity visualization. <br>
-This tool is entirely client based (runs inside your browser, Firefox or Chrome browsers prefered), there is no communication<br>
-with the server (except when pulling example alignments), so you can save local copy of this page and use it while offline.<br><br>
+	<tr><td class='text'>
+		<br>Protein multiple sequence alignment viewer provides simple analysis plots and pairwise identity visualization. <br>
+		This tool is entirely client based (runs inside your browser, Firefox or Chrome browsers prefered), there is no communication<br>
+		with the server (except when pulling example alignments), so you can save local copy of this page and use it while offline.<br><br>
 
 
-If you have any questions or requests please don't hesitate to contact us at alignmentviewer@gmail.com<br>
-The source code for this tool is at: <a href='https://github.com/dfci/alignmentviewer'>https://github.com/dfci/alignmentviewer</a>.
+		If you have any questions or requests please don't hesitate to contact us at alignmentviewer@gmail.com<br>
+		The source code for this tool is at: <a href='https://github.com/dfci/alignmentviewer'>https://github.com/dfci/alignmentviewer</a>.
 
-<!--
-<img style='vertical-align:text-bottom;' src='yamail.png'>
--->
+		<!--
+        <img style='vertical-align:text-bottom;' src='yamail.png'>
+        -->
 
-<br><br><hr height=2 width='300' color='#d0d0d0' align='left'><br><br>
+		<br><br><hr height=2 width='300' color='#d0d0d0' align='left'><br><br>
 
-<b>Nov.29th&nbsp;&nbsp;2017</b> /// Released version 1.0<br><br>
-<b>Jul.5th&nbsp;&nbsp;2017</b> /// Mutation comparison added.<br><br>
-<b>May.20th&nbsp;&nbsp;2017</b> /// Weight comparison functions added.<br><br>
-<b>Mar.17th&nbsp;&nbsp;2014</b> /// Sequence logo display added.<br><br>
-<b>Jan.2nd&nbsp;&nbsp;2013</b> /// Filtering and export supported.<br><br>
-<b>Dec.24th 2012</b> /// Custom sequence annotation as sortable msa column supported now, see "Custom Data" tab.<br><br>
-<b>Dec.13th 2012</b> /// Added MSA image rendering with mview or hydrophobicity coloring.<br><br>
-<b>Nov.11th 2012</b> /// Release 0.5 is out, changes: sorting by identity, conservation coloring control, Pfam links, drag and drop your alignment file anywhere on the page to load!
+		<b>Nov.29th&nbsp;&nbsp;2017</b> /// Released version 1.0<br><br>
+		<b>Jul.5th&nbsp;&nbsp;2017</b> /// Mutation comparison added.<br><br>
+		<b>May.20th&nbsp;&nbsp;2017</b> /// Weight comparison functions added.<br><br>
+		<b>Mar.17th&nbsp;&nbsp;2014</b> /// Sequence logo display added.<br><br>
+		<b>Jan.2nd&nbsp;&nbsp;2013</b> /// Filtering and export supported.<br><br>
+		<b>Dec.24th 2012</b> /// Custom sequence annotation as sortable msa column supported now, see "Custom Data" tab.<br><br>
+		<b>Dec.13th 2012</b> /// Added MSA image rendering with mview or hydrophobicity coloring.<br><br>
+		<b>Nov.11th 2012</b> /// Release 0.5 is out, changes: sorting by identity, conservation coloring control, Pfam links, drag and drop your alignment file anywhere on the page to load!
 
 
 
-<br><br><br><hr height=2 width='300' color='#d0d0d0' align='left'><br>
+		<br><br><br><hr height=2 width='300' color='#d0d0d0' align='left'><br>
 
-<h4><b>Privacy Policy</b></h4>
-This website makes use of google analytics to measure website visits and traffic patterns through the use of browser cookies. There is no advertising on this site. For a full description, see <a href='http://www.google.com/policies/privacy/partners/'>www.google.com/policies/privacy/partners/</a>.
-&nbsp;<br>
-Visitors who disable cookies on their browser or use private/incognito browsing should still be able to access the full functionality of this website.<br><br>
+		<h4><b>Privacy Policy</b></h4>
+		This website makes use of google analytics to measure website visits and traffic patterns through the use of browser cookies. There is no advertising on this site. For a full description, see <a href='http://www.google.com/policies/privacy/partners/'>www.google.com/policies/privacy/partners/</a>.
+		&nbsp;<br>
+		Visitors who disable cookies on their browser or use private/incognito browsing should still be able to access the full functionality of this website.<br><br>
 
-</td></tr>
+	</td></tr>
 </table>
 <div id='progress'></div>
 </div>
