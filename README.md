@@ -27,3 +27,4 @@ EVcouplings is developed in the lab of [Chris Sander](http://sanderlab.org/) at 
 * Rob Sheridan
 * Augustin Luna
 * Chris Sander
+* Christian Dallago
