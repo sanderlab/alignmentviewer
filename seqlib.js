@@ -608,13 +608,13 @@
 		},
 		generateRuler : function() {
 			var s = '';		// should be a better way to do this to be honest
-			for(var p=10; p<=this.columns.length; p++) {
+			for(var p=1; p<=this.columns.length; p++) {
 				var i = this.refseqProtFrom+p-1;
 				var Q = i%10==0;
 				var Q5 = !Q && i%5==0;
 				s += Q ? '|' : (Q5 ? ':' : '.');
 				if (!Q) continue;
-				var sn = i-10;
+				var sn = i;
 				var sn = ''+sn;
 				var np = s.length-sn.length-1;		// where num starts
 				if (np<0) continue;
