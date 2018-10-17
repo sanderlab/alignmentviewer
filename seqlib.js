@@ -608,7 +608,7 @@
 		},
 		generateRuler : function() {
 			var s = '';		// should be a better way to do this to be honest
-			for(var p=1; p<=this.columns.length; p++) {
+			for(var p=10; p<=this.columns.length; p++) {
 				var i = this.refseqProtFrom+p-1;
 				var Q = i%10==0;
 				var Q5 = !Q && i%5==0;
