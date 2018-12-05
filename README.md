@@ -1,4 +1,4 @@
-# AlignmentViewer
+[alignmentviewerlogo](alignlogo.png)!
 
 AlignmentViewer is multiple sequence alignment viewer for protein families with flexible  visualization, analysis tools and links to protein family databases. It is directly accessible in web browsers without the need for software installation, as it is implemented in JavaScript, and does not require an internet connection to function.  It can handle protein families with tens of thousand of sequences and is particularly suitable for evolutionary coupling analysis, preparing the computation of protein 3D structures and detection of functionally constrained interactions.
 
