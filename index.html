@@ -3,7 +3,7 @@
 	<meta http-equiv="Access-Control-Allow-Origin" content="*">
 	<meta name="description" content="AlignmentViewer is multiple sequence alignment viewer for protein families with flexible  visualization, analysis tools and links to protein family databases. It is directly accessible in web browsers without the need for software installation, as it is implemented in JavaScript, and does not require an internet connection to function.  It can handle protein families with tens of thousand of sequences and is particularly suitable for evolutionary coupling analysis, preparing the computation of protein 3D structures and detection of functionally constrained interactions.">
 	<meta name="keywords" content="alignment viewer, proteins, MSA, multiple sequence alignment, sanderlab, evolutionary couplings, families, analysis">
-	<title>Alignmentviewer</title>
+	<title>AlignmentViewer</title>
 	<style type="text/css">
 		html {
 			font-family: sans-serif;
@@ -31,10 +31,11 @@
 			background: #a1b4cc;
 			border-style: dotted;
 			border-width: 1px;
-			border-color: #585989
+			border-color: #585989;
 			color: #585989;
 			font-family: Trebuchet MS, Verdana;
 			font-size: 18px;
+            box-shadow: 0 0 30px 5px #999;
 			-moz-box-shadow: 0 0 30px 5px #999;
 			-webkit-box-shadow: 0 0 30px 5px #999;
 		}
@@ -322,7 +323,7 @@
                 msa.redrawConservationPlot('#plot_canvas', msaTextblockWidth);
                 var logoDiagram = new SequenceLogoDiagramD3({elementId: "seqlogo", elementWidth: msaTextblockWidth, elementHeight: 48}, alignmentData);
                 logoDiagram.initDiagram();
-            };
+            } 
         }
 
         // this gets called on msa reload only!
