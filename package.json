@@ -1,0 +1,13 @@
+{
+  "name": "alignmentviewer",
+  "version": "2.0.0",
+  "description": "AlignmentViewer is multiple sequence alignment viewer for protein families with flexible  visualization, analysis tools and links to protein family databases.",
+  "main": "index.html",
+  "repository": "https://github.com/dfci/alignmentviewer",
+  "author": "Roc Reguant",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "prettier": "^1.18.2"
+  }
+}
