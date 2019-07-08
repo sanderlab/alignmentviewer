@@ -1,4 +1,6 @@
 {
   "cSpell.enabled": false,
-  "eslint.enable": false
+  "eslint.enable": false,
+  "tslint.jsEnable": true,
+  "tslint.packageManager": "yarn"
 }

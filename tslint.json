@@ -1,7 +1,7 @@
 {
   "defaultSeverity": "error",
   "linterOptions": {
-    "exclude": ["examples", "vendor"]
+    "exclude": ["speclist*"]
   },
   "extends": [
     "tslint-config-prettier",
@@ -22,14 +22,16 @@
     "no-implicit-dependencies": true,
     "no-increment-decrement": false,
     "no-reference": false,
-    "no-relative-imports": [true, "severity", "error"],
     "no-single-line-block-comment": false,
     "no-submodule-imports": true,
     "no-suspicious-comment": false,
+    "no-this-assignment": true,
+    "no-var-keyword": true,
     "number-literal-format": false,
     "object-literal-key-quotes": [true, "as-needed"],
     "object-literal-sort-keys": false,
     "prefer-array-literal": false,
+    "prefer-const": true,
     "prefer-type-cast": false,
     "quotemark": [true, "single", "avoid-escape"],
     "semicolon": [true, "always", "ignore-bound-class-methods"],

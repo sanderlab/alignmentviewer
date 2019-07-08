@@ -1,29 +1,29 @@
-var msa; // msa obj created by seqlib.js
-var msaTextblockWidth;
-var d3StatsPlots;
-var d3PairwiseIdentityPlot;
-var d3fg; // d3 force-directed graph
-var pwGraph; // pairwise identity graph object
-var pwMap; // pairwise map plot object
-var pwMapNSeq;
-var msaImage;
-var msaImgColorType = 1; // 1:mview, 2:hydrophobicity, 3:mutations
-var drawImageNSeq;
-var asyncTimeout = 2; // ms
-var msaImageTimeout = 1; //original at 10
-var colorSliderDflt = 0;
-var imageSliderDflt = { w: 4, h: 4 };
-var filterGaps = 100; // default filtering values (=no filtering)
-var filterIdent = 0;
-var filterRSgaps = false;
-var msaPage = 0;
-var firstSequence = '';
+let msa; // msa obj created by seqlib.js
+let msaTextblockWidth;
+let d3StatsPlots;
+let d3PairwiseIdentityPlot;
+let d3fg; // d3 force-directed graph
+let pwGraph; // pairwise identity graph object
+let pwMap; // pairwise map plot object
+let pwMapNSeq;
+let msaImage;
+let msaImgColorType = 1; // 1:mview, 2:hydrophobicity, 3:mutations
+let drawImageNSeq;
+let asyncTimeout = 2; // ms
+let msaImageTimeout = 1; //original at 10
+let colorSliderDflt = 0;
+let imageSliderDflt = { w: 4, h: 4 };
+let filterGaps = 100; // default filtering values (=no filtering)
+let filterIdent = 0;
+let filterRSgaps = false;
+let msaPage = 0;
+let firstSequence = '';
 
 // Read URL query parameters
-var getUrlParameter = function(sParam) {
-  var sPageURL = window.location.search.substring(1);
-  var sURLVariables = sPageURL.split('&');
-  var sParameterName = '';
+let getUrlParameter = function(sParam) {
+  const sPageURL = window.location.search.substring(1);
+  const sURLVariables = sPageURL.split('&');
+  let sParameterName = [];
   for (let i = 0; i < sURLVariables.length; i++) {
     sParameterName = sURLVariables[i].split('=');
 
@@ -33,7 +33,7 @@ var getUrlParameter = function(sParam) {
   }
 };
 
-var btn2view = {
+let btn2view = {
   btn1: '#ABTview',
   btn2: '#MSAview',
   btn3: '#STAview',
@@ -62,7 +62,7 @@ $(document).ready(function() {
     msa.togglePairwiseIdentity();
   });
 
-  var grapthSliderDflt = 0.7;
+  const grapthSliderDflt = 0.7;
   $('#graphSlider').slider({
     max: 1,
     min: 0,
@@ -76,7 +76,7 @@ $(document).ready(function() {
 
   // --- jQuery is awesome -------------
   $('[id^=btn]').click(function(event) {
-    var view = btn2view[event.target.id]; // button id --> view id
+    const view = btn2view[event.target.id]; // button id --> view id
     if ($(view).is(':visible')) {
       return;
     } // already active, do nothing
@@ -164,15 +164,15 @@ $(document).ready(function() {
       filterGaps = $('#sliderFilterGaps').slider('option', 'value');
       filterIdent = $('#sliderFilterIdent').slider('option', 'value');
       filterRSgaps = $('#CHKrfgaps').is(':checked');
-      var orderby = $('#order').val();
+      const orderby = $('#order').val();
       msa.reRender(msaPage, orderby, filterGaps, filterIdent, filterRSgaps);
     });
   $('#filterExport')
     .button()
     .click(function() {
-      var valGaps = $('#sliderFilterGaps').slider('option', 'value');
-      var valIdent = $('#sliderFilterIdent').slider('option', 'value');
-      var varRSgaps = $('#CHKrfgaps').is(':checked');
+      const valGaps = $('#sliderFilterGaps').slider('option', 'value');
+      const valIdent = $('#sliderFilterIdent').slider('option', 'value');
+      const varRSgaps = $('#CHKrfgaps').is(':checked');
       msa.applyExport(valGaps, valIdent, false);
     });
 
@@ -233,7 +233,7 @@ $(document).ready(function() {
   });
 
   // Read MSA from URL
-  var originURL = getUrlParameter('url');
+  const originURL = getUrlParameter('url');
 
   console.log(originURL);
 
@@ -250,11 +250,11 @@ $(document).ready(function() {
 // causes re-rendering of conservation_plot/ruler/msa sequence table
 function forceMsaRerender() {
   // some web comments report that children must be rerendered explicitly rather than relying on cascade
-  var plot_canvas = document.getElementById('plot_canvas');
-  var seqlogo = document.getElementById('seqlogo');
-  var ruler = document.getElementById('MSAruler');
-  var seqs = document.getElementById('MSAseqs');
-  var msatable = document.getElementById('MSAview');
+  const plot_canvas = document.getElementById('plot_canvas');
+  const seqlogo = document.getElementById('seqlogo');
+  const ruler = document.getElementById('MSAruler');
+  const seqs = document.getElementById('MSAseqs');
+  const msatable = document.getElementById('MSAview');
   plot_canvas.style.display = 'none';
   seqlogo.style.display = 'none';
   ruler.style.display = 'none';
@@ -284,9 +284,9 @@ function zoomEventWatchdog() {
     $('#plot_canvas').html('');
     forceMsaRerender();
     msaTextblockWidth = $('#MSAseqs').width();
-    var alignmentData = msa.getNormalizedColumnProportions();
+    const alignmentData = msa.getNormalizedColumnProportions();
     msa.redrawConservationPlot('#plot_canvas', msaTextblockWidth);
-    var logoDiagram = new SequenceLogoDiagramD3(
+    const logoDiagram = new SequenceLogoDiagramD3(
       { elementId: 'seqlogo', elementWidth: msaTextblockWidth, elementHeight: 48 },
       alignmentData,
     );
@@ -350,7 +350,7 @@ function switchToMsaView() {
 
 // -------------------------------------------------------------------------- msa callbacks -------------
 
-var msaCallback = {
+let msaCallback = {
   // msa reading callbacks
 
   progress: function(msg) {
@@ -401,9 +401,9 @@ var msaCallback = {
     console.log('doneComputing .......');
     forceMsaRerender();
     msaTextblockWidth = $('#MSAseqs').width();
-    var alignmentData = msa.getNormalizedColumnProportions();
+    const alignmentData = msa.getNormalizedColumnProportions();
     msa.redrawConservationPlot('#plot_canvas', msaTextblockWidth);
-    var logoDiagram = new SequenceLogoDiagramD3(
+    const logoDiagram = new SequenceLogoDiagramD3(
       { elementId: 'seqlogo', elementWidth: msaTextblockWidth, elementHeight: 48 },
       alignmentData,
     );
@@ -417,8 +417,8 @@ var msaCallback = {
     UpdateSpeciesDiagram();
     if (msa.page.validQ) {
       $('#pagingCtrl').show();
-      var np = msa.page.pages;
-      var val = msa.page.getstr(msaPage) + ' out of ' + msa.h;
+      const np = msa.page.pages;
+      const val = msa.page.getstr(msaPage) + ' out of ' + msa.h;
       // paging slider ------------------------------
       $('#sliderPage').slider({
         min: 1,
@@ -427,7 +427,7 @@ var msaCallback = {
         value: 1,
         slide: function(event, ui) {
           msaPage = ui.value - 1;
-          var sliderPageVal = msa.page.getstr(msaPage) + ' out of ' + msa.h;
+          const sliderPageVal = msa.page.getstr(msaPage) + ' out of ' + msa.h;
           $('#sliderPageVal').html(sliderPageVal);
         },
         stop: function(event, ui) {
@@ -443,7 +443,7 @@ var msaCallback = {
   },
 };
 
-var msaPairwise = {
+let msaPairwise = {
   // pairwise identity computation callback
   start: function() {
     $('#pairwise_status').html('');
@@ -458,7 +458,7 @@ var msaPairwise = {
   done: function(completeQ) {
     if (completeQ) {
       $('#pairwise_start_btn').html('');
-      var txt =
+      const txt =
         "<b><span class='tc2'>max</span>/<span class='tc1'>average</span>/<span class='tc0'>min</span></b> (sorted by ranking)";
       $('#pairwise_status').html(txt);
       $('#MSApairwise').removeClass('plot_border');
@@ -479,7 +479,7 @@ function reloadMSA() {
   $('#progress')
     .show()
     .html('updating html...');
-  var orderby = $('#order').val();
+  const orderby = $('#order').val();
   msa.reRender(msaPage, orderby, filterGaps, filterIdent, filterRSgaps);
 }
 
@@ -505,7 +505,7 @@ function loadNewMSA(data) {
   $('#order option[value="orderCustomBW"]').remove(); // remove sorting option from msa order dropdown
   $('#MSAcustomAH').text('');
   $('#MSAcustomBH').text('');
-  var species = isset(speclist) ? speclist : false;
+  const species = isset(speclist) ? speclist : false;
   if (!msa) {
     msa = createMSA(species);
   }
@@ -514,9 +514,9 @@ function loadNewMSA(data) {
 
 // --- pulling msa examples from the server --------------------------------------------------------------
 
-var exmpUrl = '';
+let exmpUrl = '';
 function PullMsaExample(which) {
-  var url = exmpUrl;
+  let url = exmpUrl;
   switch (which) {
     case 1:
       url += '/1bkr_A.1-108.msa.txt';
@@ -543,16 +543,16 @@ function PullMsaExample(which) {
 
 function drawMsaImage() {
   $('#msaImage').html('');
-  var div = document.getElementById('msaImage');
-  var ca = div.getContext('2d');
+  const div = document.getElementById('msaImage');
+  const ca = div.getContext('2d');
   msaImage = createMsaImageCanvas(div, ca);
-  var currentFilteredSequenceCount = msa.h;
-  var filteredSequenceOrder = msa.getCurrentFilteredSequenceOrder();
+  let currentFilteredSequenceCount = msa.h;
+  const filteredSequenceOrder = msa.getCurrentFilteredSequenceOrder();
   if (filteredSequenceOrder != null) {
     currentFilteredSequenceCount = filteredSequenceOrder.length;
   }
-  var rw = $('#imageResidW').text();
-  var rh = $('#imageResidH').text();
+  const rw = $('#imageResidW').text();
+  const rh = $('#imageResidH').text();
   msaImgColorType = $('#msaImgClrSelect').val();
   msaImage.init(rw, rh, msa.w, currentFilteredSequenceCount);
   drawImageNSeq = 0;
@@ -562,16 +562,16 @@ function drawMsaImage() {
 }
 
 function asyncDrawMsaImage() {
-  var filteredSequenceOrder = msa.getCurrentFilteredSequenceOrder();
+  const filteredSequenceOrder = msa.getCurrentFilteredSequenceOrder();
   if (filteredSequenceOrder == null || filteredSequenceOrder.length === 0) {
     return;
   }
   if (drawImageNSeq === filteredSequenceOrder.length) {
     return;
   }
-  for (var col = 0; col < msa.w; col++) {
-    var sequenceIndex = filteredSequenceOrder[drawImageNSeq];
-    var aa = msa.seqs[sequenceIndex].charAt(col);
+  for (let col = 0; col < msa.w; col++) {
+    const sequenceIndex = filteredSequenceOrder[drawImageNSeq];
+    const aa = msa.seqs[sequenceIndex].charAt(col);
     if (aa === '.' || aa === '-') {
       continue;
     }
@@ -590,13 +590,13 @@ function asyncDrawMsaImage() {
         percent = 0.9; //How much transparency 0-> full color; 1-> white
 
         //Applying the transparency layer to the obtained color
-        var f = parseInt(color.slice(1), 16);
-        var t = percent < 0 ? 0 : 255;
-        let p = percent < 0 ? percent * -1 : percent;
+        const f = parseInt(color.slice(1), 16);
+        const t = percent < 0 ? 0 : 255;
+        const p = percent < 0 ? percent * -1 : percent;
         // tslint:disable: no-bitwise
-        var R = f >> 16;
-        var G = (f >> 8) & 0x00ff;
-        var B = f & 0x0000ff;
+        const R = f >> 16;
+        const G = (f >> 8) & 0x00ff;
+        const B = f & 0x0000ff;
         // tslint:enable: no-bitwise
         clr =
           '#' +
@@ -628,8 +628,8 @@ function resetMsaImage() {
 // ---- stats view plota ---------------------------------------------------------------------------------
 
 function UpdateStatsPlot() {
-  var wi = 700;
-  var he = 300;
+  const wi = 700;
+  const he = 300;
   if (d3StatsPlots) {
     d3StatsPlots.remove();
   } else {
@@ -639,7 +639,7 @@ function UpdateStatsPlot() {
       .attr('width', wi)
       .attr('height', he);
   }
-  var plot = createPlot();
+  const plot = createPlot();
   // ref.seq not included
   plot.drawGrid(d3StatsPlots, wi, he, getRange(1, msa.h - 1, 10), getRange(0, 1, 10), '#9899c9');
   plot.addCurve('#585989', 4, msa.identS1.slice(1));
@@ -666,8 +666,8 @@ function UpdatePairwisePlot() {
     clearPlots();
     return;
   }
-  var wi = 700;
-  var he = 300;
+  const wi = 700;
+  const he = 300;
   if (d3PairwiseIdentityPlot) {
     clearPlots();
   }
@@ -680,7 +680,7 @@ function UpdatePairwisePlot() {
       .attr('width', wi)
       .attr('height', he);
   }
-  let p = createPlot();
+  const p = createPlot();
   p.drawGrid(d3PairwiseIdentityPlot, wi, he, getRange(1, msa.h, 10), getRange(0, 1, 10), '#9899c9');
   p.addCurve('#3e3f61', 4, msa.pwseqminS);
   p.addCurve('#585989', 4, msa.pwseqavgS);
@@ -696,8 +696,8 @@ function UpdatePairwisePlot() {
 
 function initPairwiseMap(w) {
   if (!pwMap) {
-    var div = document.getElementById('MSApairwiseMap');
-    var ca = div.getContext('2d');
+    const div = document.getElementById('MSApairwiseMap');
+    const ca = div.getContext('2d');
     pwMap = createPairwiseMapCanvas(ca);
   }
   pwMap.initMap(w, msa.h);
@@ -710,16 +710,16 @@ function asyncDrawPairwiseMap() {
   if (pwMapNSeq === msa.h) {
     return;
   } // pairwise identity completed
-  for (var j = 0; j < msa.h; j++) {
+  for (let j = 0; j < msa.h; j++) {
     if (pwMapNSeq === j) {
       continue;
     }
-    let i = msa.getPairIdentity(pwMapNSeq, j);
-    var c = Math.floor(255 * (1 - i));
-    var q = c.toString(16);
-    var hex = (c < 16 ? '0' : '') + q;
+    const i = msa.getPairIdentity(pwMapNSeq, j);
+    const c = Math.floor(255 * (1 - i));
+    const q = c.toString(16);
+    const hex = (c < 16 ? '0' : '') + q;
     //	var clr = '#' + (i<0.333 ? hex+'00ff' : (i<0.666 ? '00'+hex+'ff' : hex+hex+'ff'));
-    var clr = '#' + hex + hex + 'ff';
+    const clr = '#' + hex + hex + 'ff';
     pwMap.paintCell(pwMapNSeq, j, clr);
   }
   pwMapNSeq++;
@@ -730,7 +730,7 @@ function initForceGraph() {
   if (!msa.pwdoneQ) {
     return;
   } // compute pairwise identity first
-  var val = $('#graphSlider').slider('option', 'value');
+  const val = $('#graphSlider').slider('option', 'value');
   pwGraph = msa.buildPairwiseIdentityGraph(val);
   if (typeof d3fg === 'undefined') {
     d3fg = createForceGraph();
@@ -747,14 +747,14 @@ function handleDragOver(evt) {
 function handleFileSelect(evt) {
   evt.stopPropagation();
   evt.preventDefault();
-  var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
+  const f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
   if (!f) {
     return;
   }
   $('#progress')
     .show()
     .html('reading the file...');
-  var r = new FileReader();
+  const r = new FileReader();
   r.onload = function(e) {
     loadNewMSA(e.target.result);
   };
@@ -765,11 +765,11 @@ function handleFileSelect(evt) {
 function handleCustomFileSelect(evt) {
   evt.stopPropagation();
   evt.preventDefault();
-  var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
+  const f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
   if (!f) {
     return;
   }
-  var r = new FileReader();
+  const r = new FileReader();
   r.onload = function(e) {
     msa.loadCustomMsaDataFile(e.target.result, function() {
       if (!msa.seqorder.cweightsA.length) {
@@ -795,22 +795,22 @@ function handleCustomFileSelect(evt) {
 function handleCustomFileSelectCouplings(evt) {
   evt.stopPropagation();
   evt.preventDefault();
-  var f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
+  const f = evt.target.files ? evt.target.files[0] : evt.dataTransfer.files[0];
   if (!f) {
     return;
   }
-  var r = new FileReader();
+  const r = new FileReader();
   r.onload = function(e) {
     msa.loadCouplingsDataFile(e.target.result, function() {
       $('#cdatStatus2').html('mapped ' + msa.couplingsN);
       console.log('>>> got the couplings');
-      var aux = {};
+      const aux = {};
       aux.A = msa.A;
       aux.B = msa.B;
       console.log(msa.A);
       console.log(aux.B);
-      var len = msa.getNormalizedColumnProportions().length;
-      var couplingsLogoDiagram = new CouplingsLogoDiagramD3(
+      const len = msa.getNormalizedColumnProportions().length;
+      const couplingsLogoDiagram = new CouplingsLogoDiagramD3(
         { elementId: 'couplingslogo', elementWidth: msaTextblockWidth, elementHeight: 30 },
         aux,
         len,
@@ -823,20 +823,20 @@ function handleCustomFileSelectCouplings(evt) {
 }
 
 function UpdateSpeciesDiagram() {
-  var width = 700;
-  var height = 600;
-  var radius = Math.min(width, height) / 2 - 50;
-  var color = d3.scale.category20();
+  const width = 700;
+  const height = 600;
+  const radius = Math.min(width, height) / 2 - 50;
+  const color = d3.scale.category20();
   //	color = {E:'#00e000', A:'#e00000', B:'#0000e0', V:'#228888'};
 
-  var svg = d3
+  const svg = d3
     .select('#specburst')
     .attr('width', width)
     .attr('height', height)
     .append('g')
     .attr('transform', 'translate(' + width / 2 + ',' + height * 0.52 + ')');
 
-  var partition = d3.layout
+  const partition = d3.layout
     .partition()
     .sort(null)
     .size([2 * Math.PI, radius * radius])
@@ -844,7 +844,7 @@ function UpdateSpeciesDiagram() {
       return 1;
     });
 
-  var arc = d3.svg
+  const arc = d3.svg
     .arc()
     .startAngle(function(d) {
       return d.x;
@@ -859,7 +859,7 @@ function UpdateSpeciesDiagram() {
       return Math.sqrt(d.y + d.dy);
     });
 
-  var testobj = {
+  const testobj = {
     name: 'flare',
     children: [
       { name: 'sdsdfsdf', size: 2, children: [{ name: 'a', size: 23 }, { name: 'b', size: 12 }] },
@@ -871,19 +871,19 @@ function UpdateSpeciesDiagram() {
     ],
   };
 
-  var obj = { name: 'species', children: [] }; // have to convert object (hash-table) to array
+  const obj = { name: 'species', children: [] }; // have to convert object (hash-table) to array
   console.log(msa.specdist.children);
-  for (var e of Object.keys(msa.specdist.children)) {
-    var o = msa.specdist.children[e];
-    var v = { name: o.name, size: o.size, children: [] };
-    for (var c of Object.keys(o.children)) {
-      var o2 = o.children[c];
-      var v2 = { name: o2.name, size: o2.size };
+  for (const e of Object.keys(msa.specdist.children)) {
+    const o = msa.specdist.children[e];
+    const v = { name: o.name, size: o.size, children: [] };
+    for (const c of Object.keys(o.children)) {
+      const o2 = o.children[c];
+      const v2 = { name: o2.name, size: o2.size };
       v.children.push(v2);
     }
     obj.children.push(v);
   }
-  var path = svg
+  const path = svg
     .datum(obj)
     .selectAll('path')
     .data(partition.nodes)
@@ -916,9 +916,9 @@ function UpdateSpeciesDiagram() {
   } // Stash the old values for transition
   function arcTween(a) {
     // Interpolate the arcs in data space
-    let i = d3.interpolate({ x: a.x0, dx: a.dx0 }, a);
+    const i = d3.interpolate({ x: a.x0, dx: a.dx0 }, a);
     return function(t) {
-      var b = i(t);
+      const b = i(t);
       a.x0 = b.x;
       a.dx0 = b.dx;
       return arc(b);
