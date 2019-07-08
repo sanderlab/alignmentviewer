@@ -41,6 +41,7 @@ var btn2view = {
   btn5: '#DATview',
   btn6: '#SPEview',
   btn7: '#couplings',
+  btn8: '#UMAPview',
 };
 
 $(document).ready(function() {
@@ -318,6 +319,7 @@ function switchToMsaView() {
   $('#DATview').hide();
   $('#couplings').hide();
   $('#SPEview').hide();
+  $('#umap').hide();
   $('#MSAview').show();
   // TODO: doable with one wildcard selector
   $('#btn1')
@@ -339,6 +341,9 @@ function switchToMsaView() {
     .removeClass('btnPressed')
     .addClass('btnReleased');
   $('#btn7')
+    .removeClass('btnPressed')
+    .addClass('btnReleased');
+  $('#btn8')
     .removeClass('btnPressed')
     .addClass('btnReleased');
 }

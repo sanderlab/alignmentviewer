@@ -217,27 +217,25 @@
   </head>
   <body>
     <!-- ______________________________________________________ site header table ___________________________________________________ -->
-
     <table border="0">
       <tr>
         <td align="left" style="vertical-align:top;" nowrap>
           <span class="tc1 alignmentviewer-title">ALIGNMENTVIEWER</span><br />
           <span style="line-height:96%">
             <span class="title title2 tc1">protein multiple sequence alignment visualization & analysis</span><br />
-            <span class="title title2 tc2"
-              >in-browser computationally intensive tool, Firefox or Chrome browsers prefered</span
+            <span class="title title2 tc2">in-browser computationally intensive tool, Firefox or Chrome browsers prefered</span
             ><br />
             <span class="tiny tc3">release 1.0</span><br /></span
           ><br />
 
           <a class="button btnPressed" id="btn1">about</a>
           <span id="buttons" style="display:none;">
-            &nbsp;&nbsp;&nbsp;<span class="tc2">|</span>&nbsp;&nbsp;&nbsp;
-            <a class="button btnReleased" id="btn2">msa view</a> <span class="tc2">|</span>
-            <a class="button btnReleased" id="btn4">image view</a> <span class="tc2">|</span>
+            &nbsp;&nbsp;&nbsp;<span class="tc2">|</span>&nbsp;&nbsp;&nbsp; <a class="button btnReleased" id="btn2">msa view</a
+            ><span class="tc2">|</span> <a class="button btnReleased" id="btn4">image view</a> <span class="tc2">|</span>
             <a class="button btnReleased" id="btn3">stats view</a> <span class="tc2">|</span>
             <a class="button btnReleased" id="btn5">custom weights</a> <span class="tc2">|</span>
-            <a class="button btnReleased" id="btn6">load couplings</a>
+            <a class="button btnReleased" id="btn6">load couplings</a> <span class="tc2">|</span>
+            <a class="button btnReleased" id="btn8">umap</a>
             <span class="tc2">
               <!--|</span>-->
               <!--<a class='button btnReleased' id='btn7'> Load couplings </a>--> </span
@@ -267,7 +265,6 @@
     <br />
 
     <!-- ______________________________________________________ image view ___________________________________________________ -->
-
     <table id="IMGview" border="0" cellpadding="1" cellspacing="1" style="display:none;">
       <tr>
         <td class="text">
@@ -313,15 +310,11 @@
     </table>
 
     <!-- ______________________________________________________ stats view ____________________________________________________ -->
-
     <table id="STAview" border="0" style="display:none;">
       <tr>
         <td valign="top">
-          <span class="textB"
-            >Sequence <span class="tc2">gaps</span> &amp; <span class="tc1">ref.seq identity</span></span
-          ><span class="text text2">
-            - amount of sequences with given fraction of gaps/identity (sorted by ranking)</span
-          >
+          <span class="textB">Sequence <span class="tc2">gaps</span> &amp; <span class="tc1">ref.seq identity</span></span
+          ><span class="text text2"> - amount of sequences with given fraction of gaps/identity (sorted by ranking)</span>
           <div id="MSAstats"></div>
         </td>
         <td class="text" valign="top"></td>
@@ -337,8 +330,7 @@
       <tr>
         <td class="text">
           <div class="textB" style="margin-top:6px;">Pairwise identity 2D map</div>
-          <canvas class="plot_border" id="MSApairwiseMap" width="700" height="700" style="margin-top:6px;"></canvas
-          ><br />
+          <canvas class="plot_border" id="MSApairwiseMap" width="700" height="700" style="margin-top:6px;"></canvas><br />
         </td>
         <td class="text" valign="top">
           <ul class="text" style="line-height:90%">
@@ -374,7 +366,6 @@
     </table>
 
     <!-- ______________________________________________________ MSA species view _______________________________________________ -->
-
     <table id="SPEview" border="0" cellpadding="1" cellspacing="1" style="display:none;">
       <tr>
         <td class="text">
@@ -393,13 +384,12 @@
     </table>
 
     <!-- ______________________________________________________ MSA custom couplings view ___________________________________________ -->
-
     <table id="couplings" border="0" cellpadding="1" cellspacing="1" style="display:none;">
       <tr>
         <td class="text">
           Load the couplings already sorted by strength. The residues start from the position zero.<br />
-          File format is tab-separated text file with two columns: the position numbers of the coupled residues
-          (position A contacts position B)<br />
+          File format is tab-separated text file with two columns: the position numbers of the coupled residues (position A
+          contacts position B)<br />
           Not all positions have to be present and only few will be displayed.<br /><br />
           <input type="file" class="filectrl" id="customdata2" size="40" /><br />
           <br />
@@ -409,7 +399,6 @@
     </table>
 
     <!-- ______________________________________________________ MSA custom data view ___________________________________________ -->
-
     <table id="DATview" border="0" cellpadding="1" cellspacing="1" style="display:none;">
       <tr>
         <td class="text">
@@ -426,7 +415,6 @@
     </table>
 
     <!-- ______________________________________________________ MSA view ______________________________________________________ -->
-
     <table id="MSAview" border="0" cellpadding="1" cellspacing="1" style="display:none;">
       <tr>
         <td></td>
@@ -448,13 +436,12 @@
 
                 <span style="font-size:5px;"><br /></span>
                 <input type="checkbox" id="CHKspecies" /> show species
-                <span class="lt">(kingdom code: A-archaea B-bacteria E-eukaryota V-viruses, Uniprot IDs required)</span
-                ><br />
+                <span class="lt">(kingdom code: A-archaea B-bacteria E-eukaryota V-viruses, Uniprot IDs required)</span><br />
                 <input type="checkbox" id="CHKinfo" /> show sequence annotation
                 <span class="lt">(any text after sequence name)</span><br />
                 <input type="checkbox" id="CHKpfam" /> link to protein Pfam domain structure page<br />
-                <input type="checkbox" id="CHKcustom" /> custom annotations
-                <span class="lt">(see tab <i>custom data</i>)</span><br />
+                <input type="checkbox" id="CHKcustom" /> custom annotations <span class="lt">(see tab <i>custom data</i>)</span
+                ><br />
                 <input type="checkbox" id="CHKconservation" /> gap &amp; conservation bar chart<br />
                 <input type="checkbox" id="CHKseqlogo" /> sequence logo<br />
                 <span style="font-size:5px"><br /></span>
@@ -463,10 +450,7 @@
                   <tr>
                     <td nowrap><div id="colorSlider" style="width: 300px; height:6px;"></div></td>
                     <td>
-                      &nbsp;&nbsp;&nbsp;<button
-                        id="colorApply"
-                        style="height:24px; font-size:10px; vertical-align:text-top;"
-                      >
+                      &nbsp;&nbsp;&nbsp;<button id="colorApply" style="height:24px; font-size:10px; vertical-align:text-top;">
                         apply
                       </button>
                     </td>
@@ -482,11 +466,7 @@
                     id="sliderPage"
                     class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"
                   >
-                    <a
-                      class="ui-slider-handle ui-state-default ui-corner-all ui-state-focus"
-                      href="#"
-                      style="left: 0%;"
-                    ></a>
+                    <a class="ui-slider-handle ui-state-default ui-corner-all ui-state-focus" href="#" style="left: 0%;"></a>
                   </div>
                 </div>
               </td>
@@ -626,17 +606,25 @@
       </tr>
     </table>
 
-    <!-- ______________________________________________________ about view ____________________________________________ -->
+    <!-- ______________________________________________________ UMAP view ______________________________________________________ -->
+    <table border="0" cellpadding="1" cellspacing="1" style="display:none;" id="UMAPview">
+      <tr>
+        <td class="text">
+          Stuff goes here
+        </td>
+      </tr>
+    </table>
 
+    <!-- ______________________________________________________ about view ____________________________________________ -->
     <table border="0" cellpadding="1" cellspacing="1" style="display:block;" id="ABTview">
       <tr>
         <td class="text">
-          <br />Protein multiple sequence alignment viewer provides simple analysis plots and pairwise identity
-          visualization. <br />
-          This tool is entirely client based (runs inside your browser, Firefox or Chrome browsers prefered), there is
-          no communication<br />
-          with the server (except when pulling example alignments), so you can save local copy of this page and use it
-          while offline.<br /><br />
+          <br />Protein multiple sequence alignment viewer provides simple analysis plots and pairwise identity visualization.
+          <br />
+          This tool is entirely client based (runs inside your browser, Firefox or Chrome browsers prefered), there is no
+          communication<br />
+          with the server (except when pulling example alignments), so you can save local copy of this page and use it while
+          offline.<br /><br />
 
           If you have any questions or requests please don't hesitate to contact us at alignmentviewer@gmail.com<br />
           The source code for this tool is at:
@@ -655,23 +643,21 @@
           <b>May.20th&nbsp;&nbsp;2017</b> /// Weight comparison functions added.<br /><br />
           <b>Mar.17th&nbsp;&nbsp;2014</b> /// Sequence logo display added.<br /><br />
           <b>Jan.2nd&nbsp;&nbsp;2013</b> /// Filtering and export supported.<br /><br />
-          <b>Dec.24th 2012</b> /// Custom sequence annotation as sortable msa column supported now, see "Custom Data"
-          tab.<br /><br />
+          <b>Dec.24th 2012</b> /// Custom sequence annotation as sortable msa column supported now, see "Custom Data" tab.<br /><br />
           <b>Dec.13th 2012</b> /// Added MSA image rendering with mview or hydrophobicity coloring.<br /><br />
-          <b>Nov.11th 2012</b> /// Release 0.5 is out, changes: sorting by identity, conservation coloring control, Pfam
-          links, drag and drop your alignment file anywhere on the page to load!
+          <b>Nov.11th 2012</b> /// Release 0.5 is out, changes: sorting by identity, conservation coloring control, Pfam links,
+          drag and drop your alignment file anywhere on the page to load!
 
           <br /><br /><br />
           <hr height="2" width="300" color="#d0d0d0" align="left" />
           <br />
 
           <h4><b>Privacy Policy</b></h4>
-          This website makes use of google analytics to measure website visits and traffic patterns through the use of
-          browser cookies. There is no advertising on this site. For a full description, see
-          <a href="http://www.google.com/policies/privacy/partners/">www.google.com/policies/privacy/partners/</a>.
-          &nbsp;<br />
-          Visitors who disable cookies on their browser or use private/incognito browsing should still be able to access
-          the full functionality of this website.<br /><br />
+          This website makes use of google analytics to measure website visits and traffic patterns through the use of browser
+          cookies. There is no advertising on this site. For a full description, see
+          <a href="http://www.google.com/policies/privacy/partners/">www.google.com/policies/privacy/partners/</a>. &nbsp;<br />
+          Visitors who disable cookies on their browser or use private/incognito browsing should still be able to access the full
+          functionality of this website.<br /><br />
         </td>
       </tr>
     </table>

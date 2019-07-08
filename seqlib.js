@@ -4,9 +4,11 @@
 // written and maintained by Yevgeniy Antipin at Memorial Sloan Kettering Cancer Center, 2012
 //
 var nl = '\n';
+
 function isset(a) {
   return typeof a !== 'undefined';
 } // yay php
+
 // prettier-ignore
 var AA = {
   A: 0, C: 0, D: 0, E: 0,
@@ -63,6 +65,7 @@ var aaclr = {
     D: 'm0', // hydrohpilic
   },
 };
+
 // hydrophobicity at ph 7' relative to Glycine
 // source: http://www.sigmaaldrich.com/life-science/metabolomics/learning-center/amino-acid-reference-chart.html
 // prettier-ignore
@@ -78,7 +81,8 @@ var AAhydro = {
   max: 100,
   min: -55,
 };
-// have to duplicate actual colors defined in CSS here because AFAIK there is no way
+
+// Have to duplicate actual colors defined in CSS here because AFAIK there is no way
 // to access UNATTACHED style and look into its properties! if you know how please drop me a line
 // prettier-ignore
 var aacolors = {
@@ -119,7 +123,9 @@ var aacolors = {
     t19: '#ffff00',
   },
 };
+
 $.browser.chrome = /chrome/.test(navigator.userAgent.toLowerCase());
+
 function getResidColor(style, aa) {
   if (!aaclr.hasOwnProperty(style) || !aaclr[style][aa]) {
     return '';
@@ -130,6 +136,7 @@ function getResidColor(style, aa) {
   }
   return aacolors[style][code];
 }
+
 // hydrophobic - red, hydrophilic - blue
 function getResidHydroColor(aa) {
   if (!AAhydro.hasOwnProperty(aa)) {
@@ -144,6 +151,7 @@ function getResidHydroColor(aa) {
   }
   return '#' + q + q + 'ff';
 }
+
 function getBioLink(type, id, text) {
   switch (type) {
     case 'uniprot':
@@ -666,13 +674,11 @@ function createMSA() {
       setTimeout($.proxy(this.asyncRender, this), this.asyncTimeout);
     },
     // --- figure out protein names, insert links, count gaps and identity, color-code residues, update divs html ------------
-    //
     // TODO: remove gaps calculation from here!
-    //
     parseSeqAndRenderHtml: function(pageQ, clrQ) {
       // writes directly to this.hseqs
       let i = this.orderby[this.asyncCurrSeq];
-      var gaps = SSL_OP_SSLEAY_080_CLIENT_DH_BUG;
+      var gaps = 0;
       var last = '';
       var entrQ = this.entropyPerCol.length > 0;
       for (var p of Object.keys(this.columns)) {
