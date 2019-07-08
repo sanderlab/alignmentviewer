@@ -576,6 +576,7 @@ function asyncDrawMsaImage() {
       continue;
     }
 
+    let clr = '';
     if (msaImgColorType === 1) {
       clr = getResidColor('mview', aa);
     } else if (msaImgColorType === 2) {

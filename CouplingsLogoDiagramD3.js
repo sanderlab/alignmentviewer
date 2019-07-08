@@ -11,19 +11,19 @@ class CouplingsLogoDiagramD3 {
   };
 
   constructor(options, data, seqLen) {
-    self.options = jQuery.extend(true, {}, CouplingsLogoDiagramD3.defaultOpts, options);
+    this.options = jQuery.extend(true, {}, CouplingsLogoDiagramD3.defaultOpts, options);
     // TODO: Currently dumping in the symColHash (normalized by alignment height) - but should be an integrated data model.
-    self.rawData = data; // other class members
-    self.svg = null;
-    self.bounds = null;
-    self.seqLen = seqLen;
+    this.rawData = data; // other class members
+    this.svg = null;
+    this.bounds = null;
+    this.seqLen = seqLen;
   }
 
   // initDiagram()
   // constructs element in container from options and populates using drawDiagram()
   initDiagram() {
-    self.svg = self.createSvg(d3.select('#' + self.options.elementId), self.options.elementWidth, self.options.elementHeight);
-    self.drawDiagram(self.svg, self.bounds, self.options, self.rawData);
+    this.svg = this.createSvg(d3.select('#' + this.options.elementId), this.options.elementWidth, this.options.elementHeight);
+    this.drawDiagram(this.svg, this.bounds, this.options, this.rawData);
   }
 
   // createSVG()
@@ -64,7 +64,7 @@ class CouplingsLogoDiagramD3 {
       .attr('transform', 'matrix(1,0,0,' + symbolProportion + ',0,' + columnFloorLevel + ')')
       .append('use')
       .attr('xlink:href', '#' + symbolCode);
-    circleData = [{ cx: 20, cy: 20, radius: 30, color: 'green' }, { cx: 70, cy: 70, radius: 20, color: 'purple' }];
+    const circleData = [{ cx: 20, cy: 20, radius: 30, color: 'green' }, { cx: 70, cy: 70, radius: 20, color: 'purple' }];
     nextcolC
       .append('g')
       .attr('transform', 'matrix(1,0,0,' + symbolProportion + ',0,' + columnFloorLevel + ')')
@@ -93,11 +93,11 @@ class CouplingsLogoDiagramD3 {
     if (this.rawData == null) {
       return;
     }
-    const columnCount = self.seqLen;
+    const columnCount = this.seqLen;
     if (columnCount === 0) {
       return;
     }
-    plotGroup = svg
+    this.plotGroup = svg
       .append('g')
       .attr(
         'transform',
