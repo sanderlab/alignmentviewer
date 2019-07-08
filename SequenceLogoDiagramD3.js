@@ -7,7 +7,8 @@
 function SequenceLogoDiagramD3(options, data) {
   var self = this;
   self.options = jQuery.extend(true, {}, self.defaultOpts, options);
-  self.rawData = data; //TODO: currently dumping in the symColHash (normalized by alignment height) .. but should be an integrated data model
+  // TODO: Currently dumping in the symColHash (normalized by alignment height) - but should be an integrated data model
+  self.rawData = data;
   // other class members
   self.svg = null;
   self.bounds = null;
@@ -23,7 +24,8 @@ SequenceLogoDiagramD3.prototype.defaultOpts = {
 
 // deriveColummProportions()
 // sorts amino acid prevalence into descending order for all columns
-// Returns an array containing one array per column. Each element in a column array is a two element array containing [residue_code, normalized_proportion] such as ["P", .2115].
+// Returns an array containing one array per column.
+// Each element in a column array is a two element array containing [residue_code, normalized_proportion] such as ["P", .2115].
 SequenceLogoDiagramD3.prototype.deriveColumnProportions = function() {
   var self = this;
   var returnValue = [];
@@ -31,7 +33,7 @@ SequenceLogoDiagramD3.prototype.deriveColumnProportions = function() {
   for (var col = 0; col < columnCount; col++) {
     returnValue.push([]);
     var returnCol = returnValue[col];
-    for (var key in self.rawData[col]) {
+    for (var key of Object.keys(self.rawData[col])) {
       returnCol.push([key, self.rawData[col][key]]);
     }
     returnCol.sort(function(a, b) {
@@ -46,11 +48,7 @@ SequenceLogoDiagramD3.prototype.deriveColumnProportions = function() {
 SequenceLogoDiagramD3.prototype.initDiagram = function() {
   var self = this;
   self.derivedColumnProportions = self.deriveColumnProportions();
-  self.svg = self.createSvg(
-    d3.select('#' + self.options.elementId),
-    self.options.elementWidth,
-    self.options.elementHeight,
-  );
+  self.svg = self.createSvg(d3.select('#' + self.options.elementId), self.options.elementWidth, self.options.elementHeight);
   self.drawDiagram(self.svg, self.bounds, self.options, self.derivedColumnProportions);
 };
 
@@ -89,6 +87,7 @@ SequenceLogoDiagramD3.prototype.addSymbolDefinitionsToPlot = function(svg) {
     .attr('id', 'B')
     .attr(
       'd',
+      // tslint:disable-next-line: max-line-length
       'M 10 99 v -99 h 50 A 25,25 0 0,1 75,50 A 25,25 0 0,1 60,99 Z M 25 31 v 10 h 35 A 15,11 0 0,0 60,15 h -35 Z M 25 75 v 10 h 35 A 15,11 0 0,0 60,60 h -35 Z',
     )
     .attr('class', 'c8');
@@ -120,6 +119,7 @@ SequenceLogoDiagramD3.prototype.addSymbolDefinitionsToPlot = function(svg) {
     .attr('id', 'G')
     .attr(
       'd',
+      // tslint:disable-next-line: max-line-length
       'M 10 50 v -15 A 46,46 0 0,1 85,12 L 72 25 A 31,31 0 0,0 25,40 v 25 A 28,28 0 0,0 75,60 h -20 v -20 h 35 v 20 A 41,41 0 0,1 10,70 Z',
     )
     .attr('class', 'c1');
@@ -161,10 +161,7 @@ SequenceLogoDiagramD3.prototype.addSymbolDefinitionsToPlot = function(svg) {
   defs
     .append('path')
     .attr('id', 'O')
-    .attr(
-      'd',
-      'M 10 40 A 15,15 0 0,1 90 40 v 20 A 15,15 0 0,1 10 60 Z M 25 60 A 10,10 0 0,0 75,60 v -20 A 10,10 0 0,0 25,40 Z',
-    )
+    .attr('d', 'M 10 40 A 15,15 0 0,1 90 40 v 20 A 15,15 0 0,1 10 60 Z M 25 60 A 10,10 0 0,0 75,60 v -20 A 10,10 0 0,0 25,40 Z')
     .attr('class', 'c1');
   defs
     .append('path')
@@ -176,6 +173,7 @@ SequenceLogoDiagramD3.prototype.addSymbolDefinitionsToPlot = function(svg) {
     .attr('id', 'Q')
     .attr(
       'd',
+      // tslint:disable-next-line: max-line-length
       'M 10 40 A 15,15 0 0,1 90 40 v 20 A 15,15 0 0,1 10 60 Z M 25 60 A 10,10 0 0,0 75,60 v -20 A 10,10 0 0,0 25,40 Z M 65 65 l 30 25 l -15 9 l -30 -24 Z',
     )
     .attr('class', 'c6');
@@ -184,6 +182,7 @@ SequenceLogoDiagramD3.prototype.addSymbolDefinitionsToPlot = function(svg) {
     .attr('id', 'R')
     .attr(
       'd',
+      // tslint:disable-next-line: max-line-length
       'M 10 99 v -99 h 55 A 12,15 0 0,1 65 60 h -15 L 90 99 h -23 L 30 65 h -5 v 34 Z M 25 20 v 20 h 35 A 15,11 0 0,0 60,20 h -35 Z',
     )
     .attr('class', 'c4');
@@ -237,15 +236,15 @@ SequenceLogoDiagramD3.prototype.addSymbolDefinitionsToPlot = function(svg) {
 SequenceLogoDiagramD3.prototype.addColumnToPlot = function(plotGroup, options, columnIndex) {
   var self = this;
   var columnProportionArray = this.derivedColumnProportions[columnIndex];
-  if (columnProportionArray == null || columnProportionArray.length == 0) {
+  if (columnProportionArray == null || columnProportionArray.length === 0) {
     return;
   }
   nextcol = plotGroup.append('g').attr('transform', 'translate(' + 100 * columnIndex + ',0)');
   var columnFloorLevel = 100;
-  for (var i = columnProportionArray.length - 1; i >= 0; i--) {
+  for (let i = columnProportionArray.length - 1; i >= 0; i--) {
     var nextSymbolSpec = columnProportionArray[i];
     var symbolCode = nextSymbolSpec[0];
-    if (symbolCode != symbolCode.toUpperCase(symbolCode)) {
+    if (symbolCode !== symbolCode.toUpperCase(symbolCode)) {
       continue;
     } //ignore lower case letters
     var symbolProportion = nextSymbolSpec[1];
@@ -267,7 +266,7 @@ SequenceLogoDiagramD3.prototype.drawPlot = function(svg, options, bounds, xScale
   }
   this.addSymbolDefinitionsToPlot(svg);
   var columnCount = this.derivedColumnProportions.length;
-  if (columnCount == 0) {
+  if (columnCount === 0) {
     return;
   }
   plotGroup = svg

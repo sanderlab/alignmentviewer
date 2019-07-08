@@ -7,8 +7,8 @@
 function CouplingsLogoDiagramD3(options, data, seqLen) {
   var self = this;
   self.options = jQuery.extend(true, {}, self.defaultOpts, options);
-  self.rawData = data; //TODO: currently dumping in the symColHash (normalized by alignment height) .. but should be an integrated data model
-  // other class members
+  // TODO: Currently dumping in the symColHash (normalized by alignment height) - but should be an integrated data model.
+  self.rawData = data; // other class members
   self.svg = null;
   self.bounds = null;
   self.seqLen = seqLen;
@@ -25,11 +25,7 @@ CouplingsLogoDiagramD3.prototype.defaultOpts = {
 // constructs element in container from options and populates using drawDiagram()
 CouplingsLogoDiagramD3.prototype.initDiagram = function() {
   var self = this;
-  self.svg = self.createSvg(
-    d3.select('#' + self.options.elementId),
-    self.options.elementWidth,
-    self.options.elementHeight,
-  );
+  self.svg = self.createSvg(d3.select('#' + self.options.elementId), self.options.elementWidth, self.options.elementHeight);
   self.drawDiagram(self.svg, self.bounds, self.options, self.rawData);
 };
 
@@ -55,13 +51,7 @@ CouplingsLogoDiagramD3.prototype.drawDiagram = function(svg, bounds, options, de
 
 // addcolumnToPlot()
 // given a plot group (g) element, add a column to it
-CouplingsLogoDiagramD3.prototype.addColumnToPlot = function(
-  plotGroup,
-  options,
-  columnIndexA,
-  columnIndexB,
-  symbolCode,
-) {
+CouplingsLogoDiagramD3.prototype.addColumnToPlot = function(plotGroup, options, columnIndexA, columnIndexB, symbolCode) {
   var self = this;
   nextcolA = plotGroup.append('g').attr('transform', 'translate(' + 100 * columnIndexA + ',0)');
   nextcolB = plotGroup.append('g').attr('transform', 'translate(' + 100 * columnIndexB + ',0)');
@@ -107,14 +97,14 @@ CouplingsLogoDiagramD3.prototype.addColumnToPlot = function(
 };
 
 // drawPlot()
-// create the group element which represents the entire plot (using scaling) and add all columns
+// Create the group element which represents the entire plot (using scaling) and add all columns.
 CouplingsLogoDiagramD3.prototype.drawPlot = function(svg, options, bounds, xScale, yScale) {
   var self = this;
   if (this.rawData == null) {
     return;
   }
   var columnCount = self.seqLen;
-  if (columnCount == 0) {
+  if (columnCount === 0) {
     return;
   }
   plotGroup = svg
@@ -146,12 +136,12 @@ CouplingsLogoDiagramD3.prototype.drawPlot = function(svg, options, bounds, xScal
     '#3b3eac',
   ]; // http://bl.ocks.org/aaizemberg/78bd3dade9593896a59d
   for (var col = 0; col < this.rawData.A.length && col < colors.length; col++) {
-    //                this.addColumnToPlot(plotGroup, options, this.rawData.A[col], this.rawData.B[col], symbolCodes[col]);
+    // this.addColumnToPlot(plotGroup, options, this.rawData.A[col], this.rawData.B[col], symbolCodes[col]);
 
     var circleDataA = [{ cx: -60, cy: 50, radius: 40, color: colors[col] }];
     var circleDataB = [{ cx: -55, cy: 50, radius: 40, color: colors[col] }];
 
-    //translate
+    // Translate.
     var trans1A = plotGroup.append('g').attr('transform', 'translate(' + 100 * this.rawData.A[col] + ',0)');
     var trans1B = plotGroup.append('g').attr('transform', 'translate(' + 100 * this.rawData.B[col] + ',0)');
 

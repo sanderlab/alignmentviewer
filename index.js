@@ -33,8 +33,6 @@ var getUrlParameter = function(sParam) {
   }
 };
 
-// _________________________________________________________________________________________________________________________________
-
 var btn2view = {
   btn1: '#ABTview',
   btn2: '#MSAview',
@@ -295,9 +293,9 @@ function zoomEventWatchdog() {
   }
 }
 
-// this gets called on msa reload only!
+// This gets called on msa reload only!
 function switchToMsaView() {
-  // clear entire msa html (12 divs) before switching to MSA view to avoid big pause for large alignments while old msa redraws
+  // Clear entire msa html (12 divs) before switching to MSA view to avoid big pause for large alignments while old msa redraws.
   $('#MSAnames').html('');
   $('#MSAinfo').html('');
   $('#MSAcustomA').html('');
@@ -455,7 +453,8 @@ var msaPairwise = {
   done: function(completeQ) {
     if (completeQ) {
       $('#pairwise_start_btn').html('');
-      var txt = "<b><span class='tc2'>max</span>/<span class='tc1'>average</span>/<span class='tc0'>min</span></b> (sorted by ranking)";
+      var txt =
+        "<b><span class='tc2'>max</span>/<span class='tc1'>average</span>/<span class='tc0'>min</span></b> (sorted by ranking)";
       $('#pairwise_status').html(txt);
       $('#MSApairwise').removeClass('plot_border');
       UpdatePairwisePlot();
@@ -588,7 +587,7 @@ function asyncDrawMsaImage() {
         //Applying the transparency layer to the obtained color
         var f = parseInt(color.slice(1), 16);
         var t = percent < 0 ? 0 : 255;
-        var p = percent < 0 ? percent * -1 : percent;
+        let p = percent < 0 ? percent * -1 : percent;
         // tslint:disable: no-bitwise
         var R = f >> 16;
         var G = (f >> 8) & 0x00ff;
@@ -596,7 +595,12 @@ function asyncDrawMsaImage() {
         // tslint:enable: no-bitwise
         clr =
           '#' +
-          (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) * 0x100 + (Math.round((t - B) * p) + B))
+          (
+            0x1000000 +
+            (Math.round((t - R) * p) + R) * 0x10000 +
+            (Math.round((t - G) * p) + G) * 0x100 +
+            (Math.round((t - B) * p) + B)
+          )
             .toString(16)
             .slice(1);
       } //clr = '#DCDCDC' //#D3D3D3 //For "greying" the non-mutated amino acids
@@ -671,7 +675,7 @@ function UpdatePairwisePlot() {
       .attr('width', wi)
       .attr('height', he);
   }
-  var p = createPlot();
+  let p = createPlot();
   p.drawGrid(d3PairwiseIdentityPlot, wi, he, getRange(1, msa.h, 10), getRange(0, 1, 10), '#9899c9');
   p.addCurve('#3e3f61', 4, msa.pwseqminS);
   p.addCurve('#585989', 4, msa.pwseqavgS);
@@ -705,7 +709,7 @@ function asyncDrawPairwiseMap() {
     if (pwMapNSeq === j) {
       continue;
     }
-    var i = msa.getPairIdentity(pwMapNSeq, j);
+    let i = msa.getPairIdentity(pwMapNSeq, j);
     var c = Math.floor(255 * (1 - i));
     var q = c.toString(16);
     var hex = (c < 16 ? '0' : '') + q;
@@ -907,7 +911,7 @@ function UpdateSpeciesDiagram() {
   } // Stash the old values for transition
   function arcTween(a) {
     // Interpolate the arcs in data space
-    var i = d3.interpolate({ x: a.x0, dx: a.dx0 }, a);
+    let i = d3.interpolate({ x: a.x0, dx: a.dx0 }, a);
     return function(t) {
       var b = i(t);
       a.x0 = b.x;

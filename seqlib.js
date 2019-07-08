@@ -12,8 +12,8 @@ var AA = {
   A: 0, C: 0, D: 0, E: 0,
   F: 0, G: 0, H: 0, I: 0,
   K: 0, L: 0, M: 0, N: 0,
-	P: 0, Q: 0, R: 0, S: 0,
-	T: 0, V: 0, W: 0, Y: 0,
+  P: 0, Q: 0, R: 0, S: 0,
+  T: 0, V: 0, W: 0, Y: 0,
   '-': 0,
 };
 
@@ -44,12 +44,13 @@ var aaclr = {
     W: 't17', Y: 't18', V: 't19',
   },
   pcp: {
-    '.': 'gr','-': 'gr', R: 'pc1', H: 'pc1',
-    K: 'pc1', D: 'pc2', E: 'pc2', S: 'pc3',
-    T: 'pc3', N: 'pc3', Q: 'pc3', C: 'pc4',
-    U: 'pc4', G: 'pc4', P: 'pc4', A: 'pc5',
-    V: 'pc5', I: 'pc5', L: 'pc5', M: 'pc5',
-    F: 'pc5', Y: 'pc5',  W: 'pc5',
+    '.': 'gr', '-': 'gr',
+    R: 'pc1', H: 'pc1', K: 'pc1', D: 'pc2',
+    E: 'pc2', S: 'pc3', T: 'pc3', N: 'pc3',
+    Q: 'pc3', C: 'pc4', U: 'pc4', G: 'pc4',
+    P: 'pc4', A: 'pc5', V: 'pc5', I: 'pc5',
+    L: 'pc5', M: 'pc5', F: 'pc5', Y: 'pc5',
+    W: 'pc5',
   },
   hydro: {
     F: 'm1', I: 'm1', W: 'm1', L: 'm1', V: 'm1',
@@ -120,19 +121,27 @@ var aacolors = {
 };
 $.browser.chrome = /chrome/.test(navigator.userAgent.toLowerCase());
 function getResidColor(style, aa) {
-  if (!aaclr.hasOwnProperty(style) || !aaclr[style][aa]) return '';
+  if (!aaclr.hasOwnProperty(style) || !aaclr[style][aa]) {
+    return '';
+  }
   var code = aaclr[style][aa];
-  if (!aacolors.hasOwnProperty(style)) return '';
+  if (!aacolors.hasOwnProperty(style)) {
+    return '';
+  }
   return aacolors[style][code];
 }
 // hydrophobic - red, hydrophilic - blue
 function getResidHydroColor(aa) {
-  if (!AAhydro.hasOwnProperty(aa)) return '';
+  if (!AAhydro.hasOwnProperty(aa)) {
+    return '';
+  }
   var h = AAhydro[aa];
   var c = 255 - h > 0 ? Math.floor((255 * h) / AAhydro.max) : Math.floor((255 * h) / AAhydro.min);
   var q = c.toString(16);
   q = (c < 16 ? '0' : '') + q;
-  if (h > 0) return '#ff' + q + q;
+  if (h > 0) {
+    return '#ff' + q + q;
+  }
   return '#' + q + q + 'ff';
 }
 function getBioLink(type, id, text) {
@@ -147,18 +156,32 @@ function getBioLink(type, id, text) {
       return '';
   }
 }
-// this parses sequence name and returns object with 8 members :
-//	seq.name, html <a href> (if uniprot name is detected), uniprot organism suffix, protein region from, to, uniprot organism code, any text after ID, link to Pfam page
-// sequence name is assumed to be Uniprot in PFam or HHblits format
-// text after first space considered annotation and not part of sequence name in msa
-//	Pfam: EGFR_HUMAN/712-968
-// HHblits:	tr|F4CCT7|F4CCT7_SPHS2 NAD(P)H-quinone oxidoreductase subunit 2 ....
-//
+
+/**
+ * Parses sequence name.
+ * Sequence name is assumed to be Uniprot in PFam or HHblits format.
+ * Text after first space considered annotation and not part of sequence name in msa.
+ *
+ * Example Formats:
+ *   - Pfam: EGFR_HUMAN/712-968
+ *   - HHblits:	tr|F4CCT7|F4CCT7_SPHS2 NAD(P)H-quinone oxidoreductase subunit 2 ....
+ *
+ * @param {*} sequenceIdLine
+ * @returns Object with 8 members :
+ * - seq.name
+ * - html <a href> (if uniprot name is detected)
+ * - uniprot organism suffix
+ * - protein region _from_
+ * - protein region _to_
+ * - uniprot organism code
+ * - any text after ID
+ * - link to Pfam page
+ */
 function ParseSeqName(sequenceIdLine) {
   var info = '';
   var sequenceId = sequenceIdLine;
   var spaceIndex = sequenceIdLine.indexOf(' ');
-  if (spaceIndex != -1) {
+  if (spaceIndex !== -1) {
     info = sequenceIdLine.substr(spaceIndex + 1);
     sequenceId = sequenceIdLine.substr(0, spaceIndex); // name is seq.name before first space
   }
@@ -169,13 +192,13 @@ function ParseSeqName(sequenceIdLine) {
     //unrecognized format: excessive slashes
     return { name: sequenceId, link: sequenceId, org: '', from: slashFrom, to: slashTo, info: info, pfam: '' };
   }
-  if (slashSplit.length == 2) {
+  if (slashSplit.length === 2) {
     // slash notation, such as in pfam alignments : EGFR_HUMAN/712-968
     var dashSplit = slashSplit[1].split('-');
-    if (dashSplit.length == 2) {
-      slashFrom = parseInt(dashSplit[0]);
-      slashTo = parseInt(dashSplit[1]);
-      if (slashFrom == NaN || slashTo == NaN) {
+    if (dashSplit.length === 2) {
+      slashFrom = parseInt(dashSplit[0], 10);
+      slashTo = parseInt(dashSplit[1], 10);
+      if (isNaN(slashFrom) || isNaN(slashTo)) {
         slashFrom = 1;
         slashTo = 0;
       }
@@ -184,17 +207,18 @@ function ParseSeqName(sequenceIdLine) {
   var fullSequenceId = slashSplit[0];
   var barSplit = fullSequenceId.split('|');
   var basicSequenceId = barSplit[barSplit.length - 1];
-  var underscoreSplit = basicSequenceId.split('_'); //split the last part of the ID such as with sp|P01112|RASH_HUMAN ... split is {'RASH' , 'HUMAN'}
+  // Split the last part of the ID such as with sp|P01112|RASH_HUMAN ... split is {'RASH' , 'HUMAN'}
+  var underscoreSplit = basicSequenceId.split('_');
   var idStem = underscoreSplit[0];
   var idSpecies = underscoreSplit[1];
   var idIsUniprot =
-    underscoreSplit.length == 2 &&
+    underscoreSplit.length === 2 &&
     idSpecies.length > 2 &&
     idSpecies.length < 6 &&
-    ((idStem.length > 0 && idStem.length < 7) || idStem.length == 10);
+    ((idStem.length > 0 && idStem.length < 7) || idStem.length === 10);
   if (idIsUniprot) {
     var uniprotLinkField =
-      getBioLink('uniprot', basicSequenceId, fullSequenceId) + (slashSplit.length == 2 ? '/' + slashSplit[1] : '');
+      getBioLink('uniprot', basicSequenceId, fullSequenceId) + (slashSplit.length === 2 ? '/' + slashSplit[1] : '');
     var pfamLinkField = getBioLink('pfam', basicSequenceId, 'pfam');
     return {
       name: sequenceId,
@@ -216,7 +240,9 @@ function mf(v) {
   return Math.floor(v);
 }
 function fillinc(ary, len) {
-  for (var p = 0; p < len; p++) ary.push(p);
+  for (let p = 0; p < len; p++) {
+    ary.push(p);
+  }
 } // make sure ary is an empty array before calling
 function getBox(w, h, margin) {
   return { l: margin, t: margin, r: w - margin, b: h - margin, w: w - 2 * margin, h: h - 2 * margin };
@@ -230,23 +256,31 @@ function getRangeUpdate() {
     max: -1e6,
     width: 0,
     update: function(v) {
-      if (v > this.max) this.max = v;
-      if (v < this.min) this.min = v;
+      if (v > this.max) {
+        this.max = v;
+      }
+      if (v < this.min) {
+        this.min = v;
+      }
       this.width = this.max - this.min;
     },
   };
 }
 function sort(values, indices) {
   // sort by values and maintain indices in parallel order
-  if (values.length != indices.length) return false;
+  if (values.length !== indices.length) {
+    return false;
+  }
   var l = [];
-  for (var k = 0; k < values.length; k++) l.push({ v: values[k], i: indices[k] });
+  for (let k = 0; k < values.length; k++) {
+    l.push({ v: values[k], i: indices[k] });
+  }
   l.sort(function(a, b) {
     return b.v - a.v;
   });
   values = [];
   indices = [];
-  for (var k = 0; k < l.length; k++) {
+  for (let k = 0; k < l.length; k++) {
     values.push(l.v[k]);
     indices.push(l.i[k]);
   }
@@ -336,7 +370,8 @@ function createPlot() {
         var yr = (this.ry.from + this.sy * y).toFixed(1);
         var yp = this.box.b - y * this.wy;
         pstr += 'M' + this.box.l + ' ' + yp + 'L' + this.box.r + ' ' + yp;
-        //				if ($.browser.chrome) yp /= 2;	// weird? you bet! i have no idea why text is shifting in chrome... 2014_02_26: not shifting with d3 apparently
+        // weird? you bet! i have no idea why text is shifting in chrome... 2014_02_26: not shifting with d3 apparently
+        // if ($.browser.chrome) yp /= 2;
         this.d3plotselect
           .append('text')
           .attr('x', this.box.l - 5)
@@ -355,11 +390,13 @@ function createPlot() {
     },
     // ary is normal ary or its items could be objects { i:index, v:value }
     addCurve: function(color, width, ary) {
-      if (ary.length < 1) return;
+      if (ary.length < 1) {
+        return;
+      }
       var vQ = isset(ary[0].v);
       var path = '';
       var sx = this.box.w / (ary.length - 1);
-      for (var i = 0; i < ary.length; i++) {
+      for (let i = 0; i < ary.length; i++) {
         var v = vQ ? ary[i].v : ary[i];
         var x = this.box.l + sx * i;
         var f = (v - this.ry.from) / this.ry.w;
@@ -412,8 +449,12 @@ function createMSA() {
     // cbpw -- callback for pairwise computing, see comments on startPairwiseIdentity() for details
     //
     asyncRead: function(text, cb, cbpw) {
-      if (cb) this.cb = cb;
-      if (cbpw) this.cbpw = cbpw;
+      if (cb) {
+        this.cb = cb;
+      }
+      if (cbpw) {
+        this.cbpw = cbpw;
+      }
       this.resetPairwise();
       this.rerenderQ = false;
       this.readyQ = false;
@@ -447,8 +488,20 @@ function createMSA() {
       this.seqorder = { orig: [], ident1: [], ident2: [] };
       this.specdist = { name: 'species', children: {} }; // species distribution object for species diagram
       // rendered html for each div
-      this.hruler = this.hseqs = this.hnames = this.hinfo = this.hspecies = this.hgaps = this.hident1 = this.hident2 = this.hrows = this.hrows2 = this.hpfam = this.hcustomwA = this.hcustomwB =
-        '';
+      this.hruler = '';
+      this.hseqs = '';
+      this.hnames = '';
+      this.hinfo = '';
+      this.hspecies = '';
+      this.hgaps = '';
+      this.hident1 = '';
+      this.hident2 = '';
+      this.hrows = '';
+      this.hrows2 = '';
+      this.hpfam = '';
+      this.hcustomwA = '';
+      this.hcustomwB = '';
+
       this.refseqIdx = 0;
       this.refseqProtFrom = 1;
       this.asyncCurrSeq = 0;
@@ -459,12 +512,17 @@ function createMSA() {
       this.fileLines = text.split(nl);
       this.orderbyStr = 'orderOrig';
       console.log('parsing msa ' + this.fileLines.length + ' lines total');
-      //			if (this.ra) { this.ra.clear(); this.ra.setSize(5,5); }		// shrink current Raphael to allow parent div resize according to new msa width
+      // Shrink current Raphael to allow parent div resize according to new msa width
+      // if (this.ra) { this.ra.clear(); this.ra.setSize(5,5); }
       if (!this.fileLines.length) {
-        if (this.cb) this.cb.done();
+        if (this.cb) {
+          this.cb.done();
+        }
         return;
       }
-      if (this.cb) this.cb.progress('reading MSA...');
+      if (this.cb) {
+        this.cb.progress('reading MSA...');
+      }
       setTimeout($.proxy(this.asyncParse, this), this.asyncTimeout);
     },
     getNormalizedColumnProportions: function() {
@@ -474,7 +532,7 @@ function createMSA() {
       }
       for (var col = 0; col < this.symColHash.length; col++) {
         var newHash = {};
-        for (var key in this.symColHash[col]) {
+        for (var key of Object.keys(this.symColHash[col])) {
           newHash[key] = this.symColHash[col][key] / this.h;
         }
         returnValue.push(newHash);
@@ -482,7 +540,9 @@ function createMSA() {
       return returnValue;
     },
     initPaging: function() {
-      if (!this.h) return;
+      if (!this.h) {
+        return;
+      }
       var h = this.h;
       this.page = {
         from: 0,
@@ -494,74 +554,102 @@ function createMSA() {
         validQ: true,
         set: function(n) {
           // set current page, n is 0-based!
-          var h = this.last + 1;
-          if (this.len >= h) {
-            this.to = h - 1;
+          var currentPage = this.last + 1;
+          if (this.len >= currentPage) {
+            this.to = currentPage - 1;
             this.validQ = false;
             return 0;
           } // page size is bigger than entire thing
-          this.pages = Math.ceil(h / this.len);
-          if (n + 1 > this.pages) n = this.pages - 1; // set on last page
+          this.pages = Math.ceil(currentPage / this.len);
+          if (n + 1 > this.pages) {
+            n = this.pages - 1; // set on last page
+          }
           this.from = n * this.len;
           this.to = this.from + this.len - 1;
-          if (this.to > this.last) this.to = this.last;
+          if (this.to > this.last) {
+            this.to = this.last;
+          }
           return n; // current page
         },
         getstr: function(n) {
           return this.rangestr[n];
         },
       };
-      for (var k = 0; k < this.page.pages; k++) {
+      for (let k = 0; k < this.page.pages; k++) {
         this.page.set(k);
         this.page.rangestr.push(this.page.from + 1 + '..' + (this.page.to + 1));
       }
       this.page.set(0);
     },
-    // --- parsing MSA -- plain text / fasta / stockholm supported, optionally dots converted to dashes, optionally uppercase forced ----------------------
-    //
+    /**
+     * Parsing MSA
+     * - Plain text / FASTA / Stockholm supported.
+     * - Optionally dots converted to dashes.
+     * - Optionally uppercase forced.
+     */
     asyncParse: function() {
       for (
         var currN = 0;
         this.asyncParseLineN < this.fileLines.length && currN < this.asyncParseStop;
         this.asyncParseLineN++, currN++
       ) {
-        var i = this.asyncParseLineN;
-        if (this.fileLines[i].length < 2) continue;
+        let i = this.asyncParseLineN;
+        if (this.fileLines[i].length < 2) {
+          continue;
+        }
         var ch = this.fileLines[i].charAt(0);
-        if (ch == '#' || ch == '/') continue; // STOCKHOLM comments
-        if (ch == '>') this.fastaQ = true;
+        if (ch === '#' || ch === '/') {
+          continue; // STOCKHOLM comments
+        }
+        if (ch === '>') {
+          this.fastaQ = true;
+        }
         if (this.fastaQ) {
           // FASTA
-          if (ch == '>') {
+          if (ch === '>') {
             this.names.push(this.fileLines[i].substr(1).trim());
             this.seqs.push('');
           } else {
-            var seq = this.fileLines[i].trim();
-            if (this.forceupperQ) seq = seq.toUpperCase();
-            if (this.forcedashQ) seq = seq.replace('.', '-');
+            let seq = this.fileLines[i].trim();
+            if (this.forceupperQ) {
+              seq = seq.toUpperCase();
+            }
+            if (this.forcedashQ) {
+              seq = seq.replace('.', '-');
+            }
             this.seqs[this.seqs.length - 1] += seq;
           }
         } else {
           // STOCKHOLM or plain text
           var t = this.fileLines[i].trim().split(/[\s\t]+/);
-          if (t.length != 2) {
-            if (this.cb) this.cb.fail('Cannot parse MSA line #' + i);
+          if (t.length !== 2) {
+            if (this.cb) {
+              this.cb.fail('Cannot parse MSA line #' + i);
+            }
             return false;
           }
-          var seq = t[1];
-          if (this.forceupperQ) seq = seq.toUpperCase();
-          if (this.forcedashQ) seq = seq.replace('.', '-');
+          let seq = t[1];
+          if (this.forceupperQ) {
+            seq = seq.toUpperCase();
+          }
+          if (this.forcedashQ) {
+            seq = seq.replace('.', '-');
+          }
           this.names.push(t[0]);
           this.seqs.push(seq);
         }
-        if (this.cb) this.cb.progress('reading MSA, line ' + this.asyncParseLineN);
+        if (this.cb) {
+          this.cb.progress('reading MSA, line ' + this.asyncParseLineN);
+        }
       }
       if (this.asyncParseLineN < this.fileLines.length) {
         setTimeout($.proxy(this.asyncParse, this), this.asyncTimeout);
         return;
       }
       if (!this.seqs.length || !this.names.length) {
-        if (this.cb) this.cb.fail();
+        if (this.cb) {
+          this.cb.fail();
+        }
         return false;
       }
       this.w = this.seqs[0].length;
@@ -583,15 +671,19 @@ function createMSA() {
     //
     parseSeqAndRenderHtml: function(pageQ, clrQ) {
       // writes directly to this.hseqs
-      var i = this.orderby[this.asyncCurrSeq];
-      var gaps = 0,
-        last = '',
-        entrQ = this.entropyPerCol.length > 0;
-      for (var p in this.columns) {
+      let i = this.orderby[this.asyncCurrSeq];
+      var gaps = SSL_OP_SSLEAY_080_CLIENT_DH_BUG;
+      var last = '';
+      var entrQ = this.entropyPerCol.length > 0;
+      for (var p of Object.keys(this.columns)) {
         var col = this.columns[p];
         var ch = this.seqs[i].charAt(col);
-        if (ch == '-') gaps++;
-        if (!pageQ) continue;
+        if (ch === '-') {
+          gaps++;
+        }
+        if (!pageQ) {
+          continue;
+        }
         var consQ = true;
         if (entrQ) {
           var ent = (this.entropyPerCol[col] - this.entropyRange.min) / this.entropyRange.width;
@@ -599,7 +691,7 @@ function createMSA() {
         }
         if (consQ && clrQ && aaclr.mview.hasOwnProperty(ch)) {
           var news = aaclr.mview[ch];
-          if (news != last) {
+          if (news !== last) {
             this.hseqs += last.length ? '</span>' : '';
             last = news;
             this.hseqs += "<span class='" + last + "'>" + ch;
@@ -607,13 +699,19 @@ function createMSA() {
             this.hseqs += ch;
           }
         } else {
-          if (last.length != 0) this.hseqs += '</span>';
+          if (last.length !== 0) {
+            this.hseqs += '</span>';
+          }
           this.hseqs += ch;
           last = '';
         }
       }
-      if (last.length != 0) this.hseqs += '</span>';
-      if (pageQ) this.hseqs += '<br>';
+      if (last.length !== 0) {
+        this.hseqs += '</span>';
+      }
+      if (pageQ) {
+        this.hseqs += '<br>';
+      }
       return gaps;
     },
     //
@@ -621,8 +719,18 @@ function createMSA() {
     //
     reRender: function(msaPage, orderby, filterGaps, filterIdent, filterRSgaps) {
       this.orderbyStr = orderby;
-      this.hseqs = this.hnames = this.hinfo = this.hspecies = this.hgaps = this.hident1 = this.hident2 = this.hrows = this.hrows2 = this.hpfam = this.hcustomwA = this.hcustomwB =
-        '';
+      this.hseqs = '';
+      this.hnames = '';
+      this.hinfo = '';
+      this.hspecies = '';
+      this.hgaps = '';
+      this.hident1 = '';
+      this.hident2 = '';
+      this.hrows = '';
+      this.hrows2 = '';
+      this.hpfam = '';
+      this.hcustomwA = '';
+      this.hcustomwB = '';
       this.rerenderQ = true;
       var which = null;
       switch (orderby) {
@@ -650,21 +758,28 @@ function createMSA() {
     },
     getNonGappyRScolumns: function() {
       var columns = [];
-      for (var p = 0; p < this.w; p++) {
+      for (let p = 0; p < this.w; p++) {
         var ch = this.seqs[0].charAt(p);
-        if (ch == '-' || ch == '.') continue;
+        if (ch === '-' || ch === '.') {
+          continue;
+        }
         columns.push(p);
       }
       return columns;
     },
     applyFiltering: function(orderAry, filterGaps, filterIdent, filterRSgaps) {
       this.columns = [];
-      if (filterRSgaps) this.columns = this.getNonGappyRScolumns();
-      else fillinc(this.columns, this.w); // restore column visibility
+      if (filterRSgaps) {
+        this.columns = this.getNonGappyRScolumns();
+      } else {
+        fillinc(this.columns, this.w); // restore column visibility
+      }
       this.orderby = [];
-      for (var i in orderAry) {
+      for (var i of Object.keys(orderAry)) {
         var seq = orderAry[i];
-        if (seq != 0 && (this.gaps[seq].v * 100 > filterGaps || this.ident1[seq].v * 100 < filterIdent)) continue;
+        if (seq !== 0 && (this.gaps[seq].v * 100 > filterGaps || this.ident1[seq].v * 100 < filterIdent)) {
+          continue;
+        }
         this.orderby.push(seq);
       }
     },
@@ -677,16 +792,21 @@ function createMSA() {
       win.document.open('text/html', 'replace');
       win.document.write('<pre>\n');
       var columns = this.columns;
-      if (filterRSgaps && this.columns.length == this.w)
+      if (filterRSgaps && this.columns.length === this.w) {
         // possibly not applied yet
         columns = this.getNonGappyRScolumns();
+      }
       for (var s in this.seqs) {
-        if (s != 0 && (this.gaps[s].v * 100 > valGaps || this.ident1[s].v * 100 < valIdent)) continue;
+        if (s !== 0 && (this.gaps[s].v * 100 > valGaps || this.ident1[s].v * 100 < valIdent)) {
+          continue;
+        }
         win.document.write('> ' + this.names[s] + nl);
         var seq = this.seqs[s];
-        if (this.columns.length != this.w) {
+        if (this.columns.length !== this.w) {
           seq = '';
-          for (var p in this.columns) seq += this.seqs[s].charAt(this.columns[p]);
+          for (var p of Object.keys(this.columns)) {
+            seq += this.seqs[s].charAt(this.columns[p]);
+          }
         }
         for (p = 0; p < seq.length; p += 70) {
           win.document.write(seq.substr(p, 70) + nl);
@@ -700,15 +820,13 @@ function createMSA() {
     // TODO: gaps and identity computations should be moved out of asyncRender() into separate async function !!!
     //
     asyncRender: function() {
-      for (
-        var currN = 0;
-        this.asyncCurrSeq < this.orderby.length && currN < this.asyncParseStop;
-        this.asyncCurrSeq++, currN++
-      ) {
+      for (var currN = 0; this.asyncCurrSeq < this.orderby.length && currN < this.asyncParseStop; this.asyncCurrSeq++, currN++) {
         var pageQ = this.asyncCurrSeq >= this.page.from && this.asyncCurrSeq <= this.page.to;
-        var i = this.orderby[this.asyncCurrSeq];
-        if (i && this.seqs[i].length != this.seqs[i - 1].length) {
-          if (this.cb) this.cb.fail('Parsing error: sequence #' + i + ' has different length');
+        let i = this.orderby[this.asyncCurrSeq];
+        if (i && this.seqs[i].length !== this.seqs[i - 1].length) {
+          if (this.cb) {
+            this.cb.fail('Parsing error: sequence #' + i + ' has different length');
+          }
           return false;
         }
         var clrQ = this.clrSeqLimit ? i < this.clrSeqLimit : true;
@@ -726,13 +844,17 @@ function createMSA() {
                 this.specdist.children[code].children[namelink.org] = { name: namelink.org, size: 1 };
               } else {
                 this.specdist.children[code].size++;
-                if (!this.specdist.children[code].children.hasOwnProperty(namelink.org))
+                if (!this.specdist.children[code].children.hasOwnProperty(namelink.org)) {
                   this.specdist.children[code].children[namelink.org] = { name: namelink.org, size: 1 };
-                else this.specdist.children[code].children[namelink.org].size++;
+                } else {
+                  this.specdist.children[code].children[namelink.org].size++;
+                }
               }
             }
           }
-          if (pageQ) this.hspecies += s + '<br>';
+          if (pageQ) {
+            this.hspecies += s + '<br>';
+          }
         }
         if (pageQ) {
           this.hnames += namelink.link + '<br>';
@@ -741,7 +863,7 @@ function createMSA() {
           this.hrows += i + 1 + '<br>';
           this.hrows2 += this.asyncCurrSeq + 1 + '<br>';
         }
-        var f1, f2, ga;
+        var ga;
         if (this.rerenderQ) {
           // redrawing loaded msa, gaps and identity already calculated
           ga = 100 * this.gaps[i].v;
@@ -750,12 +872,18 @@ function createMSA() {
         } else {
           // new msa - calculate
           this.seqname2idx[namelink.name] = i;
-          if (i == this.refseqIdx) this.refseqProtFrom = namelink.from;
+          if (i === this.refseqIdx) {
+            this.refseqProtFrom = namelink.from;
+          }
           var ident = 0;
-          if (i != this.refseqIdx) {
-            for (var k = 0; k < this.w; k++) {
-              if (this.seqs[this.refseqIdx].charAt(k) == '-' || this.seqs[i].charAt(k) == '-') continue;
-              if (this.seqs[this.refseqIdx].charAt(k) == this.seqs[i].charAt(k)) ident++;
+          if (i !== this.refseqIdx) {
+            for (let k = 0; k < this.w; k++) {
+              if (this.seqs[this.refseqIdx].charAt(k) === '-' || this.seqs[i].charAt(k) === '-') {
+                continue;
+              }
+              if (this.seqs[this.refseqIdx].charAt(k) === this.seqs[i].charAt(k)) {
+                ident++;
+              }
             }
           }
           var rga = gaps / this.w;
@@ -769,7 +897,7 @@ function createMSA() {
           this.gaps.push({ i: i, v: rga });
         }
         if (pageQ) {
-          if (i == this.refseqIdx) {
+          if (i === this.refseqIdx) {
             var a = '<span class="tc1 tblheader" style="text-align:middle">ref.seq</span><br>';
             this.hident1 += a;
             this.hident2 += a;
@@ -777,12 +905,18 @@ function createMSA() {
             this.hident1 += fi1.toFixed(1) + '<br>';
             this.hident2 += fi2.toFixed(1) + '<br>';
           }
-          if (this.customweightsA.length) this.hcustomwA += this.customweightsA[i].v + '<br>';
-          if (this.customweightsB.length) this.hcustomwB += this.customweightsB[i].v + '<br>';
+          if (this.customweightsA.length) {
+            this.hcustomwA += this.customweightsA[i].v + '<br>';
+          }
+          if (this.customweightsB.length) {
+            this.hcustomwB += this.customweightsB[i].v + '<br>';
+          }
           this.hgaps += ga.toFixed(1) + '<br>';
         }
         var prc = Math.floor((100 * this.asyncCurrSeq) / this.h);
-        if (this.cb) this.cb.progress('rendering MSA .. ' + prc + '%');
+        if (this.cb) {
+          this.cb.progress('rendering MSA .. ' + prc + '%');
+        }
       }
       if (this.asyncCurrSeq < this.orderby.length) {
         setTimeout($.proxy(this.asyncRender, this), this.asyncTimeout);
@@ -817,7 +951,7 @@ function createMSA() {
         this.identR = { min: this.identS1[this.identS1.length - 1].v, max: this.identS1[1].v };
         this.seqorder.ident1 = [];
         this.seqorder.ident2 = [];
-        for (var k = 0; k < this.identS1.length; k++) {
+        for (let k = 0; k < this.identS1.length; k++) {
           this.seqorder.ident1.push(this.identS1[k].i);
           this.seqorder.ident2.push(this.identS2[k].i);
         }
@@ -830,16 +964,19 @@ function createMSA() {
     },
     generateRuler: function() {
       var s = ''; // should be a better way to do this to be honest
-      for (var p = 1; p <= this.columns.length; p++) {
-        var i = this.refseqProtFrom + p - 1;
-        var Q = i % 10 == 0;
-        var Q5 = !Q && i % 5 == 0;
+      for (let p = 1; p <= this.columns.length; p++) {
+        let i = this.refseqProtFrom + p - 1;
+        var Q = i % 10 === 0;
+        var Q5 = !Q && i % 5 === 0;
         s += Q ? '|' : Q5 ? ':' : '.';
-        if (!Q) continue;
-        var sn = i;
-        var sn = '' + sn;
+        if (!Q) {
+          continue;
+        }
+        var sn = '' + i;
         var np = s.length - sn.length - 1; // where num starts
-        if (np < 0) continue;
+        if (np < 0) {
+          continue;
+        }
         s = s.substr(0, np) + sn + '|';
       }
       this.hruler = '.' + s;
@@ -851,31 +988,41 @@ function createMSA() {
     // This function has duplicate code within itself (too much dependencies to program it using loops)
     loadCustomMsaDataFile: function(text, UIcallback) {
       this.customweightsN = 0; // how many mapped
-      if (!this.h) return;
+      if (!this.h) {
+        return;
+      }
       var t = text.split(/[\r\n]/g);
-      if (!t.length) return;
+      if (!t.length) {
+        return;
+      }
       this.seqorder.cweightsA = [];
       this.seqorder.cweightsB = [];
       this.customweightsA = new Array(this.h);
       this.customweightsB = new Array(this.h);
-      for (var row in t) {
+      for (var row of Object.keys(t)) {
         var w = t[row].split('\t');
-        if (w.length < 2 || w.length > 3) continue;
-        if (!this.seqname2idx.hasOwnProperty(w[0])) continue;
-        var i = this.seqname2idx[w[0]];
+        if (w.length < 2 || w.length > 3) {
+          continue;
+        }
+        if (!this.seqname2idx.hasOwnProperty(w[0])) {
+          continue;
+        }
+        let i = this.seqname2idx[w[0]];
         this.customweightsA[i] = w[1];
         this.customweightsB[i] = w[2];
       }
 
       var n_customweightsB = 0; // I have not decided a function for non 100% matching sequences between A and B
-      for (var k = 0; k < this.h; k++) {
-        if (!isset(this.customweightsA[k])) this.customweightsA[k] = { i: k, v: '' };
-        else {
+      for (let k = 0; k < this.h; k++) {
+        if (!isset(this.customweightsA[k])) {
+          this.customweightsA[k] = { i: k, v: '' };
+        } else {
           this.customweightsN++;
           this.customweightsA[k] = { i: k, v: this.customweightsA[k] };
         }
-        if (!isset(this.customweightsB[k])) this.customweightsB[k] = { i: k, v: '' };
-        else {
+        if (!isset(this.customweightsB[k])) {
+          this.customweightsB[k] = { i: k, v: '' };
+        } else {
           n_customweightsB++;
           this.customweightsB[k] = { i: k, v: this.customweightsB[k] };
         }
@@ -888,14 +1035,17 @@ function createMSA() {
           return isNaN(b.v) || isNaN(a.v) ? b.v < a.v : b.v - a.v;
         }),
       );
-      for (var k = 0; k < this.cweightsS.length; k++) this.seqorder.cweightsA.push(this.cweightsS[k].i);
+      for (let k = 0; k < this.cweightsS.length; k++) {
+        this.seqorder.cweightsA.push(this.cweightsS[k].i);
+      }
       this.hcustomwA = '';
       for (
-        var i = this.page.from;
+        let i = this.page.from;
         i < this.page.to;
         i++ // this.orderby.length
-      )
+      ) {
         this.hcustomwA += this.customweightsA[this.orderby[i]].v + '<br>';
+      }
 
       // custom weights sorted B
       this.cweightsS = [].concat(
@@ -904,14 +1054,17 @@ function createMSA() {
           return isNaN(b.v) || isNaN(a.v) ? b.v < a.v : b.v - a.v;
         }),
       );
-      for (var k = 0; k < this.cweightsS.length; k++) this.seqorder.cweightsB.push(this.cweightsS[k].i);
+      for (let k = 0; k < this.cweightsS.length; k++) {
+        this.seqorder.cweightsB.push(this.cweightsS[k].i);
+      }
       this.hcustomwB = '';
       for (
-        var i = this.page.from;
+        let i = this.page.from;
         i < this.page.to;
         i++ // this.orderby.length
-      )
+      ) {
         this.hcustomwB += this.customweightsB[this.orderby[i]].v + '<br>';
+      }
 
       UIcallback();
     },
@@ -921,15 +1074,21 @@ function createMSA() {
     //
     loadCouplingsDataFile: function(text, UIcallback) {
       this.couplingsN = 0; // how many mapped
-      if (!this.h) return;
+      if (!this.h) {
+        return;
+      }
       var t = text.split(/[\r\n]/g);
-      if (!t.length) return;
+      if (!t.length) {
+        return;
+      }
       this.A = new Array(t);
       this.B = new Array(t);
-      for (var row in t) {
+      for (var row of Object.keys(t)) {
         var w = t[row].split('\t');
         console.log(w);
-        if (w.length < 2 || w.length > 3) continue;
+        if (w.length < 2 || w.length > 3) {
+          continue;
+        }
         this.A[this.couplingsN] = w[0];
         this.B[this.couplingsN] = w[1];
         this.couplingsN = this.couplingsN + 1;
@@ -941,22 +1100,27 @@ function createMSA() {
     asyncComputeConservation: function() {
       var ch = '';
       for (var currN = 0; this.asyncConsCol < this.w && currN < this.asyncConsStop; this.asyncConsCol++, currN++) {
-        var i = this.asyncConsCol;
+        let i = this.asyncConsCol;
         this.gapsPerCol[i] = 0;
         this.entropyPerCol[i] = 0;
         this.symColHash[i] = {};
-        for (var p = 0; p < this.h; p++) {
+        for (let p = 0; p < this.h; p++) {
           ch = this.seqs[p].charAt(i);
-          if (ch == '-') {
+          if (ch === '-') {
             this.gapsPerCol[i]++;
             continue;
           } // gaps not included into conservation
-          if (!AA.hasOwnProperty(ch)) continue;
-          if (this.symColHash[i].hasOwnProperty(ch)) this.symColHash[i][ch]++;
-          else this.symColHash[i][ch] = 1;
+          if (!AA.hasOwnProperty(ch)) {
+            continue;
+          }
+          if (this.symColHash[i].hasOwnProperty(ch)) {
+            this.symColHash[i][ch]++;
+          } else {
+            this.symColHash[i][ch] = 1;
+          }
         }
         var func = 0;
-        for (var key in this.symColHash[i]) {
+        for (var key of Object.keys(this.symColHash[i])) {
           // entropy -- uses count instead of frequency (probability) to capture amount of information
           var freq = this.symColHash[i][key];
           func += freq * Math.log(freq);
@@ -964,18 +1128,24 @@ function createMSA() {
         this.entropyPerCol[i] = func;
         this.entropyRange.update(func);
       }
-      if (this.cb) this.cb.progress('computing conservation, column ' + this.asyncConsCol + ' / ' + this.w);
+      if (this.cb) {
+        this.cb.progress('computing conservation, column ' + this.asyncConsCol + ' / ' + this.w);
+      }
       if (this.asyncConsCol < this.w) {
         setTimeout($.proxy(this.asyncComputeConservation, this), this.asyncTimeout);
         return;
       }
       this.readyQ = true;
       // let progress window update, otherwise it's stuck at incomplete column progress for couple of secs
-      if (this.cb) setTimeout($.proxy(this.cb.doneComputing, this), this.asyncTimeout);
+      if (this.cb) {
+        setTimeout($.proxy(this.cb.doneComputing, this), this.asyncTimeout);
+      }
     },
     // --- plot on top of msa --------------------------------------------------------------------
     redrawConservationPlot: function(plot_div_id, width) {
-      if (!this.readyQ || !this.entropyPerCol.length) return;
+      if (!this.readyQ || !this.entropyPerCol.length) {
+        return;
+      }
       var conservationPlotElement = d3.select(plot_div_id);
       var svg = conservationPlotElement
         .append('svg')
@@ -985,7 +1155,7 @@ function createMSA() {
       var rowWL = rowW / 3;
       var rowWR = 2 * rowWL;
       var y = 0;
-      for (var p = 0; p <= 10; p++) {
+      for (let p = 0; p <= 10; p++) {
         // grid
         y = Math.floor((this.raH * p) / 10) + 0.5;
         svg
@@ -999,7 +1169,7 @@ function createMSA() {
         //this.ra.path('M0 '+y+' L '+width+' '+y).attr({ stroke: '#b1b4dd', 'stroke-width':'1px' });
       }
       //	if (p==3) console.log('entropy:' + rt + ' bar:' + barH + ' total:' + this.raH);
-      for (var p in this.columns) {
+      for (let p of Object.keys(this.columns)) {
         var barH = this.raH * (msa.gapsPerCol[this.columns[p]] / msa.h);
         svg
           .append('rect')
@@ -1008,7 +1178,8 @@ function createMSA() {
           .attr('width', rowWL)
           .attr('height', this.raH)
           .attr('fill', '#a1b4cc');
-        //				this.ra.rect(p * rowW, this.raH-barH, rowWL, this.raH).attr({ stroke: 'none', fill: '#a1b4cc', shapeRendering: 'crispEdges' });
+        // this.ra.rect(p * rowW, this.raH-barH, rowWL, this.raH)
+        //   .attr({ stroke: 'none', fill: '#a1b4cc', shapeRendering: 'crispEdges' });
         var rt = (msa.entropyPerCol[this.columns[p]] - msa.entropyRange.min) / msa.entropyRange.width;
         barH = this.raH * rt;
         svg
@@ -1066,32 +1237,47 @@ function createMSA() {
       this.pairt = Math.floor((this.h * (this.h - 1)) / 2);
       this.pwQ = true; // pairwise running flag
       setTimeout($.proxy(this.anyncPairwiseIdentity, this), this.asyncTimeout);
-      if (this.cbpw) this.cbpw.start();
+      if (this.cbpw) {
+        this.cbpw.start();
+      }
     },
     togglePairwiseIdentity: function() {
       if (this.pwQ) {
         this.pwQ = false;
         this.resetPairwise();
-        if (this.cbpw) this.cbpw.done(false);
-      } else this.startPairwiseIdentity();
+        if (this.cbpw) {
+          this.cbpw.done(false);
+        }
+      } else {
+        this.startPairwiseIdentity();
+      }
     },
     anyncPairwiseIdentity: function() {
-      if (!this.pwQ) return;
+      if (!this.pwQ) {
+        return;
+      }
       var doneQ = false;
       for (var np = 0; np < this.asyncConsStop; np++) {
         var ident = 0;
-        for (var p = 0; p < this.w; p++) {
+        for (let p = 0; p < this.w; p++) {
           var ch1 = this.seqs[this.pairi].charAt(p);
           var ch2 = this.seqs[this.pairj].charAt(p);
-          if (ch1 == '-' || ch2 == '-') continue;
-          if (!aaclr.mview.hasOwnProperty(ch1) || !aaclr.mview.hasOwnProperty(ch2)) continue; // both are valid AA
-          if (ch1 == ch2) ident++;
+          if (ch1 === '-' || ch2 === '-') {
+            continue;
+          }
+          if (!aaclr.mview.hasOwnProperty(ch1) || !aaclr.mview.hasOwnProperty(ch2)) {
+            continue; // both are valid AA
+          }
+          if (ch1 === ch2) {
+            ident++;
+          }
         }
         var id = this.pairi + ',' + this.pairj;
         this.pwhash[id] = ident / this.w;
         this.pairn++;
-        if (this.pairj + 1 != this.h) this.pairj++;
-        else if (this.pairi + 1 != this.h - 1) {
+        if (this.pairj + 1 !== this.h) {
+          this.pairj++;
+        } else if (this.pairi + 1 !== this.h - 1) {
           this.pairi++;
           this.pairj = this.pairi + 1;
         } else {
@@ -1100,7 +1286,9 @@ function createMSA() {
         }
       }
       var f = ((100 * this.pairn) / this.pairt).toFixed(0);
-      if (this.cbpw) this.cbpw.progress(' ... pass1 : ' + msa.pairn + '/' + msa.pairt + ' pairs');
+      if (this.cbpw) {
+        this.cbpw.progress(' ... pass1 : ' + msa.pairn + '/' + msa.pairt + ' pairs');
+      }
       if (!doneQ) {
         setTimeout($.proxy(this.anyncPairwiseIdentity, this), this.asyncTimeout);
         return;
@@ -1114,11 +1302,15 @@ function createMSA() {
     },
     // computes min,max,avg identity for each sequence
     anyncPairwiseIdentityPass2: function() {
-      if (!this.pwQ) return;
+      if (!this.pwQ) {
+        return;
+      }
       var avg = 0;
       var r = getRangeUpdate();
       for (var j = 0; j < this.h; j++) {
-        if (j == this.pairi) continue;
+        if (j === this.pairi) {
+          continue;
+        }
         var id = this.pairi > j ? j + ',' + this.pairi : this.pairi + ',' + j;
         if (!this.pwhash.hasOwnProperty(id)) {
           concole.log('FATAL error, pairwise hash ID not found: ' + id);
@@ -1132,15 +1324,15 @@ function createMSA() {
       this.pwseqmin[this.pairi] = r.min;
       this.pwseqmax[this.pairi] = r.max;
       this.pwseqavg[this.pairi] = avg;
-      if (this.cbpw) this.cbpw.progress(' ... pass2 : ' + msa.pairi);
+      if (this.cbpw) {
+        this.cbpw.progress(' ... pass2 : ' + msa.pairi);
+      }
       this.pairi++;
       if (this.pairi < msa.h) {
         setTimeout($.proxy(this.anyncPairwiseIdentityPass2, this), this.asyncTimeout);
         return;
       }
-      console.log(
-        'sorting pairwise plots... ' + this.pwseqmin.length + ',' + this.pwseqmax.length + ',' + this.pwseqavg.length,
-      );
+      console.log('sorting pairwise plots... ' + this.pwseqmin.length + ',' + this.pwseqmax.length + ',' + this.pwseqavg.length);
       this.pwseqminS = this.pwseqmin.slice().sort(function(a, b) {
         return b - a;
       });
@@ -1155,32 +1347,42 @@ function createMSA() {
       this.pwavgR = { min: this.pwseqavgS[this.pwseqavgS.length - 1], max: this.pwseqavgS[0] };
       this.pwQ = false;
       this.pwdoneQ = true;
-      if (this.cbpw) this.cbpw.done(true);
+      if (this.cbpw) {
+        this.cbpw.done(true);
+      }
     },
     // identThr - threshold to link nodes
     // unconnected nodes not shown
     buildPairwiseIdentityGraph: function(identThr) {
-      if (!this.pwseqmin.length) return false;
+      if (!this.pwseqmin.length) {
+        return false;
+      }
       var gra = { nodes: [], links: [] };
       var map = {}; // skipping unconnected nodes, sequence index --> node index
       var mapIdx = 0;
       for (var id in this.pwhash) {
-        if (this.pwhash[id] < identThr) continue;
+        if (this.pwhash[id] < identThr) {
+          continue;
+        }
         var w = id.split(',');
-        var s1 = +w[0],
-          s2 = +w[1],
-          i1,
-          i2;
+        var s1 = +w[0];
+        var s2 = +w[1];
+        var i1;
+        var i2;
         if (!map.hasOwnProperty(s1)) {
           i1 = mapIdx++;
           map[s1] = i1;
           gra.nodes.push({});
-        } else i1 = map[s1];
+        } else {
+          i1 = map[s1];
+        }
         if (!map.hasOwnProperty(s2)) {
           i2 = mapIdx++;
           map[s2] = i2;
           gra.nodes.push({});
-        } else i2 = map[s2];
+        } else {
+          i2 = map[s2];
+        }
         gra.links.push({ source: i1, target: i2, value: this.pwhash[id] });
       }
       return gra;
@@ -1201,11 +1403,7 @@ function createForceGraph() {
     gra: false, // reference to user graph
     sampleGraph: {
       nodes: [{}, {}, {}, {}],
-      links: [
-        { source: 0, target: 1, value: 0.2 },
-        { source: 0, target: 2, value: 0.5 },
-        { source: 0, target: 3, value: 1 },
-      ],
+      links: [{ source: 0, target: 1, value: 0.2 }, { source: 0, target: 2, value: 0.5 }, { source: 0, target: 3, value: 1 }],
     },
     init: function(divID, w, h, gra) {
       this.w = w;
@@ -1228,7 +1426,9 @@ function createForceGraph() {
       this.update();
     },
     clear: function() {
-      if (!this.Q) return;
+      if (!this.Q) {
+        return;
+      }
       this.gra.nodes = [];
       this.gra.links = [];
       this.update();
@@ -1355,9 +1555,11 @@ function kMinsClustering() {
       this.clusters = [];
       this.centroids = [];
       var hash = {};
-      for (var k = 0; k < N; k++) {
-        var i = Math.floor(Math.random() * data.length);
-        if (isset(hash[data[i]])) continue;
+      for (let k = 0; k < N; k++) {
+        let i = Math.floor(Math.random() * data.length);
+        if (isset(hash[data[i]])) {
+          continue;
+        }
         this.centroids.push(data[i]);
         hash[data[i]] = 1;
       }
@@ -1367,9 +1569,11 @@ function kMinsClustering() {
     initRandomCentroids: function(N, data) {
       this.data = data;
       this.bbox = getRangeUpdate();
-      for (var k = 0; k < data.length; k++) this.bbox.update(data[k]);
-      for (var k = 0; k < N; k++) {
-        var p = this.bbox.min + Math.random() * this.bbox.width;
+      for (let k = 0; k < data.length; k++) {
+        this.bbox.update(data[k]);
+      }
+      for (let k = 0; k < N; k++) {
+        let p = this.bbox.min + Math.random() * this.bbox.width;
         //	if (k==0) p = 2.8; else if (k==1) p = 7.2;
         this.centroids.push(p);
       }
@@ -1377,45 +1581,53 @@ function kMinsClustering() {
     assign: function() {
       // assign() changes amount of clusters and centroids
       this.clusters = [];
-      for (var c in this.centroids) this.clusters.push([]);
-      for (var k in this.data) {
+      for (let c of Object.keys(this.centroids)) {
+        this.clusters.push([]);
+      }
+      for (let k of Object.keys(this.data)) {
         var dist = 1e6;
         var nearest = 0;
-        for (var c in this.centroids) {
+        for (let c of Object.keys(this.centroids)) {
           var d = Math.abs(this.centroids[c] - this.data[k]);
           if (d < dist) {
             dist = d;
             nearest = c;
           }
         }
-        //	console.log('nearest for point #' + k + ', ' + this.data[k] + ' --> cluster #' + nearest + ', cent=' + this.centroids[nearest]);
+        // console.log(`nearest for point #${k}, ${this.data[k]} --> cluster #${nearest}, cent=${this.centroids[nearest]}`);
         this.clusters[nearest].push(k);
       }
       // delete empty clusters
-      for (var k = this.clusters.length - 1; k >= 0; k--) {
-        if (this.clusters[k].length) continue;
+      for (let k = this.clusters.length - 1; k >= 0; k--) {
+        if (this.clusters[k].length) {
+          continue;
+        }
         this.clusters.splice(k, 1);
         this.centroids.splice(k, 1);
       }
     },
     getNewCentroids: function() {
       var anyoneMovedQ = false;
-      for (var c in this.clusters) {
+      for (var c of Object.keys(this.clusters)) {
         var avg = 0;
-        for (var k in this.clusters[c]) avg += this.data[this.clusters[c][k]];
+        for (let k of Object.keys(this.clusters[c])) {
+          avg += this.data[this.clusters[c][k]];
+        }
         avg /= this.clusters[c].length;
-        if (Math.abs(this.centroids[c] - avg) > 1e-6) anyoneMovedQ = true;
+        if (Math.abs(this.centroids[c] - avg) > 1e-6) {
+          anyoneMovedQ = true;
+        }
         this.centroids[c] = avg;
       }
       return anyoneMovedQ;
     },
     getSumOfSquares: function() {
       this.sumsqua = 0;
-      for (var c in this.clusters) {
+      for (var c of Object.keys(this.clusters)) {
         var sum = 0;
-        for (k in this.clusters[c])
-          sum +=
-            (this.data[this.clusters[c][k]] - this.centroids[c]) * (this.data[this.clusters[c][k]] - this.centroids[c]);
+        for (k of Object.keys(this.clusters[c])) {
+          sum += (this.data[this.clusters[c][k]] - this.centroids[c]) * (this.data[this.clusters[c][k]] - this.centroids[c]);
+        }
         this.sumsqua += sum;
       }
       return this.sumsqua;
@@ -1423,7 +1635,9 @@ function kMinsClustering() {
     runOneIteration: function() {
       while (true) {
         this.assign();
-        if (!this.getNewCentroids()) break;
+        if (!this.getNewCentroids()) {
+          break;
+        }
       }
     },
     runAllIterations: function(Nclu, data) {
@@ -1456,9 +1670,11 @@ function kMinsClustering() {
     },
     getClusteringStr: function() {
       var out = '';
-      for (var c in this.clusters) {
+      for (var c of Object.keys(this.clusters)) {
         out += 'clu #' + c + ' : cent=' + this.centroids[c] + ' [ ';
-        for (var k in this.clusters[c]) out += this.data[this.clusters[c][k]] + ' ';
+        for (let k of Object.keys(this.clusters[c])) {
+          out += this.data[this.clusters[c][k]] + ' ';
+        }
         out += ']\n';
       }
       out += 'sum of squares == ' + this.sumsqua + '\n';
