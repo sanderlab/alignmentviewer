@@ -1,0 +1,41 @@
+{
+  "defaultSeverity": "error",
+  "linterOptions": {
+    "exclude": ["examples", "vendor"]
+  },
+  "extends": [
+    "tslint-config-prettier",
+    "tslint-eslint-rules",
+    "tslint-jsdoc-rules",
+    "tslint-microsoft-contrib",
+    "tslint:latest",
+    "tslint:recommended"
+  ],
+  "jsRules": {
+    "arrow-parens": false,
+    "completed-docs": false,
+    "function-name": false,
+    "jsdoc-format": true,
+    "max-line-length": [true, 140],
+    "missing-jsdoc": false,
+    "no-console": false,
+    "no-implicit-dependencies": true,
+    "no-increment-decrement": false,
+    "no-reference": false,
+    "no-relative-imports": [true, "severity", "error"],
+    "no-single-line-block-comment": false,
+    "no-submodule-imports": true,
+    "no-suspicious-comment": false,
+    "number-literal-format": false,
+    "object-literal-key-quotes": [true, "as-needed"],
+    "object-literal-sort-keys": false,
+    "prefer-array-literal": false,
+    "prefer-type-cast": false,
+    "quotemark": [true, "jsx-double", "single", "avoid-escape"],
+    "semicolon": [true, "always", "ignore-bound-class-methods"],
+    "strict-boolean-expressions": false,
+    "trailing-comma": [true, { "esSpecCompliant": true }],
+    "variable-name": false
+  },
+  "rulesDirectory": []
+}
