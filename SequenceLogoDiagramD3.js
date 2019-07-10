@@ -26,10 +26,10 @@ class SequenceLogoDiagramD3 {
   // Returns an array containing one array per column.
   // Each element in a column array is a two element array containing [residue_code, normalized_proportion] such as ["P", .2115].
   deriveColumnProportions() {
-    const returnValue = [];
+    const returnValue = new Array();
     const columnCount = this.rawData.length;
     for (let col = 0; col < columnCount; col++) {
-      returnValue.push([]);
+      returnValue.push(new Array());
       const returnCol = returnValue[col];
       for (const key of Object.keys(this.rawData[col])) {
         returnCol.push([key, this.rawData[col][key]]);
@@ -224,7 +224,7 @@ class SequenceLogoDiagramD3 {
   // addcolumnToPlot()
   // given a plot group (g) element, add a column to it
   addColumnToPlot(plotGroup, options, columnIndex) {
-    const columnProportionArray = this.derivedColumnProportions[columnIndex];
+    const columnProportionArray = this.derivedColumnProportions ? this.derivedColumnProportions[columnIndex] : null;
     if (columnProportionArray == null || columnProportionArray.length === 0) {
       return;
     }

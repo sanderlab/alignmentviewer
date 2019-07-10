@@ -1,4 +1,4 @@
-let msa; // msa obj created by seqlib.js
+let msa = new MultipleSequenceAlignment(); // msa obj created by seqlib.js
 let msaTextblockWidth;
 let d3StatsPlots;
 let d3PairwiseIdentityPlot;
@@ -23,7 +23,7 @@ let firstSequence = '';
 let getUrlParameter = function(sParam) {
   const sPageURL = window.location.search.substring(1);
   const sURLVariables = sPageURL.split('&');
-  let sParameterName = [];
+  let sParameterName = new Array();
   for (let i = 0; i < sURLVariables.length; i++) {
     sParameterName = sURLVariables[i].split('=');
 
@@ -155,7 +155,8 @@ $(document).ready(function() {
   });
   $('#sliderFilterGapsVal').html(filterGaps + '%');
 
-  $('#CHKrfgaps').attr('checked', false);
+  // https://www.w3schools.com/tags/att_input_checked.asp
+  $('#CHKrfgaps').removeAttr('checked');
 
   $('#filterStatus').html('');
   $('#filterApply')
@@ -235,9 +236,9 @@ $(document).ready(function() {
   // Read MSA from URL
   const originURL = getUrlParameter('url');
 
-  console.log(originURL);
+  console.log(`originURL: ${originURL}`);
 
-  if (originURL !== undefined) {
+  if (originURL !== undefined && typeof originURL === 'string') {
     $('#progress')
       .show()
       .html('Fetching file...');
@@ -349,7 +350,6 @@ function switchToMsaView() {
 }
 
 // -------------------------------------------------------------------------- msa callbacks -------------
-
 let msaCallback = {
   // msa reading callbacks
 
@@ -440,6 +440,7 @@ let msaCallback = {
       $('#pagingCtrl').hide();
     }
     $('#progress').hide();
+    UpdateUMAP();
   },
 };
 
@@ -456,6 +457,7 @@ let msaPairwise = {
     $('#pairwise_status').html(msg);
   },
   done: function(completeQ) {
+    console.log(completeQ);
     if (completeQ) {
       $('#pairwise_start_btn').html('');
       const txt =
@@ -505,10 +507,10 @@ function loadNewMSA(data) {
   $('#order option[value="orderCustomBW"]').remove(); // remove sorting option from msa order dropdown
   $('#MSAcustomAH').text('');
   $('#MSAcustomBH').text('');
-  const species = isset(speclist) ? speclist : false;
   if (!msa) {
-    msa = createMSA(species);
+    msa = new MultipleSequenceAlignment();
   }
+  console.log(data);
   msa.asyncRead(data, msaCallback, msaPairwise);
 }
 
@@ -553,7 +555,7 @@ function drawMsaImage() {
   }
   const rw = $('#imageResidW').text();
   const rh = $('#imageResidH').text();
-  msaImgColorType = $('#msaImgClrSelect').val();
+  msaImgColorType = parseInt($('#msaImgClrSelect').val(), 10);
   msaImage.init(rw, rh, msa.w, currentFilteredSequenceCount);
   drawImageNSeq = 0;
   console.log('init msa image...');
@@ -577,6 +579,7 @@ function asyncDrawMsaImage() {
     }
 
     let clr = '';
+    console.log(msaImgColorType);
     if (msaImgColorType === 1) {
       clr = getResidColor('mview', aa);
     } else if (msaImgColorType === 2) {
@@ -587,8 +590,8 @@ function asyncDrawMsaImage() {
       if (msa.seqs[sequenceIndex].charAt(col) === msa.seqs[0].charAt(col)) {
         //Reducing opacity instead of preventing any disply
 
-        color = clr;
-        percent = 0.9; //How much transparency 0-> full color; 1-> white
+        const color = clr;
+        const percent = 0.9; //How much transparency 0-> full color; 1-> white
 
         //Applying the transparency layer to the obtained color
         const f = parseInt(color.slice(1), 16);
@@ -627,7 +630,6 @@ function resetMsaImage() {
 }
 
 // ---- stats view plota ---------------------------------------------------------------------------------
-
 function UpdateStatsPlot() {
   const wi = 700;
   const he = 300;
@@ -697,9 +699,12 @@ function UpdatePairwisePlot() {
 
 function initPairwiseMap(w) {
   if (!pwMap) {
-    const div = document.getElementById('MSApairwiseMap');
-    const ca = div.getContext('2d');
-    pwMap = createPairwiseMapCanvas(ca);
+    /** @type {HTMLCanvasElement | null} */
+    const div = (document.getElementById('MSApairwiseMap'));
+    if (div) {
+      const ca = div.getContext('2d');
+      pwMap = createPairwiseMapCanvas(ca);
+    }
   }
   pwMap.initMap(w, msa.h);
   pwMapNSeq = 0;
@@ -872,11 +877,11 @@ function UpdateSpeciesDiagram() {
     ],
   };
 
-  const obj = { name: 'species', children: [] }; // have to convert object (hash-table) to array
+  const obj = { name: 'species', children: new Array() }; // have to convert object (hash-table) to array
   console.log(msa.specdist.children);
   for (const e of Object.keys(msa.specdist.children)) {
     const o = msa.specdist.children[e];
-    const v = { name: o.name, size: o.size, children: [] };
+    const v = { name: o.name, size: o.size, children: new Array() };
     for (const c of Object.keys(o.children)) {
       const o2 = o.children[c];
       const v2 = { name: o2.name, size: o2.size };
@@ -926,4 +931,26 @@ function UpdateSpeciesDiagram() {
     };
   }
   d3.select(self.frameElement).style('height', height + 'px');
+}
+
+function UpdateUMAP() {
+  // Casting for TypeScript compiler autocomplete goodness.
+  /** @type {HTMLIFrameElement | null} */
+  const iframe = (document.getElementById('bb-viz-iframe'));
+  if (iframe && iframe.contentWindow) {
+    iframe.setAttribute('src', './bb-viz/index.html');
+    window.addEventListener('message', e => {
+      console.log(e);
+    });
+
+    iframe.addEventListener('load', e => {
+      console.log('hmmm');
+      iframe.contentWindow.postMessage(
+        {
+          msg: 'hey hey people',
+        },
+        '*',
+      );
+    });
+  }
 }

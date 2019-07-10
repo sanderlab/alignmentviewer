@@ -9,6 +9,7 @@
   "private": false,
   "devDependencies": {
     "@types/jquery": "^3.3.30",
+    "@types/jqueryui": "^1.12.7",
     "prettier": "^1.18.2",
     "tslint": "^5.18.0",
     "tslint-config-prettier": "^1.18.0",

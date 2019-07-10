@@ -18,12 +18,19 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@types/jquery@^3.3.30":
+"@types/jquery@*", "@types/jquery@^3.3.30":
   version "3.3.30"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.30.tgz#af4ad612d86d954d74664b2b0ec337a251fddb5b"
   integrity sha512-chB+QbLulamShZAFcTJtl8opZwHFBpDOP6nRLrPGkhC6N1aKWrDXg2Nc71tEg6ny6E8SQpRwbWSi9GdstH5VJA==
   dependencies:
     "@types/sizzle" "*"
+
+"@types/jqueryui@^1.12.7":
+  version "1.12.7"
+  resolved "https://registry.yarnpkg.com/@types/jqueryui/-/jqueryui-1.12.7.tgz#81546a73d5460a27d972008a8bd1d73b0e275a48"
+  integrity sha512-MpHuknhR20kBNsDA2VAM6WZGc+CMApzfKfTZuzMOH2dEUzo5POPGicfGJ647wvl2T6ZgQKPCSWmCUhna3XpX0Q==
+  dependencies:
+    "@types/jquery" "*"
 
 "@types/sizzle@*":
   version "2.3.2"

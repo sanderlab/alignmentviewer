@@ -48,9 +48,9 @@ class CouplingsLogoDiagramD3 {
   // addcolumnToPlot()
   // given a plot group (g) element, add a column to it
   addColumnToPlot(plotGroup, options, columnIndexA, columnIndexB, symbolCode) {
-    nextcolA = plotGroup.append('g').attr('transform', 'translate(' + 100 * columnIndexA + ',0)');
-    nextcolB = plotGroup.append('g').attr('transform', 'translate(' + 100 * columnIndexB + ',0)');
-    nextcolC = plotGroup.append('g').attr('transform', 'translate(' + 100 * columnIndexB + ',0)');
+    const nextcolA = plotGroup.append('g').attr('transform', 'translate(' + 100 * columnIndexA + ',0)');
+    const nextcolB = plotGroup.append('g').attr('transform', 'translate(' + 100 * columnIndexB + ',0)');
+    const nextcolC = plotGroup.append('g').attr('transform', 'translate(' + 100 * columnIndexB + ',0)');
     let columnFloorLevel = 100;
     const symbolProportion = 1;
     columnFloorLevel -= symbolProportion * 100;
@@ -72,7 +72,7 @@ class CouplingsLogoDiagramD3 {
       .data(circleData)
       .enter()
       .append('circle');
-    circleAttributes = nextcolC
+    const circleAttributes = nextcolC
       .attr('cx', function(d) {
         return d.cx;
       })
@@ -130,8 +130,8 @@ class CouplingsLogoDiagramD3 {
       const circleDataA = [{ cx: -60, cy: 50, radius: 40, color: colors[col] }];
       const circleDataB = [{ cx: -55, cy: 50, radius: 40, color: colors[col] }];
       // Translate.
-      const trans1A = plotGroup.append('g').attr('transform', 'translate(' + 100 * this.rawData.A[col] + ',0)');
-      const trans1B = plotGroup.append('g').attr('transform', 'translate(' + 100 * this.rawData.B[col] + ',0)');
+      const trans1A = this.plotGroup.append('g').attr('transform', 'translate(' + 100 * this.rawData.A[col] + ',0)');
+      const trans1B = this.plotGroup.append('g').attr('transform', 'translate(' + 100 * this.rawData.B[col] + ',0)');
       const circlesA = trans1A
         .selectAll('circle')
         .data(circleDataA)

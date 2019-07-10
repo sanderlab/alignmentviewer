@@ -14,7 +14,6 @@
   "jsRules": {
     "arrow-parens": false,
     "completed-docs": false,
-    "function-name": false,
     "jsdoc-format": true,
     "max-line-length": [true, 130],
     "missing-jsdoc": false,

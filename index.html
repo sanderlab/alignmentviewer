@@ -195,6 +195,8 @@
     <script type="text/javascript" src="seqlib.js"></script>
     <script type="text/javascript" src="SequenceLogoDiagramD3.js"></script>
     <script type="text/javascript" src="CouplingsLogoDiagramD3.js"></script>
+    <script type="text/javascript" src="KMinsClustering.js"></script>
+    <script type="text/javascript" src="MultipleSequenceAlignment.js"></script>
 
     <script type="text/javascript" src="index.js"></script>
     <script>
@@ -230,8 +232,8 @@
 
           <a class="button btnPressed" id="btn1">about</a>
           <span id="buttons" style="display:none;">
-            &nbsp;&nbsp;&nbsp;<span class="tc2">|</span>&nbsp;&nbsp;&nbsp; <a class="button btnReleased" id="btn2">msa view</a
-            ><span class="tc2">|</span> <a class="button btnReleased" id="btn4">image view</a> <span class="tc2">|</span>
+            &nbsp;&nbsp;&nbsp;<span class="tc2">|</span>&nbsp;&nbsp;&nbsp; <a class="button btnReleased" id="btn2">msa view</a>
+            <span class="tc2"> |</span> <a class="button btnReleased" id="btn4">image view</a> <span class="tc2">|</span>
             <a class="button btnReleased" id="btn3">stats view</a> <span class="tc2">|</span>
             <a class="button btnReleased" id="btn5">custom weights</a> <span class="tc2">|</span>
             <a class="button btnReleased" id="btn6">load couplings</a> <span class="tc2">|</span>
@@ -610,7 +612,7 @@
     <table border="0" cellpadding="1" cellspacing="1" style="display:none;" id="UMAPview">
       <tr>
         <td class="text">
-          Stuff goes here
+          <iframe id="bb-viz-iframe" width="1600" height="800"></iframe>
         </td>
       </tr>
     </table>
