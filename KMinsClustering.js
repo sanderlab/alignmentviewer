@@ -42,8 +42,8 @@ class KMinsClustering {
   assign() {
     // assign() changes amount of clusters and centroids
     this.clusters = [];
-    for (const c of Object.keys(this.centroids)) {
-      this.clusters.push([]);
+    for (let i = 0; i < Object.keys(this.centroids).length; ++i) {
+      this.clusters.push(new Array());
     }
 
     for (const k of Object.keys(this.data)) {

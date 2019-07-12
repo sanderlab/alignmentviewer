@@ -279,18 +279,18 @@ function sort(values, indices) {
   if (values.length !== indices.length) {
     return false;
   }
-  const l = [];
+  const l = new Array();
   for (let k = 0; k < values.length; k++) {
     l.push({ v: values[k], i: indices[k] });
   }
   l.sort(function(a, b) {
     return b.v - a.v;
   });
-  values = [];
-  indices = [];
+  values = new Array();
+  indices = new Array();
   for (let k = 0; k < l.length; k++) {
-    values.push(l.v[k]);
-    indices.push(l.i[k]);
+    values.push(l[k].v);
+    indices.push(l[k].i);
   }
   return true;
 }
@@ -342,17 +342,21 @@ function createPairwiseMapCanvas(canvas) {
 
 function createPlot() {
   return {
-    d3plotselect: 0,
-    box: 0, // internal plot bbox
-    rx: 0,
-    ry: 0, // range objects
+    d3plotselect: {},
+    box: { l: 0, t: 0, r: 0, b: 0, w: 0, h: 0 }, // internal plot bbox
+    rx: { from: 0, to: 0, steps: 0, w: 0 },
+    ry: { from: 0, to: 0, steps: 0, w: 0 }, // range objects
     wx: 0,
     wy: 0, // grid steps in pixels
     sx: 0,
     sy: 0, // grid steps in specified range space
     // initialize and draw grid for regular plot
-    // range variables -- { from:0, to:1, steps:10 }
     // gridsty -- style name
+
+    /**
+     * @param {{ from: number, to: number, steps: number, w: number }} rangeX
+     * @param {{ from: number, to: number, steps: number, w: number }} rangeY
+     */
     drawGrid: function(d3plotselect, w, h, rangeX, rangeY, color) {
       const mrg = 26; // margin
       this.d3plotselect = d3plotselect;
@@ -429,13 +433,13 @@ function createForceGraph() {
   return {
     w: 700,
     h: 700,
-    node: false,
-    link: false,
-    vis: false,
-    force: false,
+    node: {},
+    link: {},
+    vis: {},
+    force: {},
     Q: false,
     linkdist: { min: 10, max: 100 },
-    gra: false, // reference to user graph
+    gra: { links: new Array(), nodes: new Array() }, // reference to user graph
     sampleGraph: {
       nodes: [{}, {}, {}, {}],
       links: [{ source: 0, target: 1, value: 0.2 }, { source: 0, target: 2, value: 0.5 }, { source: 0, target: 3, value: 1 }],
@@ -456,6 +460,7 @@ function createForceGraph() {
           .size([this.w, this.h]);
         this.Q = true;
       }
+
       this.force.linkdist = this.linkdist; // so linkDistance() callback can access
       this.linkdist.w = this.linkdist.max - this.linkdist.min;
       this.update();
@@ -464,15 +469,15 @@ function createForceGraph() {
       if (!this.Q) {
         return;
       }
-      this.gra.nodes = [];
-      this.gra.links = [];
+      this.gra.nodes = new Array();
+      this.gra.links = new Array();
       this.update();
     },
     update: function() {
       const nodes = this.gra.nodes;
       const links = this.gra.links;
       this.force
-        .linkDistance(function(d) {
+        .linkDistance(d => {
           return this.linkdist.min + this.linkdist.w * d.value;
         })
         .nodes(nodes)

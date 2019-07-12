@@ -53,9 +53,20 @@ $(document).ready(function() {
     return false;
   };
   document.documentElement.ondrop = handleFileSelect;
-  document.getElementById('files').addEventListener('change', handleFileSelect, false);
-  document.getElementById('customdata').addEventListener('change', handleCustomFileSelect, false);
-  document.getElementById('customdata2').addEventListener('change', handleCustomFileSelectCouplings, false);
+  const fileInput = document.getElementById('files');
+  if (fileInput) {
+    fileInput.addEventListener('change', handleFileSelect, false);
+  }
+
+  const weightFileInput = document.getElementById('customdata');
+  if (weightFileInput) {
+    weightFileInput.addEventListener('change', handleCustomFileSelect, false);
+  }
+
+  const couplingFileInput = document.getElementById('customdata2');
+  if (couplingFileInput) {
+    couplingFileInput.addEventListener('change', handleCustomFileSelectCouplings, false);
+  }
 
   // on-click computing pair-wise identity
   $('#pairwise_start_btn').click(function(event) {
@@ -69,10 +80,10 @@ $(document).ready(function() {
     step: 0.01,
     value: grapthSliderDflt,
     slide: function(event, ui) {
-      $('#graphSliderVal').html(ui.value);
+      $('#graphSliderVal').html(ui.value ? ui.value.toString() : '');
     },
   });
-  $('#graphSliderVal').html(grapthSliderDflt);
+  $('#graphSliderVal').html(grapthSliderDflt.toString());
 
   // --- jQuery is awesome -------------
   $('[id^=btn]').click(function(event) {
@@ -122,11 +133,11 @@ $(document).ready(function() {
     step: 0.01,
     value: colorSliderDflt,
     slide: function(event, ui) {
-      $('#colorSliderVal').html(ui.value);
+      $('#colorSliderVal').html(ui.value ? ui.value.toString() : '');
       msa.setColorThresh(ui.value);
     },
   });
-  $('#colorSliderVal').html(colorSliderDflt);
+  $('#colorSliderVal').html(colorSliderDflt.toString());
   $('#colorApply')
     .button()
     .click(reloadMSA);
@@ -187,28 +198,28 @@ $(document).ready(function() {
     step: 1,
     value: imageSliderDflt.w,
     slide: function(event, ui) {
-      $('#imageResidW').html(ui.value);
+      $('#imageResidW').html(ui.value ? ui.value.toString() : '');
     },
   });
-  $('#imageResidW').html(imageSliderDflt.w);
+  $('#imageResidW').html(imageSliderDflt.w.toString());
   $('#imageResidHSlider').slider({
     max: 10,
     min: 1,
     step: 1,
     value: imageSliderDflt.h,
     slide: function(event, ui) {
-      $('#imageResidH').html(ui.value);
+      $('#imageResidH').html(ui.value ? ui.value.toString() : '');
     },
   });
-  $('#imageResidH').html(imageSliderDflt.h);
+  $('#imageResidH').html(imageSliderDflt.h.toString());
 
   // checkboxes to control annotation columns
-  $('#CHKspecies').attr('checked', true);
-  $('#CHKinfo').attr('checked', true);
-  $('#CHKcustom').attr('checked', true);
-  $('#CHKpfam').attr('checked', true);
-  $('#CHKconservation').attr('checked', true);
-  $('#CHKseqlogo').attr('checked', true);
+  $('#CHKspecies').attr('checked', '');
+  $('#CHKinfo').attr('checked', '');
+  $('#CHKcustom').attr('checked', '');
+  $('#CHKpfam').attr('checked', '');
+  $('#CHKconservation').attr('checked', '');
+  $('#CHKseqlogo').attr('checked', '');
   $('#CHKspecies').change(function() {
     $('[id^=MSAspecies]').toggle();
   });
@@ -256,6 +267,11 @@ function forceMsaRerender() {
   const ruler = document.getElementById('MSAruler');
   const seqs = document.getElementById('MSAseqs');
   const msatable = document.getElementById('MSAview');
+
+  if (!plot_canvas || !seqlogo || !ruler || !seqs || !msatable) {
+    return;
+  }
+
   plot_canvas.style.display = 'none';
   seqlogo.style.display = 'none';
   ruler.style.display = 'none';
@@ -279,7 +295,8 @@ function zoomEventWatchdog() {
   if (msaTextblockWidth === 0) {
     return;
   }
-  if (Math.abs($('#MSAseqs').width() - msaTextblockWidth) > 5) {
+  const msaWidth = $('#MSAseqs').width();
+  if (msaWidth && Math.abs(msaWidth - msaTextblockWidth) > 5) {
     //	console.log('logo width reset:' + msaTextblockWidth + ' ' + $('#MSAseqs').width() + ' mismatch');
     $('#seqlogo').html('');
     $('#plot_canvas').html('');
@@ -426,12 +443,12 @@ let msaCallback = {
         step: 1,
         value: 1,
         slide: function(event, ui) {
-          msaPage = ui.value - 1;
+          msaPage = ui.value ? ui.value - 1 : 0;
           const sliderPageVal = msa.page.getstr(msaPage) + ' out of ' + msa.h;
           $('#sliderPageVal').html(sliderPageVal);
         },
         stop: function(event, ui) {
-          msaPage = ui.value - 1;
+          msaPage = ui.value ? ui.value - 1 : 0;
           reloadMSA();
         },
       });
@@ -498,7 +515,7 @@ function loadNewMSA(data) {
   $('#pairwise_status').html(' (takes a while for large alignments)');
   $('[id^=inp_]').val('');
   $('#MSApairwise').addClass('plot_border');
-  $('#colorSliderVal').html(colorSliderDflt);
+  $('#colorSliderVal').html(colorSliderDflt.toString());
   $('#colorSlider').slider('option', 'value', colorSliderDflt);
   $('#order').val('orderOrig');
   $('#customdata').val(''); // clear path in custom data file control
@@ -510,7 +527,6 @@ function loadNewMSA(data) {
   if (!msa) {
     msa = new MultipleSequenceAlignment();
   }
-  console.log(data);
   msa.asyncRead(data, msaCallback, msaPairwise);
 }
 
@@ -545,7 +561,11 @@ function PullMsaExample(which) {
 
 function drawMsaImage() {
   $('#msaImage').html('');
-  const div = document.getElementById('msaImage');
+  /** @type {HTMLCanvasElement | null} */
+  const div = (document.getElementById('msaImage'));
+  if (!div) {
+    return;
+  }
   const ca = div.getContext('2d');
   msaImage = createMsaImageCanvas(div, ca);
   let currentFilteredSequenceCount = msa.h;
@@ -555,11 +575,11 @@ function drawMsaImage() {
   }
   const rw = $('#imageResidW').text();
   const rh = $('#imageResidH').text();
-  msaImgColorType = parseInt($('#msaImgClrSelect').val(), 10);
+  const msaImgClrSelect = $('#msaImgClrSelect').val();
+  msaImgColorType = msaImgClrSelect ? parseInt(msaImgClrSelect.toString(), 10) : 0;
   msaImage.init(rw, rh, msa.w, currentFilteredSequenceCount);
   drawImageNSeq = 0;
   console.log('init msa image...');
-  console.log(this.seqs);
   setTimeout('asyncDrawMsaImage()', 0); //0<-msaImageTimeout
 }
 
@@ -762,7 +782,7 @@ function handleFileSelect(evt) {
     .html('reading the file...');
   const r = new FileReader();
   r.onload = function(e) {
-    loadNewMSA(e.target.result);
+    loadNewMSA(r.result);
   };
   r.readAsText(f);
   return false;
@@ -777,7 +797,7 @@ function handleCustomFileSelect(evt) {
   }
   const r = new FileReader();
   r.onload = function(e) {
-    msa.loadCustomMsaDataFile(e.target.result, function() {
+    msa.loadCustomMsaDataFile(r.result, function() {
       if (!msa.seqorder.cweightsA.length) {
         return;
       }
@@ -807,7 +827,7 @@ function handleCustomFileSelectCouplings(evt) {
   }
   const r = new FileReader();
   r.onload = function(e) {
-    msa.loadCouplingsDataFile(e.target.result, function() {
+    msa.loadCouplingsDataFile(r.result, function() {
       $('#cdatStatus2').html('mapped ' + msa.couplingsN);
       console.log('>>> got the couplings');
       const aux = {};
@@ -944,7 +964,9 @@ function UpdateUMAP() {
     });
 
     iframe.addEventListener('load', e => {
-      console.log('hmmm');
+      if (!iframe.contentWindow) {
+        return;
+      }
       iframe.contentWindow.postMessage(
         {
           msg: 'hey hey people',

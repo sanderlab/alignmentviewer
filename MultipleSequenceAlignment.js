@@ -5,10 +5,7 @@ class MultipleSequenceAlignment {
     this.forceupperQ = false; // force upper case for sequences
     this.forcedashQ = false; // replace dots with dashes
     this.colorThresh = 0; // conservation coloring threshold, color everything at 0
-    (this.setColorThresh = function(thresh) {
-      this.colorThresh = thresh;
-    }),
-      (this.asyncTimeout = 2);
+    this.asyncTimeout = 2;
     this.cb = {
       done: (...args) => {
         return;
@@ -20,9 +17,16 @@ class MultipleSequenceAlignment {
     this.raH = 160; // msa plot height
     this.ra = false; // raphael on top of msa - entropy/gaps
     // current selection of sequences based on applied filters -- work in progress
-    this.seqorder = {}; // filtering/sorting alignment sequences, default order is 0,1,2,3,...
+
+    // filtering/sorting alignment sequences, default order is 0,1,2,3,...
+    this.seqorder = { orig: new Array(), ident1: new Array(), ident2: new Array() };
+
     // pairwise identity stuff
-    this.cbpw = false; // pairwise callback obj
+    this.cbpw = {
+      start: () => {
+        return;
+      },
+    }; // pairwise callback obj
     this.pwhash = {}; // hash: "i,j" --> count
     this.pwseqmin = new Array(); // array: seq.index --> min pairwise identity for a given sequence
     this.pwseqmax = new Array(); // array: seq.index --> max pairwise identity for a given sequence
@@ -40,16 +44,7 @@ class MultipleSequenceAlignment {
     // cb -- callback object, must have 3 functions: { progress(), done(), fail() }
     // cbpw -- callback for pairwise computing, see comments on startPairwiseIdentity() for details
     //
-  }
 
-  asyncRead(text, cb, cbpw) {
-    if (cb) {
-      this.cb = cb;
-    }
-    if (cbpw) {
-      this.cbpw = cbpw;
-    }
-    this.resetPairwise();
     this.rerenderQ = false;
     this.readyQ = false;
     // sequences x columns
@@ -80,8 +75,8 @@ class MultipleSequenceAlignment {
     this.gapsPerCol = new Array();
     this.symColHash = new Array();
     this.fileLines = new Array();
+    this.columns = new Array();
     this.seqname2idx = {}; // map: seq.name --> seq.index
-    this.seqorder = { orig: new Array(), ident1: new Array(), ident2: new Array() };
     this.specdist = { name: 'species', children: {} }; // species distribution object for species diagram
     // rendered html for each div
     this.hruler = '';
@@ -105,8 +100,20 @@ class MultipleSequenceAlignment {
     this.asyncParseStop = 51;
     this.asyncConsStop = 50;
     this.asyncParseLineN = 0;
-    this.fileLines = text.split(nl);
     this.orderbyStr = 'orderOrig';
+    this.orderby = this.seqorder.orig; // orderby is just a reference to one of seqorder arrays
+  }
+
+  asyncRead(text, cb, cbpw) {
+    if (cb) {
+      this.cb = cb;
+    }
+    if (cbpw) {
+      this.cbpw = cbpw;
+    }
+    this.resetPairwise();
+
+    this.fileLines = text.split(nl);
     console.log('parsing msa ' + this.fileLines.length + ' lines total');
     // Shrink current Raphael to allow parent div resize according to new msa width
     // if (this.ra) { this.ra.clear(); this.ra.setSize(5,5); }
@@ -120,6 +127,10 @@ class MultipleSequenceAlignment {
       this.cb.progress('reading MSA...');
     }
     setTimeout($.proxy(this.asyncParse, this), this.asyncTimeout);
+  }
+
+  setColorThresh(thresh) {
+    this.colorThresh = thresh;
   }
 
   getNormalizedColumnProportions() {
@@ -146,6 +157,7 @@ class MultipleSequenceAlignment {
       from: 0,
       to: 0,
       len: 1800,
+      idx: 0, // from / len,
       pages: 1,
       last: h - 1,
       rangestr: new Array(),
@@ -404,7 +416,7 @@ class MultipleSequenceAlignment {
       columns = this.getNonGappyRScolumns();
     }
     for (const s in this.seqs) {
-      if (s !== 0 && (this.gaps[s].v * 100 > valGaps || this.ident1[s].v * 100 < valIdent)) {
+      if (this.seqs[s] !== 0 && (this.gaps[s].v * 100 > valGaps || this.ident1[s].v * 100 < valIdent)) {
         continue;
       }
       win.document.write('> ' + this.names[s] + nl);
@@ -542,19 +554,19 @@ class MultipleSequenceAlignment {
       // sorted descending gaps,identity; keep refseq first
       this.identS1 = [].concat(
         this.ident1[0],
-        this.ident1.slice(1).sort(function(a, b) {
+        ...this.ident1.slice(1).sort(function(a, b) {
           return b.v - a.v;
         }),
       );
       this.identS2 = [].concat(
         this.ident2[0],
-        this.ident2.slice(1).sort(function(a, b) {
+        ...this.ident2.slice(1).sort(function(a, b) {
           return b.v - a.v;
         }),
       );
       this.gapsS = [].concat(
         this.gaps[0],
-        this.gaps.slice(1).sort(function(a, b) {
+        ...this.gaps.slice(1).sort(function(a, b) {
           return b.v - a.v;
         }),
       );
@@ -644,8 +656,11 @@ class MultipleSequenceAlignment {
     // custom weights sorted A
     this.cweightsS = [].concat(
       this.customweightsA[0],
-      this.customweightsA.slice(1).sort(function(a, b) {
-        return isNaN(b.v) || isNaN(a.v) ? b.v < a.v : b.v - a.v;
+      ...this.customweightsA.slice(1).sort(function(a, b) {
+        if (isNaN(b.v) || isNaN(a.v)) {
+          return b.v < a.v ? 1 : -1;
+        }
+        return b.v - a.v;
       }),
     );
     for (let k = 0; k < this.cweightsS.length; k++) {
@@ -663,8 +678,11 @@ class MultipleSequenceAlignment {
     // custom weights sorted B
     this.cweightsS = [].concat(
       this.customweightsB[0],
-      this.customweightsB.slice(1).sort(function(a, b) {
-        return isNaN(b.v) || isNaN(a.v) ? b.v < a.v : b.v - a.v;
+      ...this.customweightsB.slice(1).sort(function(a, b) {
+        if (isNaN(b.v) || isNaN(a.v)) {
+          return b.v < a.v ? 1 : -1;
+        }
+        return b.v - a.v;
       }),
     );
     for (let k = 0; k < this.cweightsS.length; k++) {
@@ -789,7 +807,7 @@ class MultipleSequenceAlignment {
       let barH = this.raH * (msa.gapsPerCol[this.columns[p]] / msa.h);
       svg
         .append('rect')
-        .attr('x', p * rowW)
+        .attr('x', this.columns[p] * rowW)
         .attr('y', this.raH - barH)
         .attr('width', rowWL)
         .attr('height', this.raH)
@@ -800,7 +818,7 @@ class MultipleSequenceAlignment {
       barH = this.raH * rt;
       svg
         .append('rect')
-        .attr('x', p * rowW + rowWL)
+        .attr('x', this.columns[p] * rowW + rowWL)
         .attr('y', this.raH - barH)
         .attr('width', rowWR - 1)
         .attr('height', this.raH)
