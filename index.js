@@ -1,4 +1,5 @@
 let msa = new MultipleSequenceAlignment(); // msa obj created by seqlib.js
+let prevMsa = new MultipleSequenceAlignment();
 let msaTextblockWidth;
 let d3StatsPlots;
 let d3PairwiseIdentityPlot;
@@ -42,6 +43,7 @@ let btn2view = {
   btn6: '#SPEview',
   btn7: '#couplings',
   btn8: '#UMAPview',
+  link1: '#DATview',
 };
 
 $(document).ready(function() {
@@ -337,7 +339,7 @@ function switchToMsaView() {
   $('#DATview').hide();
   $('#couplings').hide();
   $('#SPEview').hide();
-  $('#umap').hide();
+  $('#UMAPview').hide();
   $('#MSAview').show();
   // TODO: doable with one wildcard selector
   $('#btn1')
@@ -363,7 +365,27 @@ function switchToMsaView() {
     .addClass('btnReleased');
   $('#btn8')
     .removeClass('btnPressed')
-    .addClass('btnReleased');
+    .addClass('btnReleased')
+    .click(() => {
+      LoadUMAP();
+    });
+  $('#link1').click(() => {
+    // Shamelessly copying above jquery code.
+    const view = btn2view['link1']; // button id --> view id
+    if ($(view).is(':visible')) {
+      return;
+    } // already active, do nothing
+    $('[id$=view]')
+      .not(view)
+      .hide(); // select all views except current, hide
+    $(view).show(); // show current
+    $('[id^=btn]')
+      .removeClass('btnPressed')
+      .addClass('btnReleased');
+    $('#btn5')
+      .removeClass('btnReleased')
+      .addClass('btnPressed');
+  });
 }
 
 // -------------------------------------------------------------------------- msa callbacks -------------
@@ -457,7 +479,6 @@ let msaCallback = {
       $('#pagingCtrl').hide();
     }
     $('#progress').hide();
-    UpdateUMAP();
   },
 };
 
@@ -953,26 +974,49 @@ function UpdateSpeciesDiagram() {
   d3.select(self.frameElement).style('height', height + 'px');
 }
 
-function UpdateUMAP() {
+function LoadUMAP() {
   // Casting for TypeScript compiler autocomplete goodness.
   /** @type {HTMLIFrameElement | null} */
   const iframe = (document.getElementById('bb-viz-iframe'));
-  if (iframe && iframe.contentWindow) {
-    iframe.setAttribute('src', './bb-viz/index.html');
-    window.addEventListener('message', e => {
-      console.log(e);
-    });
+  const { customweightsA, names, seqs } = msa;
 
-    iframe.addEventListener('load', e => {
-      if (!iframe.contentWindow) {
-        return;
-      }
-      iframe.contentWindow.postMessage(
-        {
-          msg: 'hey hey people',
-        },
-        '*',
-      );
-    });
+  if (msa !== prevMsa) {
+    if (iframe && iframe.contentWindow) {
+      iframe.setAttribute('src', './bb-viz/bioblocks.html');
+      window.addEventListener('message', e => {
+        console.log(`Message from bb-viz: ${JSON.stringify(e)}`);
+      });
+
+      $('#num-umap-seqs').text(seqs.length <= 2000 ? seqs.length : '2000 randomly selected');
+      iframe.addEventListener('load', e => {
+        if (!iframe.contentWindow) {
+          console.log('No content window for bb-viz, unable to render!');
+          return;
+        }
+        iframe.contentWindow.postMessage(
+          {
+            annotations: customweightsA.map(weight => weight.v),
+            names,
+            seqs,
+            viz: 'UMAP Sequence',
+          },
+          '*',
+        );
+      });
+    }
+  }
+
+  if (iframe && iframe.contentWindow) {
+    iframe.contentWindow.postMessage(
+      {
+        annotations: customweightsA.map(weight => weight.v),
+        names,
+        seqs,
+        viz: 'UMAP Sequence',
+      },
+      '*',
+    );
+
+    prevMsa = msa;
   }
 }

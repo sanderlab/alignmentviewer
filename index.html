@@ -234,10 +234,10 @@
           <span id="buttons" style="display:none;">
             &nbsp;&nbsp;&nbsp;<span class="tc2">|</span>&nbsp;&nbsp;&nbsp; <a class="button btnReleased" id="btn2">msa view</a>
             <span class="tc2"> |</span> <a class="button btnReleased" id="btn4">image view</a> <span class="tc2">|</span>
+            <a class="button btnReleased" id="btn8">sequence space</a> <span class="tc2">|</span>
             <a class="button btnReleased" id="btn3">stats view</a> <span class="tc2">|</span>
-            <a class="button btnReleased" id="btn5">custom weights</a> <span class="tc2">|</span>
-            <a class="button btnReleased" id="btn6">load couplings</a> <span class="tc2">|</span>
-            <a class="button btnReleased" id="btn8">umap</a>
+            <a class="button btnReleased" id="btn5">upload annotations</a> <span class="tc2">|</span>
+            <a class="button btnReleased" id="btn6">load couplings</a>
             <span class="tc2">
               <!--|</span>-->
               <!--<a class='button btnReleased' id='btn7'> Load couplings </a>--> </span
@@ -612,7 +612,20 @@
     <table border="0" cellpadding="1" cellspacing="1" style="display:none;" id="UMAPview">
       <tr>
         <td class="text">
-          <iframe id="bb-viz-iframe" width="1600" height="800"></iframe>
+          Sequence space view of <span id="num-umap-seqs"></span> sequences from the multiple sequence alignment.<br />
+          Dimensionality reduction is carried out using the UMAP algorithm (<a href="https://arxiv.org/abs/1802.03426"
+            >arXiv e-print</a
+          >) as implemented using umap-js (<a href="https://github.com/PAIR-code/umap-js">github</a>).
+          <br />
+          To visualize sequence classes, please <a id="link1">upload an annotation.</a>
+          <br />
+          <br />
+          <br />
+        </td>
+      </tr>
+      <tr>
+        <td class="text">
+          <iframe id="bb-viz-iframe"></iframe>
         </td>
       </tr>
     </table>

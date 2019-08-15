@@ -80,10 +80,9 @@ line.link {
 /* hydrophobic */
 .pc5 { background-color:green; }
 
-
-
-
-
-
-
-
+#bb-viz-iframe {
+  border-style: ridge;
+  height: 530px;
+  margin-left: calc(50vw - 340px);
+  width: 680px;
+}
