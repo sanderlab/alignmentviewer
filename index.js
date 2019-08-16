@@ -987,7 +987,7 @@ function LoadUMAP() {
         console.log(`Message from bb-viz: ${JSON.stringify(e)}`);
       });
 
-      $('#num-umap-seqs').text(seqs.length <= 2000 ? seqs.length : '2000 randomly selected');
+      $('#num-umap-seqs').text(seqs.length <= 4000 ? seqs.length : '4000 randomly selected');
       iframe.addEventListener('load', e => {
         if (!iframe.contentWindow) {
           console.log('No content window for bb-viz, unable to render!');
@@ -1016,12 +1016,13 @@ function LoadUMAP() {
       },
       '*',
     );
-
     if (msa.customweightsA && msa.customweightsA.length >= 1) {
-      iframe.style.marginLeft = 'calc(50vw - 340px)';
-      iframe.style.width = '680px';
+      iframe.style.marginLeft = 'calc(50vw - 350px)';
+      iframe.style.width = '700px';
+    } else {
+      iframe.style.marginLeft = 'calc(50vw - 262)';
+      iframe.style.width = '525px';
     }
-
     prevMsa = msa;
   }
 }
