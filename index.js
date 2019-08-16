@@ -1017,6 +1017,11 @@ function LoadUMAP() {
       '*',
     );
 
+    if (msa.customweightsA && msa.customweightsA.length >= 1) {
+      iframe.style.marginLeft = 'calc(50vw - 340px)';
+      iframe.style.width = '680px';
+    }
+
     prevMsa = msa;
   }
 }
