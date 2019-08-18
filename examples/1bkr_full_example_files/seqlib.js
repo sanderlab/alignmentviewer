@@ -351,7 +351,7 @@
 		asyncParse : function() {
 			for (var currN=0; this.asyncParseLineN<this.fileLines.length
 						&& currN<this.asyncParseStop; this.asyncParseLineN++, currN++) {
-				var i = this.asyncParseLineN;
+				let i = this.asyncParseLineN;
 				if (this.fileLines[i].length<2) continue;
 				var ch = this.fileLines[i].charAt(0);
 				if (ch=='#' || ch=='/') continue;	// STOCKHOLM comments
@@ -401,7 +401,7 @@
 		// TODO: remove gaps calculation from here!
 		//
 		parseSeqAndRenderHtml : function(pageQ, clrQ) {		// writes directly to this.hseqs
-			var i = this.orderby[this.asyncCurrSeq];
+			let i = this.orderby[this.asyncCurrSeq];
 			var gaps = 0, last = '', entrQ = this.entropyPerCol.length>0;
 			for(var p in this.columns) {
 				var col = this.columns[p];
@@ -505,7 +505,7 @@
 		asyncRender : function() {
 			for (var currN=0; this.asyncCurrSeq<this.orderby.length && currN<this.asyncParseStop; this.asyncCurrSeq++, currN++) {
 				var pageQ = this.asyncCurrSeq >= this.page.from && this.asyncCurrSeq <= this.page.to;
-				var i = this.orderby[this.asyncCurrSeq];
+				let i = this.orderby[this.asyncCurrSeq];
 				if (i && this.seqs[i].length!=this.seqs[i-1].length) {
 					if (this.cb) this.cb.fail('Parsing error: sequence #' + i + ' has different length');
 					return false;
@@ -609,7 +609,7 @@
 		generateRuler : function() {
 			var s = '';		// should be a better way to do this to be honest
 			for(var p=1; p<=this.columns.length; p++) {
-				var i = this.refseqProtFrom+p-1;
+				let i = this.refseqProtFrom+p-1;
 				var Q = i%10==0;
 				var Q5 = !Q && i%5==0;
 				s += Q ? '|' : (Q5 ? ':' : '.');
@@ -638,7 +638,7 @@
 				var w = t[row].split("\t");
 				if (w.length < 2 || w.length > 3) continue;
 				if (!this.seqname2idx.hasOwnProperty(w[0])) continue;
-				var i = this.seqname2idx[w[0]];
+				let i = this.seqname2idx[w[0]];
 				this.customweightsA[i] = w[1];
 				this.customweightsB[i] = w[2];
 			}
@@ -673,7 +673,7 @@
 		asyncComputeConservation : function() {
 			var ch = '';
 			for (var currN=0; this.asyncConsCol<this.w && currN<this.asyncConsStop; this.asyncConsCol++, currN++) {
-				var i = this.asyncConsCol;
+				let i = this.asyncConsCol;
 				this.gapsPerCol[i] = 0;
 				this.entropyPerCol[i] = 0;
 				this.symColHash[i] = { };
@@ -989,7 +989,7 @@
 				this.centroids = [];
 				var hash = {};
 				for(var k=0; k<N; k++) {
-					var i = Math.floor(Math.random() * data.length);
+					let i = Math.floor(Math.random() * data.length);
 					if (isset(hash[data[i]])) continue;
 					this.centroids.push(data[i]);
 					hash[data[i]] = 1;

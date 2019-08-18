@@ -1,0 +1,21 @@
+{
+  "name": "alignmentviewer",
+  "version": "2.0.0",
+  "description": "AlignmentViewer is multiple sequence alignment viewer for protein families with flexible  visualization, analysis tools and links to protein family databases.",
+  "main": "index.html",
+  "repository": "https://github.com/dfci/alignmentviewer",
+  "author": "Roc Reguant",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@types/jquery": "^3.3.30",
+    "@types/jqueryui": "^1.12.7",
+    "prettier": "^1.18.2",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-jsdoc-rules": "^0.2.0",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "typescript": "^3.5.2"
+  }
+}

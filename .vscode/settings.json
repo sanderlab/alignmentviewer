@@ -1,0 +1,7 @@
+{
+  "cSpell.enabled": false,
+  "eslint.enable": false,
+  "tslint.jsEnable": true,
+  "tslint.packageManager": "yarn",
+  "editor.formatOnSave": true
+}
