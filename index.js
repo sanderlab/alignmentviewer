@@ -1026,16 +1026,6 @@ function LoadUMAP() {
     }
     iframe.style.height = '581px';
 
-    /*
-    iframe.style.width = '100vw';
-    iframe.style.height = '100vh';
-    iframe.style.position = 'fixed';
-    iframe.style.bottom = '0';
-    iframe.style.right = '0';
-    iframe.style.border = '0';
-    iframe.style.margin = '0';
-    */
-
     prevMsa = msa;
   }
 }
