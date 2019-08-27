@@ -983,6 +983,7 @@ function LoadUMAP() {
   if (msa !== prevMsa) {
     if (iframe && iframe.contentWindow) {
       iframe.setAttribute('src', './bb-viz/bioblocks.html');
+      iframe.setAttribute('allow', 'fullscreen');
       window.addEventListener('message', e => {
         console.log(`Message from bb-viz: ${JSON.stringify(e)}`);
       });
@@ -1023,6 +1024,8 @@ function LoadUMAP() {
       iframe.style.marginLeft = 'calc(50vw - 262)';
       iframe.style.width = '525px';
     }
+    iframe.style.height = '581px';
+
     prevMsa = msa;
   }
 }
