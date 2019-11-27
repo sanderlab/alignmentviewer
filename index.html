@@ -373,11 +373,18 @@
         <td class="text">
           <!-- <svg class='plot_border' id='specburst'></svg> -->
 
-          Load the couplings already sorted by importance.<br />
-          File format is tab-separated text file with two columns: residue A contacts residue B<br />
-          Each row in the input file is represented by a color with a maximum of 20 contacts.<br />
-          Not all positions have to be present but do not use the same position more than once.<br />
-          The ellipses with the same color represent contacts.<br /><br />
+          This function allows to load coupling scores sorted by importance to display contacts on the MSA.<br />
+          Prerequisite: the file format is a comma-separated file (.csv), such as what gets outputted by <a href="evcouplings.org" target="_blank">evcouplings.org</a> when selecting the "Raw Evolutionary Couplings (EC) table" option. <br />
+          An example:<br />
+          <pre>
+i,A_i,j,A_j,fn,cn,segment_i,segment_j,probability
+49,V,69,M,0,0.050877,A,A,0.9985961719887426
+57,S,65,D,0,0.045328,A,A,0.9918500685696678
+52,R,73,V,0,0.042749,A,A,0.9835481279392891
+          </pre>
+          Once loaded, the MSA view tab will display colored ellipses.<br />
+          The same colored ellipse on two different residues represents a contact between the pair. <br />
+          A maximum of 20 ellipses will be displayed.<br />
           <input type="file" class="filectrl" id="customdata2" size="40" /><br />
           <br />
           <div id="cdatStatus2"></div>
