@@ -17,7 +17,8 @@
     "strict": true,
     "target": "es5"
   },
-  "exclude": ["examples", "node_modules", "vendor"],
+  "exclude": [
+    "example", "node_modules", "vendor"],
   "typeAcquisition": {
     "enable": false
   }
