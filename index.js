@@ -553,25 +553,8 @@ function loadNewMSA(data) {
 
 // --- pulling msa example from the server --------------------------------------------------------------
 
-let exmpUrl = '';
-function PullMsaExample(which) {
-  let url = exmpUrl;
-  switch (which) {
-    case 1:
-      url += '/example/1bkr_A.1-108.msa.txt';
-      break;
-    case 2:
-      url += '/MYG_PHYMC.1-154.msa.txt';
-      break;
-    case 3:
-      url += '/EGFR_HUMAN.712-968.msa.txt';
-      break;
-    case 4:
-      url += '/BLAT_ECOLX.1-286.msa.txt';
-      break;
-    default:
-      return;
-  }
+function PullMsaExample() {
+  let url = '/example/1bkr_A.1-108.msa.txt';
   console.log(url);
   $.get(url, function(data) {
     loadNewMSA(data);
