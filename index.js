@@ -499,7 +499,7 @@ let msaPairwise = {
     if (completeQ) {
       $('#pairwise_start_btn').html('');
       const txt =
-        "<b><span class='tc2'>max</span>/<span class='tc1'>average</span>/<span class='tc0'>min</span></b> (sorted by ranking)";
+        "<b><span class='tc2'>max</span>/<span style='color:#f5a742'>average</span>/<span class='tc0'>min</span></b> (sorted by ranking)";
       $('#pairwise_status').html(txt);
       $('#MSApairwise').removeClass('plot_border');
       UpdatePairwisePlot();
@@ -669,7 +669,7 @@ function UpdateStatsPlot() {
   const plot = createPlot();
   // ref.seq not included
   plot.drawGrid(d3StatsPlots, wi, he, getRange(1, msa.h - 1, 10), getRange(0, 1, 10), '#9899c9');
-  plot.addCurve('#585989', 4, msa.identS1.slice(1));
+  plot.addCurve('#f5a742', 4, msa.identS1.slice(1));
   plot.addCurve('#7879a9', 4, msa.gapsS.slice(1));
   $('#inp_gaps').val(msa.gapsMax);
   $('#inp_ident_min').val(msa.identR.min);
@@ -710,7 +710,7 @@ function UpdatePairwisePlot() {
   const p = createPlot();
   p.drawGrid(d3PairwiseIdentityPlot, wi, he, getRange(1, msa.h, 10), getRange(0, 1, 10), '#9899c9');
   p.addCurve('#3e3f61', 4, msa.pwseqminS);
-  p.addCurve('#585989', 4, msa.pwseqavgS);
+  p.addCurve('#f5a742', 4, msa.pwseqavgS);
   p.addCurve('#7792ba', 4, msa.pwseqmaxS);
   $('#inp_pwmin_min').val(msa.pwminR.min);
   $('#inp_pwmin_max').val(msa.pwminR.max);
