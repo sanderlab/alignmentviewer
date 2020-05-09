@@ -937,7 +937,7 @@ class MultipleSequenceAlignment {
         }
         const f = ((100 * this.pairn) / this.pairt).toFixed(0);
         if (this.cbpw) {
-            this.cbpw.progress(' ... pass1 : ' + msa.pairn + '/' + msa.pairt + ' pairs');
+            this.cbpw.progress(' ... pass1 : ' + msa.pairn/msa.pairt*50 + ' %');
         }
         if (!doneQ) {
             setTimeout($.proxy(this.anyncPairwiseIdentity, this), this.asyncTimeout);
@@ -977,7 +977,7 @@ class MultipleSequenceAlignment {
         this.pwseqmax[this.pairi] = r.max;
         this.pwseqavg[this.pairi] = avg;
         if (this.cbpw) {
-            this.cbpw.progress(' ... pass2 : ' + msa.pairi);
+            this.cbpw.progress(' ... pass2 : ' + msa.pairi/msa.h*50 + '%');
         }
         this.pairi++;
         if (this.pairi < msa.h) {
