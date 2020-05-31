@@ -378,6 +378,17 @@ function createPlot() {
           .attr('font-size', '10px')
           .attr('fill', 'black')
           .text(xr);
+          
+        //##ROC#
+        if (x == 5){
+                this.d3plotselect
+                  .append('text')
+                  .attr('x', xp)
+                  .attr('y', this.box.b + 10)
+                  .attr('font-size', '10px')
+                  .attr('fill', 'black')
+                  .text("Sequence number");
+        }
       }
       this.sy = (this.ry.to - this.ry.from) / this.ry.steps;
       for (let y = 0; y <= this.ry.steps; y++) {
@@ -394,6 +405,21 @@ function createPlot() {
           .attr('fill', 'black')
           .attr('text-anchor', 'end')
           .text(yr);
+        
+        //##ROC#
+        if (y == 10){
+          this.d3plotselect
+            .append('text')
+            .attr('x', this.box.l - 15)
+            .attr('y', yp+50 )
+            .attr('font-size', '10px')
+            .attr('fill', 'black')
+            .attr('text-anchor', 'end')
+            .attr('transform', 'rotate(-90)')
+            .text('Percentage');
+        }
+
+
       }
       this.d3plotselect
         .append('path')
