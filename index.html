@@ -321,8 +321,11 @@
       <tr>
         <td class="text">
           <span class="textB">Pairwise identity</span>&nbsp;&nbsp;&nbsp; If you want to compute the graphs below please click on: <b><a id="pairwise_start_btn">calculate</a
-          ></b>b><span id="pairwise_status"> (takes a while for large alignments)</span>
-          <div class="plot_border tc3" id="MSApairwise" style="margin-top:6px; width:700px; height:300px;"></div>
+          ></b><span id="pairwise_status"> (takes a while for large alignments)</span>
+          <div class="plot_border tc3" id="MSApairwise" style="margin-top:6px; width:700px; height:300px;">
+            <div style="position:relative;top:40%;text-align:center;z-index:100"> <a id="pairwise_start_btn">calculate</a> <br><span id="pairwise_status"> (takes a while for large alignments)</span></div>
+
+          </div>
         </td>
         <td class="text" valign="top"></td>
       </tr>
@@ -441,6 +444,13 @@ i,A_i,j,A_j,fn,cn,segment_i,segment_j,probability
                   <option value="orderIdent1">identity1</option>
                   <option value="orderIdent2">identity2</option> </select
                 ><br />
+
+                &nbsp;Coloring Scheme:
+                <select id="aaorder">
+                  <option value="original" style="background-color: blue">original</option>
+                  <option value="new" style="background-color: green">Clustal</option>
+                </select>
+                <br/>
 
                 <span style="font-size:5px;"><br /></span>
                 <input type="checkbox" id="CHKspecies" /> show species
