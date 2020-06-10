@@ -410,8 +410,8 @@ function createPlot() {
         if (y == 10){
           this.d3plotselect
             .append('text')
-            .attr('x', this.box.l - 15)
-            .attr('y', yp+50 )
+            .attr('x', -100)
+            .attr('y', 10 )
             .attr('font-size', '10px')
             .attr('fill', 'black')
             .attr('text-anchor', 'end')
