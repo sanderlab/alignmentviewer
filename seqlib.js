@@ -358,7 +358,7 @@ function createPlot() {
      * @param {{ from: number, to: number, steps: number, w: number }} rangeY
      */
     drawGrid: function(d3plotselect, w, h, rangeX, rangeY, color) {
-      const mrg = 26; // margin
+      const mrg = 40; // margin
       this.d3plotselect = d3plotselect;
       this.box = getBox(w, h, mrg);
       this.rx = rangeX;
@@ -378,6 +378,17 @@ function createPlot() {
           .attr('font-size', '10px')
           .attr('fill', 'black')
           .text(xr);
+          
+        //##ROC#
+        if (x == 5){
+                this.d3plotselect
+                  .append('text')
+                  .attr('x', xp-40)
+                  .attr('y', this.box.b + 30)
+                  .attr('font-size', '12px')
+                  .attr('fill', 'black')
+                  .text("Sequence number");
+        }
       }
       this.sy = (this.ry.to - this.ry.from) / this.ry.steps;
       for (let y = 0; y <= this.ry.steps; y++) {
@@ -394,6 +405,21 @@ function createPlot() {
           .attr('fill', 'black')
           .attr('text-anchor', 'end')
           .text(yr);
+        
+        //##ROC#
+        if (y == 10){
+          this.d3plotselect
+            .append('text')
+            .attr('x', -110)
+            .attr('y', 10 )
+            .attr('font-size', '12px')
+            .attr('fill', 'black')
+            .attr('text-anchor', 'end')
+            .attr('transform', 'rotate(-90)')
+            .text('Percentage');
+        }
+
+
       }
       this.d3plotselect
         .append('path')
