@@ -655,8 +655,8 @@ function resetMsaImage() {
 
 // ---- stats view plota ---------------------------------------------------------------------------------
 function UpdateStatsPlot() {
-  const wi = 700;
-  const he = 300;
+  const wi = 750;
+  const he = 350;
   if (d3StatsPlots) {
     d3StatsPlots.remove();
   } else {
@@ -668,7 +668,7 @@ function UpdateStatsPlot() {
   }
   const plot = createPlot();
   // ref.seq not included //-30:roc
-  plot.drawGrid(d3StatsPlots, wi-30, he-30, getRange(1, msa.h - 1, 10), getRange(0, 1, 10), '#9899c9');
+  plot.drawGrid(d3StatsPlots, wi, he, getRange(1, msa.h - 1, 10), getRange(0, 1, 10), '#9899c9');
   plot.addCurve('#f5a742', 4, msa.identS1.slice(1));
   plot.addCurve('#7879a9', 4, msa.gapsS.slice(1));
   $('#inp_gaps').val(msa.gapsMax);
@@ -693,8 +693,8 @@ function UpdatePairwisePlot() {
     clearPlots();
     return;
   }
-  const wi = 700;
-  const he = 300;
+  const wi = 750;
+  const he = 350;
   if (d3PairwiseIdentityPlot) {
     clearPlots();
   }
@@ -708,7 +708,7 @@ function UpdatePairwisePlot() {
       .attr('height', he);
   }
   const p = createPlot();
-  p.drawGrid(d3PairwiseIdentityPlot, wi-30, he-30, getRange(1, msa.h, 10), getRange(0, 1, 10), '#9899c9');
+  p.drawGrid(d3PairwiseIdentityPlot, wi, he, getRange(1, msa.h, 10), getRange(0, 1, 10), '#9899c9');
   p.addCurve('#3e3f61', 4, msa.pwseqminS);
   p.addCurve('#f5a742', 4, msa.pwseqavgS);
   p.addCurve('#7792ba', 4, msa.pwseqmaxS);

@@ -358,7 +358,7 @@ function createPlot() {
      * @param {{ from: number, to: number, steps: number, w: number }} rangeY
      */
     drawGrid: function(d3plotselect, w, h, rangeX, rangeY, color) {
-      const mrg = 26; // margin
+      const mrg = 40; // margin
       this.d3plotselect = d3plotselect;
       this.box = getBox(w, h, mrg);
       this.rx = rangeX;
@@ -383,9 +383,9 @@ function createPlot() {
         if (x == 5){
                 this.d3plotselect
                   .append('text')
-                  .attr('x', xp)
+                  .attr('x', xp-40)
                   .attr('y', this.box.b + 30)
-                  .attr('font-size', '10px')
+                  .attr('font-size', '12px')
                   .attr('fill', 'black')
                   .text("Sequence number");
         }
@@ -410,9 +410,9 @@ function createPlot() {
         if (y == 10){
           this.d3plotselect
             .append('text')
-            .attr('x', -100)
+            .attr('x', -110)
             .attr('y', 10 )
-            .attr('font-size', '10px')
+            .attr('font-size', '12px')
             .attr('fill', 'black')
             .attr('text-anchor', 'end')
             .attr('transform', 'rotate(-90)')
