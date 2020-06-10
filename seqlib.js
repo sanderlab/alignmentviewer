@@ -384,7 +384,7 @@ function createPlot() {
                 this.d3plotselect
                   .append('text')
                   .attr('x', xp)
-                  .attr('y', this.box.b + 10)
+                  .attr('y', this.box.b + 30)
                   .attr('font-size', '10px')
                   .attr('fill', 'black')
                   .text("Sequence number");
