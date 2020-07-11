@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <html>
   <head>
     <meta charset="utf-8" />
@@ -711,3 +712,707 @@ i,A_i,j,A_j,fn,cn,segment_i,segment_j,probability
     <div id="progress"></div>
   </body>
 </html>
+=======
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Access-Control-Allow-Origin" content="*" />
+    <meta
+      name="description"
+      content="AlignmentViewer is multiple sequence alignment viewer for protein families with flexible  visualization, analysis tools and links to protein family databases. It is directly accessible in web browsers without the need for software installation, as it is implemented in JavaScript, and does not require an internet connection to function.  It can handle protein families with tens of thousand of sequences and is particularly suitable for evolutionary coupling analysis, preparing the computation of protein 3D structures and detection of functionally constrained interactions."
+    />
+    <meta
+      name="keywords"
+      content="alignment viewer, proteins, MSA, multiple sequence alignment, sanderlab, evolutionary couplings, families, analysis"
+    />
+    <title>AlignmentViewer</title>
+    <style type="text/css">
+      html {
+        font-family: sans-serif;
+        margin: 1% 1% 1% 1%;
+        background: #fff;
+        background: #fff -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #e0e0e0), color-stop(100%, #e0e0e0)) fixed;
+        background: #fff -o-linear-gradient(#fff, #e0e0e0) fixed;
+        background: #fff -ms-linear-gradient(#fff, #e0e0e0) fixed;
+        background: #fff linear-gradient(#fff, #e0e0e0) fixed;
+        background: #fff -webkit-linear-gradient(#fff, #e0e0e0) fixed;
+        background: #fff -moz-linear-gradient(#fff, #e0e0e0) fixed;
+      }
+      a {
+        color: #3e3f61;
+        cursor: pointer;
+        text-decoration: none;
+        border-bottom: 1px dotted;
+      }
+      #progress {
+        display: none;
+        position: fixed;
+        left: 44%;
+        top: 44%;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 3% 3% 3% 3%;
+        background: #a1b4cc;
+        border-style: dotted;
+        border-width: 1px;
+        border-color: #585989;
+        color: #585989;
+        font-family: Trebuchet MS, Verdana;
+        font-size: 18px;
+        box-shadow: 0 0 30px 5px #999;
+        -moz-box-shadow: 0 0 30px 5px #999;
+        -webkit-box-shadow: 0 0 30px 5px #999;
+      }
+      .dim {
+        color: #a1b4cc;
+      }
+      .filectrl {
+        background-color: #fff;
+        width: 150px;
+      }
+      .tblhead {
+        background: grey;
+      }
+      .button {
+        font-family: Trebuchet MS, Verdana;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 2px;
+        padding-left: 10px;
+        padding-right: 10px;
+        text-decoration: none;
+        border: 1px solid #a1b4cc;
+      }
+      .button2 {
+        height: 24px;
+        font-size: 10px;
+        vertical-align: text-top;
+      }
+      .btnPressed {
+        color: #3e3f61;
+        background: none;
+        border: 1px dotted #3e3f61;
+      }
+      .btnReleased {
+        color: white;
+        background: #a1b4cc;
+        border: 1px solid #a1b4cc;
+      }
+      .plot_border {
+        border: 1px dotted #7792ba;
+      }
+      .hpadding {
+        padding-left: 10px;
+      }
+      .title {
+        font-family: Trebuchet MS, Verdana;
+        letter-spacing: -0.08em;
+        font-size: 36px;
+        font-weight: bold;
+      }
+      .ctrlval {
+        color: navy;
+        font-weight: bold;
+      }
+      .dense {
+        line-height: 80%;
+      }
+      .lt {
+        color: grey;
+      }
+      .bgl {
+        background-color: #aaa;
+      }
+      .tiny {
+        font-family: Trebuchet MS, Verdana;
+        font-size: 12px;
+      }
+      .text {
+        font-family: Trebuchet MS, Verdana;
+        font-size: 14px;
+        font-weight: normal;
+      }
+      .textB {
+        font-family: Trebuchet MS, Verdana;
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .title2 {
+        font-size: 14px;
+        letter-spacing: 0em;
+      }
+      .enter {
+        width: 8em;
+      }
+      li {
+        margin: 0.5em 0;
+      }
+      button {
+        color: #555;
+      }
+      ul {
+        list-style-type: none;
+        padding: 2em;
+        margin: 1em;
+      }
+      .bar {
+        fill: steelblue;
+      }
+      .c1 {
+        stroke: none;
+        fill: #33cc00;
+      }
+      .c2 {
+        stroke: none;
+        fill: #009900;
+      }
+      .c3 {
+        stroke: none;
+        fill: yellow;
+      }
+      .c4 {
+        stroke: none;
+        fill: #cc0000;
+      }
+      .c5 {
+        stroke: none;
+        fill: #0033ff;
+      }
+      .c6 {
+        stroke: none;
+        fill: #6600cc;
+      }
+      .c7 {
+        stroke: none;
+        fill: #0099ff;
+      }
+      .c8 {
+        stroke: none;
+        fill: #666666;
+      }
+      .c9 {
+        stroke: none;
+        fill: #999999;
+      }
+      @import url('https://fonts.googleapis.com/css?family=Anton');
+      .alignmentviewer-title {
+        font-family: 'Anton', sans-serif;
+        font-size: 3em;
+      }
+    </style>
+    <link type="text/css" href="vendor/jquery-ui-1.8.21.custom.css" rel="stylesheet" />
+    <script type="text/javascript" src="vendor/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="vendor/jquery-ui-1.8.21.custom.min.js"></script>
+    <script type="text/javascript" src="vendor/d3.v2.min.js"></script>
+    <script type="text/javascript" src="speclist.2012_09.js"></script>
+    <!-- before seqlib.js -->
+    <link type="text/css" href="seqlib.css" rel="stylesheet" />
+    <script type="text/javascript" src="seqlib.js"></script>
+    <script type="text/javascript" src="SequenceLogoDiagramD3.js"></script>
+    <script type="text/javascript" src="CouplingsLogoDiagramD3.js"></script>
+    <script type="text/javascript" src="KMinsClustering.js"></script>
+    <script type="text/javascript" src="MultipleSequenceAlignment.js"></script>
+
+    <script type="text/javascript" src="index.js"></script>
+    <script>
+      (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        (i[r] =
+          i[r] ||
+          function() {
+            (i[r].q = i[r].q || []).push(arguments);
+          }),
+          (i[r].l = 1 * new Date());
+        (a = s.createElement(o)), (m = s.getElementsByTagName(o)[0]);
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m);
+      })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+      ga('create', 'UA-57486113-7', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- ______________________________________________________ site header table ___________________________________________________ -->
+    <table border="0">
+      <tr>
+        <td align="left" style="vertical-align:top;" nowrap>
+          <span class="tc1 alignmentviewer-title">ALIGNMENTVIEWER</span><br />
+          <span style="line-height:96%">
+            <span class="title title2 tc1">protein multiple sequence alignment visualization & analysis</span><br />
+            <span class="title title2 tc2">in-browser computationally intensive tool, Firefox or Chrome browsers prefered</span
+            ><br />
+            <span class="tiny tc3">release 1.0</span><br /></span
+          ><br />
+
+          <a class="button btnPressed" id="btn1">about</a>
+          <span id="buttons" style="display:none;">
+            &nbsp;&nbsp;&nbsp;<span class="tc2">|</span>&nbsp;&nbsp;&nbsp; <a class="button btnReleased" id="btn2">msa view</a>
+            <span class="tc2"> |</span> <a class="button btnReleased" id="btn4">image view</a> <span class="tc2">|</span>
+            <a class="button btnReleased" id="btn8">sequence space</a> <span class="tc2">|</span>
+            <a class="button btnReleased" id="btn3">stats view</a> <span class="tc2">|</span>
+            <a class="button btnReleased" id="btn5">upload annotations</a> <span class="tc2">|</span>
+            <a class="button btnReleased" id="btn6">load couplings</a>
+            <span class="tc2">
+              <!--|</span>-->
+              <!--<a class='button btnReleased' id='btn7'> Load couplings </a>--> </span
+            ><br /><span style="font-size:3px;"><br /></span
+          ></span>
+        </td>
+        <td align="right" valign="bottom" width="99%" nowrap></td>
+        <td class="textB tc0 tc4bg" align="left" valign="bottom" style="padding:15px;" nowrap>
+          <span style="line-height:98%">
+            Drag and drop to this page or load below multiple sequence<br />
+            alignment file in plain text, STOCKHOLM or FASTA format.<br />
+            Or use example alignment:
+            <a onclick="PullMsaExample()">1bkr:A</a>
+            <span style="font-size:5px;"><br /></span
+          ></span>
+          <input type="file" class="filectrl" id="files" size="40" /><br />
+        </td>
+      </tr>
+      <tr>
+        <td class="tc4bg" colspan="3" height="2"></td>
+      </tr>
+    </table>
+
+    <br />
+
+    <!-- ______________________________________________________ image view ___________________________________________________ -->
+    <table id="IMGview" border="0" cellpadding="1" cellspacing="1" style="display:none;">
+      <tr>
+        <td class="text">
+          <br />
+          <table class="text">
+            <tr>
+              <td nowrap>
+                Generate msa image using
+                <select id="msaImgClrSelect">
+                  <option value="1">mview</option>
+                  <option value="2">hydrophobicity</option>
+                  <option value="3">Mutations</option>
+                </select>
+                coloring :
+              </td>
+              <td style="padding-left:50px;" nowrap>
+                <button id="imageApply" style="height:24px; font-size:10px; vertical-align:text-top;">apply</button>
+              </td>
+            </tr>
+          </table>
+
+          <table>
+            <tr>
+              <td class="text lt" align="right" nowrap>residue width in pixels: <span id="imageResidW"></span></td>
+              <td class="text" style="padding-left:15px;">
+                <div id="imageResidWSlider" style="width: 200px; height:6px;"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="text lt" align="right" nowrap>residue height in pixels: <span id="imageResidH"></span></td>
+              <td class="text" style="padding-left:15px;">
+                <div id="imageResidHSlider" style="width: 200px; height:6px;"></div>
+              </td>
+            </tr>
+          </table>
+
+          <br /><br />
+          <canvas class="plot_border" id="msaImage" width="100" height="100" style="margin-top:6px;"></canvas>
+
+          <br /><br /><br /><br /><br /><br /><br /><br />
+        </td>
+      </tr>
+    </table>
+
+    <!-- ______________________________________________________ stats view ____________________________________________________ -->
+    <table id="STAview" border="0" style="display:none;">
+      <tr>
+        <td valign="top">
+          <span class="textB">Sequence <span class="tc2">gaps</span> &amp; <span style="color:#f5a742">ref.seq identity</span></span
+          ><span class="text text2"> - amount of sequences with given fraction of gaps/identity (sorted by ranking)</span>
+          <div id="MSAstats"></div>
+        </td>
+        <td class="text" valign="top"></td>
+      </tr>
+      <tr>
+        <td class="text">
+          <span class="textB">Pairwise identity </span><span id="pairwise_status"> </span>
+          <div class="plot_border tc3" id="MSApairwise" style="margin-top:6px; width:700px; height:300px;">
+            <div style="position:relative;top:40%;text-align:center;z-index:100"> <a id="pairwise_start_btn">calculate </a></div>
+
+          </div>
+        </td>
+        <td class="text" valign="top"></td>
+      </tr>
+      <tr>
+        <td class="text">
+          <div class="textB" style="margin-top:40px;">Pairwise identity 2D map</div>
+          <canvas class="plot_border" id="MSApairwiseMap" width="700" height="700" style="margin-top:6px;"></canvas><br />
+        </td>
+        <td class="text" valign="top">
+          <ul class="text" style="line-height:90%">
+            <li><span style="background-color:#ffffff">&nbsp;&nbsp;&nbsp;</span> 0</li>
+            <li><span style="background-color:#d8d8ff">&nbsp;&nbsp;&nbsp;</span> 0.1</li>
+            <li><span style="background-color:#ccccff">&nbsp;&nbsp;&nbsp;</span> 0.2</li>
+            <li><span style="background-color:#a8a8ff">&nbsp;&nbsp;&nbsp;</span> 0.3</li>
+            <li><span style="background-color:#9999ff">&nbsp;&nbsp;&nbsp;</span> 0.4</li>
+            <li><span style="background-color:#7878ff">&nbsp;&nbsp;&nbsp;</span> 0.5</li>
+            <li><span style="background-color:#6666ff">&nbsp;&nbsp;&nbsp;</span> 0.6</li>
+            <li><span style="background-color:#4848ff">&nbsp;&nbsp;&nbsp;</span> 0.7</li>
+            <li><span style="background-color:#3333ff">&nbsp;&nbsp;&nbsp;</span> 0.8</li>
+            <li><span style="background-color:#1919ff">&nbsp;&nbsp;&nbsp;</span> 0.9</li>
+            <li><span style="background-color:#0000ff">&nbsp;&nbsp;&nbsp;</span> 1</li>
+          </ul>
+        </td>
+      </tr>
+      <!--<tr><td class='text'>
+	<div class='textB' style='margin-top:6px;'>Pairwise identity force-directed graph</div>
+	<div class='plot_border' id='MSApairwiseGraph' style='width:700p; height:700;'></div>
+</td><td class='text' valign='top'>
+	<ul class='text'>
+		<li>lowest seq.identity to include in graph : <span id='graphSliderVal'></span></li>
+		<li><div id='graphSlider'></div></li>
+		<li><button id='graphApply'>rebuild graph</button>&nbsp;&nbsp;&nbsp;&nbsp;<button id='graphClear'>clear graph</button></li>
+	</ul>
+</td>
+</tr>-->
+      <tr>
+        <td class="text"></td>
+        <td class="text" valign="top"></td>
+      </tr>
+    </table>
+
+    <!-- ______________________________________________________ MSA species view _______________________________________________ -->
+    <table id="SPEview" border="0" cellpadding="1" cellspacing="1" style="display:none;">
+      <tr>
+        <td class="text">
+          <!-- <svg class='plot_border' id='specburst'></svg> -->
+
+          This function allows to load coupling scores sorted by importance to display contacts on the MSA.<br />
+          The 1bkr:A coupling scores can be downloaded <a href="https://alignmentviewer.org/example/1bkr_A_CouplingScores.csv" target="_blank">here</a>. <br />
+          Prerequisite: the file format is a comma-separated file (.csv), such as what gets outputted by <a href="evcouplings.org" target="_blank">evcouplings.org</a> when selecting the "Raw Evolutionary Couplings (EC) table" option. <br />
+          An example:<br />
+          <pre>
+i,A_i,j,A_j,fn,cn,segment_i,segment_j,probability
+49,V,69,M,0,0.050877,A,A,0.9985961719887426
+57,S,65,D,0,0.045328,A,A,0.9918500685696678
+52,R,73,V,0,0.042749,A,A,0.9835481279392891
+          </pre>
+          Once loaded, the MSA view tab will display colored ellipses.<br />
+          The same colored ellipse on two different residues represents a contact between the pair. <br />
+          A maximum of 20 ellipses will be displayed.<br />
+          <input type="file" class="filectrl" id="customdata2" size="40" /><br />
+          <br />
+          <div id="cdatStatus2"></div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- ______________________________________________________ MSA custom couplings view ___________________________________________ -->
+    <table id="couplings" border="0" cellpadding="1" cellspacing="1" style="display:none;">
+      <tr>
+        <td class="text">
+          Load the couplings already sorted by strength. The residues start from the position zero.<br />
+          File format is tab-separated text file with two columns: the position numbers of the coupled residues (position A
+          contacts position B)<br />
+          Not all positions have to be present and only few will be displayed.<br /><br />
+          <input type="file" class="filectrl" id="customdata2" size="40" /><br />
+          <br />
+          <div id="cdatStatus2"></div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- ______________________________________________________ MSA custom data view ___________________________________________ -->
+    <table id="DATview" border="0" cellpadding="1" cellspacing="1" style="display:none;">
+      <tr>
+        <td class="text">
+          Load custom sequence annotation to be shown along the alignment as sortable column.<br />
+          File format is tab-separated text file with two columns: sequence name as in your multiple sequence alignment
+          (MYG_HUMAN/1-154), annotation (numerical or text).<br />
+          The example for 1bkr:A can be downloaded <a href="https://alignmentviewer.org/example/1bkr_A.1-108.msa_annotations.txt" target="_blank">here</a>. <br />
+          Not all sequence names have to be present - can provide as few as one to move it up when sorted.<br />
+          Position of reference sequence is maintained in sorted msa.<br /><br />
+          <input type="file" class="filectrl" id="customdata" size="40" /><br />
+          <br />
+          <div id="cdatStatus"></div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- ______________________________________________________ MSA view ______________________________________________________ -->
+    <table id="MSAview" border="0" cellpadding="1" cellspacing="1" style="display:none;">
+      <tr>
+        <td></td>
+        <td class="text" colspan="11" nowrap>
+          <table border="0" cellpadding="1" cellspacing="1">
+            <tr>
+              <td class="text" nowrap>
+                <span class="tc2">
+                  &nbsp;ident1% = fraction of reference sequence identical to second sequence (gaps not counted)<br />
+                  &nbsp;ident2% = fraction of second sequence identical to reference sequence (gaps not counted)<br /> </span
+                ><span style="font-size:5px;"><br /></span>
+
+                &nbsp;Sequence order:
+                <select id="order">
+                  <option value="orderOrig">original</option>
+                  <option value="orderIdent1">identity1</option>
+                  <option value="orderIdent2">identity2</option> </select
+                ><br />
+
+                <!--&nbsp;Coloring Scheme:
+                <select id="aaorder">
+                  <option value="original" style="background-color: blue">original</option>
+                  <option value="new" style="background-color: green">Clustal</option>
+                </select>
+                <br/>-->
+
+                <span style="font-size:5px;"><br /></span>
+                <input type="checkbox" id="CHKspecies" /> show species
+                <span class="lt">(kingdom code: A-archaea B-bacteria E-eukaryota V-viruses, Uniprot IDs required)</span><br />
+                <input type="checkbox" id="CHKinfo" /> show sequence annotation
+                <span class="lt">(any text after sequence name)</span><br />
+                <input type="checkbox" id="CHKpfam" /> link to protein Pfam domain structure page<br />
+                <input type="checkbox" id="CHKcustom" /> custom annotations <span class="lt">(see tab <i>custom data</i>)</span
+                ><br />
+                <input type="checkbox" id="CHKconservation" /> gap &amp; conservation bar chart<br />
+                <input type="checkbox" id="CHKseqlogo" /> sequence logo<br />
+                <span style="font-size:5px"><br /></span>
+                &nbsp;Color columns with conservation higher than: <span id="colorSliderVal"></span><br />
+                <table class="text">
+                  <tr>
+                    <td nowrap><div id="colorSlider" style="width: 300px; height:6px;"></div></td>
+                    <td>
+                      &nbsp;&nbsp;&nbsp;<button id="colorApply" style="height:24px; font-size:10px; vertical-align:text-top;">
+                        apply
+                      </button>
+                    </td>
+                  </tr>
+                </table>
+
+                <span style="font-size:5px"><br /></span>
+                <div id="pagingCtrl">
+                  <span class="ctrlval">Currently showing sequences: <span id="sliderPageVal"></span></span><br />
+                  <span style="font-size:5px"><br /></span>
+                  <div
+                    style="width: 300px; height:6px;"
+                    id="sliderPage"
+                    class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"
+                  >
+                    <a class="ui-slider-handle ui-state-default ui-corner-all ui-state-focus" href="#" style="left: 0%;"></a>
+                  </div>
+                </div>
+              </td>
+              <td class="text hpadding" valign="top" nowrap>
+                <table class="text" border="0" cellspacing="1" cellpadding="10" width="340">
+                  <tr>
+                    <td class="hpadding textB" bgcolor="#d0d0e0" style="color:white">Filtering</td>
+                  </tr>
+                  <tr>
+                    <td class="hpadding" nowrap bgcolor="#f0f0f0">
+                      <span style="font-size:5px"><br /></span>
+
+                      Hide sequences with gaps higher than <span id="sliderFilterGapsVal"></span><br />
+                      <span style="font-size:4px"><br /></span>
+                      <div id="sliderFilterGaps" style="width: 250px; height:6px;"></div>
+                      <span style="font-size:10px"><br /></span>
+                      Hide sequences with identity1 lower than <span id="sliderFilterIdentVal"></span><br />
+                      <span style="font-size:4px"><br /></span>
+                      <div id="sliderFilterIdent" style="width: 250px; height:6px;"></div>
+                      <br />
+
+                      <!--
+                        <input type="checkbox" id="CHKrfgaps">
+                        Hide columns with gaps in reference sequence<br>
+                        -->
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="hpadding" align="middle" nowrap bgcolor="#f0f0f0">
+                      <span id="filterStatus"></span>
+                      <span style="font-size:4px"><br /></span>
+                      <button id="filterExport" style="height:24px; font-size:10px; vertical-align:text-top;">
+                        &nbsp;&nbsp;&nbsp;export&nbsp;&nbsp;&nbsp;
+                      </button>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      <button id="filterApply" style="height:24px; font-size:10px; vertical-align:text-top;">
+                        &nbsp;&nbsp;&nbsp;apply&nbsp;&nbsp;&nbsp;
+                      </button>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="12"></td>
+        <td align="left" nowrap>
+          <div id="labeled_plot_canvas">
+            <span class="textB"><span class="tc3">gaps</span>/<span class="tc1">conservation</span></span>
+            <div id="plot_canvas" class=""></div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <!-- ___ MSA logo  __________ -->
+        <td colspan="12"></td>
+        <td align="left" nowrap><div id="seqlogo"></div></td>
+      </tr>
+      <tr>
+        <!-- ___ MSA logo  __________ -->
+        <td colspan="12"></td>
+        <td align="left" nowrap><div id="couplingslogo"></div></td>
+      </tr>
+      <tr>
+        <td align="right" nowrap><!-- ___ MSA header/plots ___ --></td>
+        <td align="right" nowrap></td>
+        <td></td>
+        <td></td>
+        <td align="right" style="vertical-align:bottom;" nowrap>
+          <div class="tc2 tblheader" id="MSAcustomAH"></div>
+        </td>
+        <td align="right" style="vertical-align:bottom;" nowrap>
+          <div class="tc2 tblheader" id="MSAcustomBH"></div>
+        </td>
+        <td class="hpadding" style="vertical-align:bottom;">
+          <div class="tc2 tblheader" id="MSAspeciesH">species</div>
+        </td>
+        <td align="center" style="vertical-align:bottom;">
+          <div class="tc2 tblheader" id="MSApfamH">pfam</div>
+        </td>
+        <td align="right" style="vertical-align:bottom;" nowrap>
+          <div class="tc2 tblheader">gaps%</div>
+        </td>
+        <td align="right" style="vertical-align:bottom;" nowrap>
+          <div class="tc2 tblheader">ident1%</div>
+        </td>
+        <td align="right" style="vertical-align:bottom;" nowrap>
+          <div class="tc2 tblheader">ident2%</div>
+        </td>
+        <td width="20px"></td>
+        <td align="left" nowrap><div id="MSAruler" class="ali tc2"></div></td>
+      </tr>
+      <tr>
+        <!-- ___ MSA body ___________ -->
+        <td align="right" nowrap>
+          <div class="ali dim" id="MSArows"></div>
+        </td>
+
+        <td align="right" nowrap>
+          <div class="ali dim" id="MSArows2"></div>
+        </td>
+        <td class="hpadding" align="left" nowrap>
+          <div class="ali" id="MSAnames"></div>
+        </td>
+        <td align="left" nowrap>
+          <div class="ali" id="MSAinfo"></div>
+        </td>
+        <td align="right" nowrap>
+          <div class="ali tc1" id="MSAcustomA"></div>
+        </td>
+        <td align="right" nowrap>
+          <div class="ali tc1" id="MSAcustomB"></div>
+        </td>
+        <td class="hpadding" align="left" nowrap>
+          <div class="ali" id="MSAspecies"></div>
+        </td>
+        <td class="hpadding" align="left" nowrap>
+          <div class="ali" id="MSApfam"></div>
+        </td>
+        <td class="hpadding" align="left" nowrap>
+          <div class="ali tc1" id="MSAgaps" align="right"></div>
+        </td>
+        <td class="hpadding" align="left" nowrap>
+          <div class="ali tc1" id="MSAident1" align="right"></div>
+        </td>
+        <td class="hpadding" align="left" nowrap>
+          <div class="ali tc1" id="MSAident2" align="right"></div>
+        </td>
+        <td width="20px">
+          &nbsp;
+        </td>
+        <td align="left" nowrap>
+          <div class="ali" id="MSAseqs" style="color:grey"></div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- ______________________________________________________ UMAP view ______________________________________________________ -->
+    <table border="0" cellpadding="1" cellspacing="1" style="display:none;" id="UMAPview">
+      <tr>
+        <td class="text">
+          Sequence space view of <span id="num-umap-seqs"></span> sequences from the multiple sequence alignment.<br />
+          Dimensionality reduction is carried out using the UMAP algorithm (<a href="https://arxiv.org/abs/1802.03426"
+            >arXiv e-print</a
+          >) as implemented using umap-js (<a href="https://github.com/PAIR-code/umap-js">github</a>).
+          <br />
+          To visualize sequence classes, please <a id="link1">upload an annotation.</a>
+          <br />
+          <br />
+        </td>
+      </tr>
+      <tr>
+        <td class="text">
+          <iframe id="bb-viz-iframe"></iframe>
+        </td>
+      </tr>
+    </table>
+
+    <!-- ______________________________________________________ about view ____________________________________________ -->
+    <table border="0" cellpadding="1" cellspacing="1" style="display:block;" id="ABTview">
+      <tr>
+        <td class="text">
+          <br />Protein multiple sequence alignment viewer provides simple analysis plots and pairwise identity visualization.
+          <br />
+          This tool is entirely client based (runs inside your browser, Firefox or Chrome browsers prefered), there is no
+          communication<br />
+          with the server (except when pulling example alignments), so you can save local copy of this page and use it while
+          offline.<br /><br />
+
+          If you have any questions or requests please don't hesitate to contact us at alignmentviewer@gmail.com<br />
+          The source code for this tool is at:
+          <a href="https://github.com/sanderlab/alignmentviewer">https://github.com/sanderlab/alignmentviewer</a>.
+
+          <!--
+        <img style='vertical-align:text-bottom;' src='yamail.png'>
+        -->
+
+          <br /><br />
+          <hr height="2" width="300" color="#d0d0d0" align="left" />
+          <br /><br />
+
+          
+          <b>Aug. 15th 2019</b> /// Fixed bugs, removed comments, and improved modularity<br />
+          <b>Jul. 18th 2019</b> /// Implemented UMAP<br />
+	  <b>Aug. 1st 2018</b> /// <a href="http://evcouplings.org" target="_blank">evcouplings.org</a> uses AlignmentViewer to view alignments<br />
+	  <b>Jul. 1st 2018</b> /// Load external alignments via URL queries (e.g.: alignmentviewer.com/?url=https%3A%2F%2Fmyserver.org%2Falignments%2Fmy_alignment)<br />
+          <b>Jan. 7th 2018</b> /// Preloaded example<br />
+          <b>Nov. 29th 2017</b> /// Released version 1.0<br />
+          <b>Jul. 5th 2017</b> /// Mutation comparison added.<br />
+          <b>May. 20th 2017</b> /// Weight comparison functions added.<br />
+          <b>Mar. 17th 2014</b> /// Sequence logo display added.<br />
+          <b>Jan. 2nd 2013</b> /// Filtering and export supported.<br />
+          <b>Dec. 24th 2012</b> /// Custom sequence annotation as sortable msa column supported now, see "Custom Data" tab.<br />
+          <b>Dec. 13th 2012</b> /// Added MSA image rendering with mview or hydrophobicity coloring.<br />
+          <b>Nov. 11th 2012</b> /// Release 0.5 is out, changes: sorting by identity, conservation coloring control, Pfam links,
+          drag and drop your alignment file anywhere on the page to load!
+
+          <br /><br />
+          <hr height="2" width="300" color="#d0d0d0" align="left" />
+          <br />
+
+          <h4><b>Privacy Policy</b></h4>
+          This website makes use of google analytics to measure website visits and traffic patterns through the use of browser
+          cookies. There is no advertising on this site. For a full description, see
+          <a href="http://www.google.com/policies/privacy/partners/">www.google.com/policies/privacy/partners/</a>. &nbsp;<br />
+          Visitors who disable cookies on their browser or use private/incognito browsing should still be able to access the full
+          functionality of this website.<br /><br />
+        </td>
+      </tr>
+    </table>
+
+    <div id="progress"></div>
+  </body>
+</html>
+>>>>>>> 4a879ef0c599ab8d9bc57c9ccbf615a15b65b4e2
