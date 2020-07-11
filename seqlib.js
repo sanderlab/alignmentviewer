@@ -383,11 +383,11 @@ function createPlot() {
         if (x == 5){
                 this.d3plotselect
                   .append('text')
-                  .attr('x', xp-40)
+                  .attr('x', xp-110)
                   .attr('y', this.box.b + 30)
                   .attr('font-size', '12px')
                   .attr('fill', 'black')
-                  .text("Sequence number");
+                  .text("Sequence number (sorted in descending order)");
         }
       }
       this.sy = (this.ry.to - this.ry.from) / this.ry.steps;
@@ -410,13 +410,13 @@ function createPlot() {
         if (y == 10){
           this.d3plotselect
             .append('text')
-            .attr('x', -110)
+            .attr('x', -150)
             .attr('y', 10 )
             .attr('font-size', '12px')
             .attr('fill', 'black')
             .attr('text-anchor', 'end')
             .attr('transform', 'rotate(-90)')
-            .text('Percentage');
+            .text('Fraction');
         }
 
 

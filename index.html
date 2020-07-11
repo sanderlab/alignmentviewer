@@ -179,6 +179,12 @@
         stroke: none;
         fill: #999999;
       }
+      body.clustal .c1{
+        color: purple;
+      }
+      body.clustal.c2{
+        color: yellow;
+      }
       @import url('https://fonts.googleapis.com/css?family=Anton');
       .alignmentviewer-title {
         font-family: 'Anton', sans-serif;
@@ -215,6 +221,10 @@
       })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
       ga('create', 'UA-57486113-7', 'auto');
       ga('send', 'pageview');
+    </script>
+    <script>
+      //PART 1 in javascript: 
+      $("#colorScheme").change(function() { document.body.className = $('option:selected', this).text(); });
     </script>
   </head>
   <body>
@@ -322,7 +332,8 @@
         <td class="text">
           <span class="textB">Pairwise identity </span><span id="pairwise_status"> </span>
           <div class="plot_border tc3" id="MSApairwise" style="margin-top:6px; width:700px; height:300px;">
-            <div style="position:relative;top:40%;text-align:center;z-index:100"> <a id="pairwise_start_btn">calculate </a></div>
+            <div style="position:relative;top:40%;text-align:center;z-index:100;font-size: 40px"> 
+              <a id="pairwise_start_btn" style="color:#ff0000">calculate </a></div>
 
           </div>
         </td>
@@ -444,12 +455,12 @@ i,A_i,j,A_j,fn,cn,segment_i,segment_j,probability
                   <option value="orderIdent2">identity2</option> </select
                 ><br />
 
-                <!--&nbsp;Coloring Scheme:
-                <select id="aaorder">
+                &nbsp;Coloring Scheme:
+                <select id="colorScheme">
                   <option value="original" style="background-color: blue">original</option>
                   <option value="new" style="background-color: green">Clustal</option>
                 </select>
-                <br/>-->
+                <br/>
 
                 <span style="font-size:5px;"><br /></span>
                 <input type="checkbox" id="CHKspecies" /> show species
