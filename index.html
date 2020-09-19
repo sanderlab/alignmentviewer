@@ -222,10 +222,7 @@
       ga('create', 'UA-57486113-7', 'auto');
       ga('send', 'pageview');
     </script>
-    <script>
-      //PART 1 in javascript: 
-      $("#colorScheme").change(function() { document.body.className = $('option:selected', this).text(); });
-    </script>
+
   </head>
   <body>
     <!-- ______________________________________________________ site header table ___________________________________________________ -->
@@ -709,5 +706,24 @@ i,A_i,j,A_j,fn,cn,segment_i,segment_j,probability
     </table>
 
     <div id="progress"></div>
+        <script>
+      //PART 1 in javascript: 
+      //$("#colorScheme").change(function() { document.body.className = $('option:selected', this).text(); });
+		function colorlist(){
+			console.log('A .......');
+			elem = document.querySelector('.c0');
+			elem.style.setProperty('color', "#ffff00");
+			elem = document.querySelector('.c1');
+			elem.style.setProperty('color', "#ffff00");
+			elem = document.querySelector('.c2');
+			elem.style.setProperty('color', "#ffff00");
+			elem = document.querySelector('.c3');
+			elem.style.setProperty('color', "#ffff00");
+			elem = document.querySelector('.c7');
+			elem.style.setProperty('color', "#ffff00");
+		    console.log('B .......');
+		}
+		document.getElementById("colorScheme").onchange = colorlist;
+    </script>
   </body>
 </html>
