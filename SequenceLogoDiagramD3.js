@@ -6,20 +6,20 @@
 // @param options presentation and data processing / statistical options
 class SequenceLogoDiagramD3 {
   // Default Options
-  static defaultOpts = {
-    elementId: 'seqlogo', //html element Id to use as container
-    elementWidth: 600, // desired width of the container
-    elementHeight: 32, // desired height of the container
-  };
 
   constructor(options, data) {
-    this.options = jQuery.extend(true, {}, SequenceLogoDiagramD3.defaultOpts, options);
+    this.options = jQuery.extend(true, {}, options);
     // TODO: Currently dumping in the symColHash (normalized by alignment height) - but should be an integrated data model
     this.rawData = data;
     // other class members
     this.svg = null;
     this.bounds = null;
     this.derivedColumnProportions = null;
+    const defaultOpts = {
+      elementId: 'seqlogo', //html element Id to use as container
+      elementWidth: 600, // desired width of the container
+      elementHeight: 32, // desired height of the container
+    };
   }
   // deriveColummProportions()
   // sorts amino acid prevalence into descending order for all columns

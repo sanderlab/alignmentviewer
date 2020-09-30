@@ -4,19 +4,21 @@
 // @param alignment A multiple sequence alignment
 // @param options presentation and data processing / statistical options
 class CouplingsLogoDiagramD3 {
-  static defaultOpts = {
-    elementId: 'couplingslogo', //html element Id to use as container
-    elementWidth: 600, // desired width of the container
-    elementHeight: 32, // desired height of the container
-  };
 
+
+  //##ROC##
   constructor(options, data, seqLen) {
-    this.options = jQuery.extend(true, {}, CouplingsLogoDiagramD3.defaultOpts, options);
+    this.options = jQuery.extend(true, {},  options);
     // TODO: Currently dumping in the symColHash (normalized by alignment height) - but should be an integrated data model.
     this.rawData = data; // other class members
     this.svg = null;
     this.bounds = null;
     this.seqLen = seqLen;
+    const defaultOpts = {
+      elementId: 'couplingslogo', //html element Id to use as container
+      elementWidth: 600, // desired width of the container
+      elementHeight: 32, // desired height of the container
+    };
   }
 
   // initDiagram()
