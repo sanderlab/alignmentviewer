@@ -545,9 +545,11 @@ function loadNewMSA(data) {
   $('#order option[value="orderCustomBW"]').remove(); // remove sorting option from msa order dropdown
   $('#MSAcustomAH').text('');
   $('#MSAcustomBH').text('');
-  if (!msa) {
-    msa = new MultipleSequenceAlignment();
-  }
+
+  //Remove If ##ROC##
+  //if (!msa) {
+  msa = new MultipleSequenceAlignment();
+  //}
   msa.asyncRead(data, msaCallback, msaPairwise);
 }
 
