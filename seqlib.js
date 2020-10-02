@@ -21,6 +21,14 @@ let AA = {
 
 // prettier-ignore
 let aaclr = {
+  defaultClasses:  {
+    '.': 'gr', '-': 'gr', G: 'aag',  A: 'aaa',
+    I: 'aai', V: 'aav', L: 'aal', M: 'aam', F: 'aaf',
+    Y: 'aay', W: 'aaw', H: 'aah', C: 'aac', P: 'aap',
+    K: 'aak', R: 'aar', D: 'aad', E: 'aae', Q: 'aaq',
+    N: 'aan', S: 'aas', T: 'aat', B: 'aab', Z: 'aaz',
+    X: 'aax', '?': 'c9', '*': 'c8',  U: 'aau',
+  },
   // amino-acid coloring, colors defined in css
   mview: {
     '.': 'gr', '-': 'gr', G: 'c0',  A: 'c0',
@@ -87,54 +95,66 @@ let AAhydro = {
 // prettier-ignore
 let aacolors = {
   mview: {
-    gr: 'grey',
-    bl: 'black',
-    m0: 'blue',
-    m1: 'red',
-    c0: '#33cc00',
-    c1: '#009900',
-    c2: '#ffff00',
-    c3: '#33cc00',
-    c4: '#cc0000',
-    c5: '#0033ff',
-    c6: '#6600cc',
-    c7: '#0099ff',
-    c8: '#666666',
-    c9: '#999999',
-    t0: '#5858a7',
-    t1: '#6b6b94',
-    t2: '#64649b',
-    t3: '#2121de',
-    t4: '#9d9d62',
-    t5: '#8c8c73',
-    t6: '#0000ff',
-    t7: '#4949b6',
-    t8: '#60609f',
-    t9: '#ecec13',
-    t10: '#b2b24d',
-    t11: '#4747b8',
-    t12: '#82827d',
-    t13: '#c2c23d',
-    t14: '#2323dc',
-    t15: '#4949b6',
-    t16: '#9d9d62',
-    t17: '#c0c03f',
-    t18: '#d3d32c',
-    t19: '#ffff00',
+    G: '#33cc00',
+    A: '#33cc00',
+    I: '#33cc00',
+    V: '#33cc00',
+    L: '#33cc00',
+    M: '#33cc00',
+    F: '#009900',
+    Y: '#009900',
+    W: '#009900',
+    H: '#009900',
+    C: '#ffff00',
+    P: '#33cc00',
+    K: '#33cc00',
+    R: '#cc0000',
+    D: '#0033ff',
+    E: '#0033ff',
+    Q: '#6600cc',
+    N: '#6600cc',
+    S: '#0099ff',
+    T: '#0099ff',
+    B: '#666666',
+    Z: '#666666',
+    X: '#666666',
+    U: '#000000'
+  },
+  clustal:{
+    G: '#f09048',
+    A: '#80a0f0',
+    I: '#80a0f0',
+    V: '#80a0f0',
+    L: '#80a0f0',
+    M: '#80a0f0',
+    F: '#80a0f0',
+    Y: '#15a4a4',
+    W: '#80a0f0',
+    H: '#15a4a4',
+    C: '#f08080',
+    P: '#c0c000',
+    K: '#f01505',
+    R: '#f01505',
+    D: '#0033ff',
+    E: '#c048c0',
+    Q: '#6600cc',
+    N: '#15c015',
+    S: '#0099ff',
+    T: '#0099ff',
+    B: '#666666',
+    Z: '#666666',
+    X: '#666666',
+    U: '#000000',
   },
 };
 
 $.browser.chrome = /chrome/.test(navigator.userAgent.toLowerCase());
 
 function getResidColor(style, aa) {
-  if (!aaclr.hasOwnProperty(style) || !aaclr[style][aa]) {
-    return '';
-  }
-  const code = aaclr[style][aa];
   if (!aacolors.hasOwnProperty(style)) {
     return '';
   }
-  return aacolors[style][code];
+  return aacolors[style][aa];
 }
 
 // hydrophobic - red, hydrophilic - blue

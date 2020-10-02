@@ -281,8 +281,9 @@
                 Generate msa image using
                 <select id="msaImgClrSelect">
                   <option value="1">mview</option>
-                  <option value="2">hydrophobicity</option>
-                  <option value="3">Mutations</option>
+                  <option value="2">clustal</option>
+                  <option value="3">hydrophobicity</option>
+                  <!--<option value="4">Mutations</option>-->
                 </select>
                 coloring :
               </td>
@@ -454,8 +455,8 @@ i,A_i,j,A_j,fn,cn,segment_i,segment_j,probability
 
                 &nbsp;Coloring Scheme:
                 <select id="colorScheme">
-                  <option value="original" style="background-color: blue">Original</option>
-                  <option value="clustal" style="background-color: green">Clustal</option>
+                  <option value="original" style="background-color: blue">mview (default)</option>
+                  <option value="clustal" style="background-color: green">clustal</option>
                 </select>
                 <br/>
 
@@ -707,118 +708,11 @@ i,A_i,j,A_j,fn,cn,segment_i,segment_j,probability
 
     <div id="progress"></div>
         <script>
-      //PART 1 in javascript: 
-      //$("#colorScheme").change(function() { document.body.className = $('option:selected', this).text(); });
-//			console.log('A .......');
-//			elem = document.querySelectorAll('.c0');
-//			for(var i=0; i<elem.length; i++){
-//			    elem[i].style.setProperty('color', "#ffff00");
-//		    }
-//			elem = document.querySelectorAll('.c1');
-//			for(var i=0; i<elem.length; i++){
-//			    elem[i].style.setProperty('color', "#ffff00");
-//		    }
-//			elem = document.querySelectorAll('.c2');
-//			for(var i=0; i<elem.length; i++){
-//			    elem[i].style.setProperty('color', "#ffff00");
-//		    }
-//			elem = document.querySelectorAll('.c3');
-//			for(var i=0; i<elem.length; i++){
-//			    elem[i].style.setProperty('color', "#ffff00");
-//		    }
-//			elem = document.querySelectorAll('.c7');
-//			for(var i=0; i<elem.length; i++){
-//			    elem[i].style.setProperty('color', "#ffff00");
-//		    }
-//		    console.log('B .......');
-//		}
-//		document.getElementById("colorScheme").onchange = colorlist;
 
 		$(document).ready(function () {   
 		    $('body').on('change','#colorScheme', function() {
-
-		    	var dict = {'.c0' :'#33cc00',
-								'.c1' :'#009900',
-								'.c2' :'#ffff00',
-								'.c3' :'#33cc00',
-								'.c4' :'#cc0000',
-								'.c5' :'#0033ff',
-								'.c6' :'#6600cc',
-								'.c7' :'#0099ff',
-								'.c8' :'#666666',
-								'.c9' :'#999999',
-								'.t0' :'#5858a7',
-								'.t1' :'#6b6b94',
-								'.t2' :'#64649b',
-								'.t3' :'#2121de',
-								'.t4' :'#9d9d62',
-								'.t5' :'#8c8c73',
-								'.t6' :'#0000ff',
-								'.t7' :'#4949b6',
-								'.t8' :'#60609f',
-								'.t9' :'#ecec13',
-								'.t10':'#b2b24d',
-								'.t11':'#4747b8',
-								'.t12':'#82827d',
-								'.t13':'#c2c23d',
-								'.t14':'#2323dc',
-								'.t15':'#4949b6',
-								'.t16':'#9d9d62',
-								'.t17':'#c0c03f',
-								'.t18':'#d3d32c',
-								'.t19':'#ffff00'};
-
-				if (this.value == 'clustal'){
-					// http://www.jalview.org/help/html/colourSchemes/clustal.html
-					var dict = {'.c0' :'#f09048',
-									'.c1' :'#15a4a4',
-									'.c2' :'#f08080',
-									'.c3' :'#c0c000',
-									'.c4' :'#f01505',
-									'.c5' :'#c048c0',
-									'.c6' :'#15c015',
-									'.c7' :'#15c015',
-									'.c8' :'#666666',
-									'.c9' :'#999999',
-									'.t0' :'#5858a7',
-									'.t1' :'#6b6b94',
-									'.t2' :'#64649b',
-									'.t3' :'#2121de',
-									'.t4' :'#9d9d62',
-									'.t5' :'#8c8c73',
-									'.t6' :'#0000ff',
-									'.t7' :'#15c015',
-									'.t8' :'#60609f',
-									'.t9' :'#ecec13',
-									'.t10':'#b2b24d',
-									'.t11':'#4747b8',
-									'.t12':'#82827d',
-									'.t13':'#c2c23d',
-									'.t14':'#2323dc',
-									'.t15':'#4949b6',
-									'.t16':'#9d9d62',
-									'.t17':'#c0c03f',
-									'.t18':'#d3d32c',
-									'.t19':'#ffff00'};
-				}
-
-
-		        console.log('B .......');
-		        console.log(this.value);
-
-
-		        for(var key in dict) {
-				 	var color = dict[key];
-
-				 	//get the elements with the color
-	  				elem = document.querySelectorAll(key);
-					for(var i=0; i<elem.length; i++){
-						//Set the color
-					    elem[i].style.setProperty('color', color);
-				    }
-				}
-
-
+		    	document.getElementById("seqlogo").className = this.value;
+		    	document.getElementById("MSAseqs").className = 'ali ' + this.value;
 		    });
 		});  
 

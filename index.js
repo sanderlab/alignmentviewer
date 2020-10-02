@@ -609,8 +609,10 @@ function asyncDrawMsaImage() {
     if (msaImgColorType === 1) {
       clr = getResidColor('mview', aa);
     } else if (msaImgColorType === 2) {
-      clr = getResidHydroColor(aa);
+      clr = getResidColor('clustal', aa);
     } else if (msaImgColorType === 3) {
+      clr = getResidHydroColor(aa);
+    }else if (msaImgColorType === 4) {
       clr = getResidColor('mview', aa);
 
       if (msa.seqs[sequenceIndex].charAt(col) === msa.seqs[0].charAt(col)) {

@@ -299,8 +299,8 @@ class MultipleSequenceAlignment {
                 const ent = (this.entropyPerCol[col] - this.entropyRange.min) / this.entropyRange.width;
                 consQ = ent >= this.colorThresh;
             }
-            if (consQ && clrQ && aaclr.mview.hasOwnProperty(ch)) {
-                const news = aaclr.mview[ch];
+            if (consQ && clrQ && aaclr.defaultClasses.hasOwnProperty(ch)) {
+                const news = aaclr.defaultClasses[ch];
                 if (news !== last) {
                     this.hseqs += last.length ? '</span>' : '';
                     last = news;
@@ -915,7 +915,7 @@ class MultipleSequenceAlignment {
                 if (ch1 === '-' || ch2 === '-') {
                     continue;
                 }
-                if (!aaclr.mview.hasOwnProperty(ch1) || !aaclr.mview.hasOwnProperty(ch2)) {
+                if (!aaclr.defaultClasses.hasOwnProperty(ch1) || !aaclr.defaultClasses.hasOwnProperty(ch2)) {
                     continue; // both are valid AA
                 }
                 if (ch1 === ch2) {

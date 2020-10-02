@@ -33,41 +33,61 @@ line.link {
 	stroke-width: 1.5px;
 }
 
-/* mview / multalin / tailor coloring */
-.gr  { color:grey;    }
-.bl  { color:black;   }
-.m0  { color:blue;    }
-.m1  { color:red;     }
-.c0  { color:#33cc00; }
-.c1  { color:#009900; }
-.c2  { color:#ffff00; }
-.c3  { color:#33cc00; }
-.c4  { color:#cc0000; }
-.c5  { color:#0033ff; }
-.c6  { color:#6600cc; }
-.c7  { color:#0099ff; }
-.c8  { color:#666666; }
-.c9  { color:#999999; }
-.t0  { color:#5858a7; }
-.t1  { color:#6b6b94; }
-.t2  { color:#64649b; }
-.t3  { color:#2121de; }
-.t4  { color:#9d9d62; }
-.t5  { color:#8c8c73; }
-.t6  { color:#0000ff; }
-.t7  { color:#4949b6; }
-.t8  { color:#60609f; }
-.t9  { color:#ecec13; }
-.t10 { color:#b2b24d; }
-.t11 { color:#4747b8; }
-.t12 { color:#82827d; }
-.t13 { color:#c2c23d; }
-.t14 { color:#2323dc; }
-.t15 { color:#4949b6; }
-.t16 { color:#9d9d62; }
-.t17 { color:#c0c03f; }
-.t18 { color:#d3d32c; }
-.t19 { color:#ffff00; }
+
+/* Amino acid css classes - default mview */
+.aag { color:#33cc00; fill:#33cc00; }
+.aaa { color:#33cc00; fill:#33cc00; }
+.aai { color:#33cc00; fill:#33cc00; }
+.aav { color:#33cc00; fill:#33cc00; }
+.aal { color:#33cc00; fill:#33cc00; }
+.aam { color:#33cc00; fill:#33cc00; }
+.aaf { color:#009900; fill:#009900; }
+.aay { color:#009900; fill:#009900; }
+.aaw { color:#009900; fill:#009900; }
+.aah { color:#009900; fill:#009900; }
+.aac { color:#ffff00; fill:#ffff00; }
+.aap { color:#33cc00; fill:#ffff00; }
+.aak { color:#33cc00; fill:#ffff00; }
+.aar { color:#cc0000; fill:#cc0000; }
+.aad { color:#0033ff; fill:#0033ff; }
+.aae { color:#0033ff; fill:#0033ff; }
+.aaq { color:#6600cc; fill:#6600cc; }
+.aan { color:#6600cc; fill:#6600cc; }
+.aas { color:#0099ff; fill:#0099ff; }
+.aat { color:#0099ff; fill:#0099ff; }
+.aab { color:#666666; fill:#666666; }
+.aaz { color:#666666; fill:#666666; }
+.aax { color:#666666; fill:#666666; }
+.aau { color:black; fill:black;   }
+
+/* Amino acid css classes - clustal */
+.clustal .aag { color:#f09048; fill:#f09048; }
+.clustal .aaa { color:#80a0f0; fill:#80a0f0; }
+.clustal .aai { color:#80a0f0; fill:#80a0f0; }
+.clustal .aav { color:#80a0f0; fill:#80a0f0; }
+.clustal .aal { color:#80a0f0; fill:#80a0f0; }
+.clustal .aam { color:#80a0f0; fill:#80a0f0; }
+.clustal .aaf { color:#80a0f0; fill:#80a0f0; }
+.clustal .aay { color:#15a4a4; fill:#15a4a4; }
+.clustal .aaw { color:#80a0f0; fill:#80a0f0; }
+.clustal .aah { color:#15a4a4; fill:#15a4a4; }
+.clustal .aac { color:#f08080; fill:#f08080; }
+.clustal .aap { color:#c0c000; fill:#c0c000; }
+.clustal .aak { color:#f01505; fill:#f01505; }
+.clustal .aar { color:#f01505; fill:#f01505; }
+.clustal .aad { color:#0033ff; fill:#0033ff; }
+.clustal .aae { color:#c048c0; fill:#c048c0; }
+.clustal .aaq { color:#6600cc; fill:#6600cc; }
+.clustal .aan { color:#15c015; fill:#15c015; }
+.clustal .aas { color:#0099ff; fill:#0099ff; }
+.clustal .aat { color:#0099ff; fill:#0099ff; }
+.clustal .aab { color:#666666; fill:#666666; }
+.clustal .aaz { color:#666666; fill:#666666; }
+.clustal .aax { color:#666666; fill:#666666; }
+.clustal .aau { color:black; fill:black;   }
+
+
+
 
 /* charged - positive */
 .pc1 { background-color:red; }
