@@ -714,6 +714,32 @@ i,A_i,j,A_j,fn,cn,segment_i,segment_j,probability
 		    $('body').on('change','#colorScheme', function() {
 		    	document.getElementById("seqlogo").className = this.value;
 		    	document.getElementById("MSAseqs").className = 'ali ' + this.value;
+
+		    		//##ROC# > This code it is because for safari and Firefox the logo did not change colors uless the tab was manually changed
+		    		  	//btn2: '#MSAview',
+  						//btn3: '#STAview',
+				    var view = '#STAview'; // button id --> view id
+				    if ($(view).is(':visible')) {
+				      return;
+				    } // already active, do nothing
+				    $('[id$=view]')
+				      .not(view)
+				      .hide(); // select all views except current, hide
+				    $(view).show(); // show current
+
+				    var view = '#MSAview'; // button id --> view id
+				    if ($(view).is(':visible')) {
+				      return;
+				    } // already active, do nothing
+				    $('[id$=view]')
+				      .not(view)
+				      .hide(); // select all views except current, hide
+				    $(view).show(); // show current
+
+				    //console.log('done logo color');
+
+
+
 		    });
 		});  
 
